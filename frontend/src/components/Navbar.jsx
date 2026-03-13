@@ -43,12 +43,6 @@ export default function Navbar({ onBookNow }) {
               {l}
             </a>
           ))}
-          <a href="/admin" className="text-sm transition-colors"
-            style={{ color: "rgba(255,255,255,0.3)" }}
-            onMouseEnter={(e) => (e.target.style.color = "#c084fc")}
-            onMouseLeave={(e) => (e.target.style.color = "rgba(255,255,255,0.3)")}>
-            Admin
-          </a>
         </div>
 
         {/* Book Now */}

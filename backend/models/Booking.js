@@ -2,68 +2,42 @@ const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
-    clientName: {
+    clientName:      { type: String, required: true, trim: true },
+    clientPhone:     { type: String, required: true },
+    clientEmail:     { type: String, default: "" },
+    userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
+
+    hallId:          { type: mongoose.Schema.Types.ObjectId, ref: "Hall", required: true },
+    eventType:       { type: String, default: "Walima" },
+    eventDate:       { type: Date, required: true },
+
+    // NEW: which time slot is booked — morning / afternoon / evening
+    timeSlot: {
       type: String,
-      required: [true, "Client name is required"],
-      trim: true,
+      enum: ["morning", "afternoon", "evening"],
+      required: true,
     },
-    clientPhone: {
-      type: String,
-      required: [true, "Phone number is required"],
-      trim: true,
-    },
-    clientEmail: {
-      type: String,
-      trim: true,
-      lowercase: true,
-    },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    hallId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Hall",
-      required: [true, "Hall is required"],
-    },
-    eventType: {
-      type: String,
-      enum: ["Nikkah", "Walima", "Birthday", "Conference", "Anniversary", "Other"],
-      default: "Walima",
-    },
-    eventDate: {
-      type: Date,
-      required: [true, "Event date is required"],
-    },
-    guests: {
-      type: Number,
-      required: [true, "Number of guests is required"],
-      min: 1,
-    },
-    totalPrice: {
-      type: Number,
-      default: 0,
-    },
-    paymentMethod: {
-      type: String,
-      enum: ["JazzCash", "EasyPaisa", "Card", "Bank Transfer", "Cash", "Crypto"],
-      default: "Cash",
-    },
-    transactionId: {
-      type: String,
-      trim: true,
-    },
+
+    guests:          { type: Number, required: true, min: 1 },
+    totalPrice:      { type: Number, required: true },
+
+    paymentMethod:   { type: String, default: "" },
+    transactionId:   { type: String, default: "" },
+    specialRequests: { type: String, default: "" },
+
     status: {
       type: String,
-      enum: ["Pending", "Confirmed", "Cancelled", "Completed"],
+      enum: ["Pending", "Confirmed", "Cancelled"],
       default: "Pending",
-    },
-    specialRequests: {
-      type: String,
-      trim: true,
     },
   },
   { timestamps: true }
+);
+
+// Compound index — prevents duplicate hall+date+slot bookings at DB level
+bookingSchema.index(
+  { hallId: 1, eventDate: 1, timeSlot: 1 },
+  { unique: true, partialFilterExpression: { status: { $in: ["Pending", "Confirmed"] } } }
 );
 
 module.exports = mongoose.model("Booking", bookingSchema);
