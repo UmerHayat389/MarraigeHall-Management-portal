@@ -2,13 +2,11 @@ const mongoose = require("mongoose");
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      "mongodb+srv://yt-demo:KuUMLNlX8irVtLCU@cluster0.ixji0sy.mongodb.net/hotelmanagementportal"
-    );
-
-    console.log("MongoDB Connected");
+    const conn = await mongoose.connect(process.env.MONGO_URI);
+    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    console.log(`📦 Database: ${conn.connection.name}`);
   } catch (error) {
-    console.log(error);
+    console.error(`❌ MongoDB Connection Error: ${error.message}`);
     process.exit(1);
   }
 };
