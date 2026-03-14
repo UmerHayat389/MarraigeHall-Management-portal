@@ -189,7 +189,9 @@ exports.getAvailableSlots = async (req, res) => {
   try {
     const { hallId } = req.params;
     const { date }   = req.query;
+    const TOTAL_SLOTS = 3; // morning, afternoon, evening
 
+    // With ?date= -> return booked slots for that specific day
     if (date) {
       const startOfDay = new Date(date); startOfDay.setUTCHours(0, 0, 0, 0);
       const endOfDay   = new Date(date); endOfDay.setUTCHours(23, 59, 59, 999);
@@ -201,11 +203,26 @@ exports.getAvailableSlots = async (req, res) => {
       return res.json({ success: true, date, bookedSlots: bookings.map((b) => b.timeSlot).filter(Boolean) });
     }
 
-    const bookedDates = await Booking.find({
+    // Without ?date -> return only FULLY booked dates (all 3 slots taken)
+    const allBookings = await Booking.find({
       hallId,
       status: { $in: ["Pending", "Confirmed"] },
-    }).select("eventDate eventType clientName timeSlot");
-    res.json({ success: true, bookedDates });
+    }).select("eventDate timeSlot");
+
+    // Count distinct booked slots per date
+    const slotsByDate = {};
+    allBookings.forEach((b) => {
+      const dateKey = new Date(b.eventDate).toISOString().split("T")[0];
+      if (!slotsByDate[dateKey]) slotsByDate[dateKey] = new Set();
+      if (b.timeSlot) slotsByDate[dateKey].add(b.timeSlot);
+    });
+
+    // Only return dates where all 3 slots are booked
+    const fullyBookedDates = Object.keys(slotsByDate)
+      .filter((d) => slotsByDate[d].size >= TOTAL_SLOTS)
+      .map((d) => ({ eventDate: d }));
+
+    res.json({ success: true, bookedDates: fullyBookedDates });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

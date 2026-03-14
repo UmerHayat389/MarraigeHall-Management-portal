@@ -191,6 +191,12 @@ export default function BookingStatus() {
                     </div>
 
                     <div style={{ padding: "1.25rem 1.5rem" }}>
+                      {/* Guest name header */}
+                      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                        <p style={{ color: "rgba(192,132,252,0.5)", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.25rem" }}>Booking For</p>
+                        <p style={{ color: "white", fontWeight: 600, fontSize: "1.1rem", fontFamily: "'Playfair Display',serif" }}>{b.clientName || "—"}</p>
+                      </div>
+
                       {/* Reference row — user ref + internal ID */}
                       <div className="bs-ref-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.18)", borderRadius: "10px", padding: "0.75rem 1rem", marginBottom: "1rem" }}>
                         <div>
