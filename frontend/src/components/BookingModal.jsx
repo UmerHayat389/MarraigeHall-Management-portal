@@ -1,524 +1,1023 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
 
-const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap');`;
+const STEP_LABELS = ["Details", "Hall & Date", "Payment", "Confirmed"];
+const EVENT_TYPES = ["Nikkah", "Walima", "Barat", "Birthday", "Conference", "Anniversary", "Other"];
+const PAY_METHODS = ["JazzCash", "EasyPaisa", "Bank Transfer", "Cash"];
 
-const ADMIN_CSS = `
-  .admin-layout { display: flex; min-height: 100vh; }
+// Time slots definition — in a real app these would come from the backend
+// Format: { id, label, startTime, endTime }
+const ALL_TIME_SLOTS = [
+  { id: "afternoon", label: "Afternoon",  startTime: "12:00 PM", endTime: "4:00 PM"  },
+  { id: "evening",   label: "Evening",    startTime: "5:00 PM",  endTime: "9:00 PM"  },
+  { id: "latenight", label: "Late Night", startTime: "10:00 PM", endTime: "2:00 AM"  },
+];
 
-  /* Sidebar */
-  .admin-sidebar {
-    width: 220px;
-    flex-shrink: 0;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    background: rgba(255,255,255,0.015);
-    border-right: 1px solid rgba(167,139,250,0.1);
-    display: flex;
-    flex-direction: column;
-    padding: 1.5rem 1rem;
-    transition: transform 0.3s;
-    z-index: 100;
-  }
+const inputClass = (err) =>
+  `w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-all ${
+    err
+      ? "border border-red-500/60 bg-red-500/5"
+      : "border border-purple-500/20 bg-white/5 focus:border-purple-400"
+  }`;
 
-  /* Main content */
-  .admin-main { flex: 1; padding: 2rem; overflow-y: auto; min-width: 0; }
+function Field({ label, error, children }) {
+  return (
+    <div>
+      <label
+        className="block text-xs font-medium mb-1.5 tracking-wider uppercase"
+        style={{ color: "rgba(192,132,252,0.7)" }}
+      >
+        {label}
+      </label>
+      {children}
+      {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
+    </div>
+  );
+}
 
-  /* Mobile top bar */
-  .admin-topbar {
-    display: none;
-    position: sticky;
-    top: 0;
-    z-index: 200;
-    background: #07050f;
-    border-bottom: 1px solid rgba(167,139,250,0.1);
-    padding: 0.75rem 1rem;
-    align-items: center;
-    justify-content: space-between;
-  }
+/* ─── Custom Dropdown ────────────────────────────────────────────────────── */
+const EVENT_ICONS = { Nikkah: "☪️", Walima: "🌸", Barat: "💐", Birthday: "🎂", Conference: "🎤", Anniversary: "💍", Other: "✨" };
 
-  /* Mobile overlay */
-  .sidebar-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 99;
-    backdrop-filter: blur(4px);
-  }
+function CustomSelect({ value, onChange, options, placeholder = "Select...", error, icons = {} }) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
 
-  @media (max-width: 768px) {
-    .admin-layout { flex-direction: column; }
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
-    .admin-topbar { display: flex; }
+  const selected = options.find((o) => (o.value ?? o) === value);
+  const label = selected ? (selected.label ?? selected) : null;
+  const icon = icons[label] || icons[value] || null;
 
-    .admin-sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      transform: translateX(-100%);
-      z-index: 200;
-      background: #0d0920;
-      border-right: 1px solid rgba(167,139,250,0.2);
+  return (
+    <div ref={ref} style={{ position: "relative", userSelect: "none" }}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-all flex items-center justify-between"
+        style={{
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : open ? "rgba(167,139,250,0.5)" : "rgba(167,139,250,0.2)"}`,
+          background: error ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)",
+        }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "8px", color: label ? "white" : "rgba(255,255,255,0.3)" }}>
+          {icon && <span style={{ fontSize: "1rem" }}>{icon}</span>}
+          {label || placeholder}
+        </span>
+        <span style={{ color: "rgba(167,139,250,0.6)", fontSize: "0.7rem", transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 999,
+          background: "linear-gradient(145deg,#1e1240,#160e35)",
+          border: "1px solid rgba(167,139,250,0.25)", borderRadius: "12px",
+          overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+        }}>
+          {options.map((opt) => {
+            const val = opt.value ?? opt;
+            const lbl = opt.label ?? opt;
+            const ico = icons[lbl] || icons[val] || null;
+            const isActive = val === value;
+            return (
+              <button
+                key={val}
+                type="button"
+                onClick={() => { onChange(val); setOpen(false); }}
+                className="w-full px-3 py-2.5 text-sm text-left flex items-center gap-3 transition-all"
+                style={{
+                  background: isActive ? "rgba(124,58,237,0.3)" : "transparent",
+                  color: isActive ? "white" : "rgba(255,255,255,0.7)",
+                  borderLeft: isActive ? "2px solid #a855f7" : "2px solid transparent",
+                }}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(124,58,237,0.15)"; }}
+                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+              >
+                {ico && <span style={{ fontSize: "1rem", width: "20px", textAlign: "center" }}>{ico}</span>}
+                <span>{lbl}</span>
+                {isActive && <span style={{ marginLeft: "auto", color: "#a855f7", fontSize: "0.75rem" }}>✓</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
+function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) {
+  const [selected, setSelected] = useState(null);
+
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(7,5,15,0.75)", backdropFilter: "blur(8px)" }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl overflow-hidden"
+        style={{
+          background: "linear-gradient(145deg,#1a1035,#120d2a)",
+          border: "1px solid rgba(167,139,250,0.22)",
+        }}
+      >
+        {/* Header */}
+        <div className="p-5 pb-3">
+          <div className="flex justify-between items-start mb-1">
+            <div>
+              <h3
+                className="text-lg font-semibold text-white"
+                style={{ fontFamily: "'Playfair Display',serif" }}
+              >
+                Available Time Slots
+              </h3>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(192,132,252,0.6)" }}>
+                {hallName} · {date}
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-lg leading-none transition-colors"
+              style={{ color: "rgba(167,139,250,0.45)" }}
+              onMouseEnter={(e) => (e.target.style.color = "white")}
+              onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.45)")}
+            >
+              ✕
+            </button>
+          </div>
+          <div
+            className="h-px mt-3"
+            style={{ background: "rgba(167,139,250,0.12)" }}
+          />
+        </div>
+
+        {/* Slots */}
+        <div className="px-5 pb-2 space-y-2.5">
+          {ALL_TIME_SLOTS.map((slot) => {
+            const booked = bookedSlots.includes(slot.id);
+            const active = selected === slot.id;
+            return (
+              <button
+                key={slot.id}
+                type="button"
+                disabled={booked}
+                onClick={() => !booked && setSelected(slot.id)}
+                className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition-all"
+                style={{
+                  border: `1px solid ${
+                    booked
+                      ? "rgba(239,68,68,0.2)"
+                      : active
+                      ? "rgba(167,139,250,0.55)"
+                      : "rgba(167,139,250,0.15)"
+                  }`,
+                  background: booked
+                    ? "rgba(239,68,68,0.05)"
+                    : active
+                    ? "rgba(124,58,237,0.28)"
+                    : "rgba(255,255,255,0.02)",
+                  cursor: booked ? "not-allowed" : "pointer",
+                  opacity: booked ? 0.6 : 1,
+                }}
+                onMouseEnter={(e) => {
+                  if (!booked && !active)
+                    e.currentTarget.style.background = "rgba(124,58,237,0.12)";
+                }}
+                onMouseLeave={(e) => {
+                  if (!booked && !active)
+                    e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  {/* Dot indicator */}
+                  <div
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "50%",
+                      background: booked ? "#ef4444" : active ? "#a855f7" : "#22c55e",
+                      flexShrink: 0,
+                    }}
+                  />
+                  <div className="text-left">
+                    <p
+                      className="text-sm font-medium"
+                      style={{ color: booked ? "rgba(255,255,255,0.35)" : "white" }}
+                    >
+                      {slot.label}
+                    </p>
+                    <p
+                      className="text-xs"
+                      style={{ color: "rgba(255,255,255,0.35)", marginTop: "1px" }}
+                    >
+                      {slot.startTime} – {slot.endTime}
+                    </p>
+                  </div>
+                </div>
+                <span
+                  className="text-xs px-2.5 py-1 rounded-full"
+                  style={{
+                    background: booked
+                      ? "rgba(239,68,68,0.15)"
+                      : active
+                      ? "rgba(124,58,237,0.4)"
+                      : "rgba(34,197,94,0.12)",
+                    color: booked ? "#f87171" : active ? "#e9d5ff" : "#4ade80",
+                    border: `1px solid ${
+                      booked
+                        ? "rgba(239,68,68,0.25)"
+                        : active
+                        ? "rgba(167,139,250,0.4)"
+                        : "rgba(34,197,94,0.25)"
+                    }`,
+                  }}
+                >
+                  {booked ? "Booked" : active ? "Selected" : "Available"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Footer */}
+        <div className="p-5 pt-4 flex gap-3 justify-end">
+          <button
+            onClick={onClose}
+            className="px-4 py-2.5 rounded-xl text-sm transition-all"
+            style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => selected && onSelect(selected)}
+            disabled={!selected}
+            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
+            style={{
+              background: "linear-gradient(135deg,#7c3aed,#a855f7)",
+              opacity: selected ? 1 : 0.4,
+              cursor: selected ? "pointer" : "not-allowed",
+            }}
+          >
+            Confirm Slot →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main BookingModal ──────────────────────────────────────────────────── */
+export default function BookingModal({ hall: preselectedHall, onClose }) {
+  const [step, setStep]               = useState(1);
+  const [halls, setHalls]             = useState([{ _id: "demo_1", name: "Royal Banquet Hall", location: "Karachi", totalSeats: 800, pricePerHead: 1500 }, { _id: "demo_2", name: "Garden Pavilion", location: "Karachi", totalSeats: 300, pricePerHead: 1200 }, { _id: "demo_3", name: "Grand Ballroom", location: "Karachi", totalSeats: 1200, pricePerHead: 1800 }, { _id: "demo_4", name: "Crystal Suite", location: "Karachi", totalSeats: 150, pricePerHead: 2000 }]);
+  const [bookedDates, setBookedDates] = useState([]);
+  const [bookedSlots, setBookedSlots] = useState([]); // slots booked on selected date
+  const [selectedHall, setSelectedHall] = useState(preselectedHall || null);
+  const [showTimeSlots, setShowTimeSlots] = useState(false);
+  const [loading, setLoading]         = useState(false);
+  const [bookingRef, setBookingRef]   = useState("");
+  const [bookingId, setBookingId]     = useState(null);
+  const [confirmedStatus, setConfirmedStatus] = useState("Pending"); // tracks polled status
+  const [errors, setErrors]           = useState({});
+
+  const [form, setForm] = useState({
+    clientName: "", clientPhone: "", clientEmail: "",
+    hallId:       preselectedHall?._id || "",
+    eventType:    "Walima",
+    eventDate:    "",
+    timeSlot:     "",        // NEW — selected time slot id
+    timeSlotLabel: "",       // human-readable label
+    guests:       2,
+    paymentMethod: "", transactionId: "",
+    specialRequests: "",
+  });
+
+  const today = new Date().toISOString().split("T")[0];
+
+
+  /* Fetch all halls */
+  useEffect(() => {
+    api.get("/halls")
+      .then((res) => {
+        const list = res.data.halls || res.data;
+        if (Array.isArray(list) && list.length > 0) setHalls(list);
+      })
+      .catch(() => {});
+  }, []);
+
+  /* Poll booking status every 12s once on step 4 */
+  useEffect(() => {
+    if (step !== 4 || !bookingId || confirmedStatus === "Confirmed" || confirmedStatus === "Cancelled") return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get(`/bookings/${bookingId}/status`);
+        if (res.data.success) setConfirmedStatus(res.data.status);
+      } catch {}
+    }, 12000);
+    return () => clearInterval(interval);
+  }, [step, bookingId, confirmedStatus]);
+
+  /* Fetch booked dates when hall changes */
+  useEffect(() => {
+    if (!form.hallId) return;
+    api.get(`/bookings/slots/${form.hallId}`)
+      .then((res) => {
+        const data = res.data.bookedDates || [];
+        const todayStr = new Date().toISOString().split("T")[0];
+        const TOTAL_SLOTS = 3; // afternoon, evening, latenight
+
+        // Count how many slots are booked per date
+        const slotCount = {};
+        data.forEach((b) => {
+          const d = b.eventDate?.split("T")[0];
+          if (!d || d.length !== 10) return;
+          const year = parseInt(d.split("-")[0]);
+          if (year < 2024 || year > 2100) return;
+          if (d < todayStr) return;
+          slotCount[d] = (slotCount[d] || 0) + 1;
+        });
+
+        // Only mark date as fully booked when ALL 3 slots are taken
+        const fullyBooked = Object.keys(slotCount).filter(
+          (d) => slotCount[d] >= TOTAL_SLOTS
+        );
+        setBookedDates(fullyBooked);
+      })
+      .catch(() => {});
+    const found = halls.find((h) => h._id === form.hallId);
+    if (found) setSelectedHall(found);
+  }, [form.hallId, halls]);
+
+  /* When date is picked, fetch booked time slots for that date & open time-slot modal */
+  const maxDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split("T")[0];
+  })();
+
+  const handleDateChange = (dateVal) => {
+    set("eventDate", dateVal);
+    set("timeSlot", "");
+    set("timeSlotLabel", "");
+    setErrors((e) => ({ ...e, eventDate: "" }));
+
+    // Only proceed if date is fully entered (yyyy-mm-dd = 10 chars)
+    if (!dateVal || dateVal.length < 10) return;
+
+    const chosen = new Date(dateVal);
+    const todayDate = new Date(today);
+    todayDate.setHours(0, 0, 0, 0);
+    chosen.setHours(0, 0, 0, 0);
+
+    // Past date
+    if (chosen < todayDate) {
+      setErrors((e) => ({ ...e, eventDate: "Date cannot be in the past" }));
+      return;
     }
-    .admin-sidebar.open { transform: translateX(0); }
 
-    .sidebar-overlay.open { display: block; }
-
-    .admin-main { padding: 1.25rem 1rem; }
-
-    .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
-  }
-
-  @media (max-width: 480px) {
-    .stats-grid { grid-template-columns: 1fr !important; }
-    .bookings-header { flex-direction: column; align-items: flex-start !important; }
-    .booking-row { flex-direction: column !important; }
-    .booking-actions { justify-content: flex-start !important; }
-    .filter-btns { flex-wrap: wrap; }
-  }
-`;
-
-const inputStyle = (err) => ({
-  width: "100%", padding: "0.6rem 0.875rem", borderRadius: "10px",
-  background: "rgba(255,255,255,0.05)", color: "white", fontSize: "0.85rem",
-  outline: "none", border: `1px solid ${err ? "rgba(239,68,68,0.5)" : "rgba(167,139,250,0.2)"}`,
-  fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box",
-});
-const labelStyle = { display: "block", fontSize: "0.68rem", fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase", color: "rgba(192,132,252,0.7)", marginBottom: "0.35rem" };
-const cardStyle = { background: "rgba(255,255,255,0.02)", border: "1px solid rgba(167,139,250,0.12)", borderRadius: "16px", padding: "1.5rem" };
-const btnPrimary = { padding: "0.6rem 1.4rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "white", fontWeight: 600, fontSize: "0.85rem", cursor: "pointer" };
-const btnDanger = { padding: "0.45rem 0.9rem", borderRadius: "8px", background: "rgba(239,68,68,0.15)", color: "#f87171", fontSize: "0.78rem", cursor: "pointer", border: "1px solid rgba(239,68,68,0.25)" };
-const btnGhost = { padding: "0.45rem 0.9rem", borderRadius: "8px", background: "transparent", color: "#c084fc", fontSize: "0.78rem", cursor: "pointer", border: "1px solid rgba(167,139,250,0.25)" };
-
-/* ── Login Page — supports Admin and Employee login ── */
-function LoginPage({ onLogin }) {
-  const [loginType, setLoginType] = useState("admin"); // "admin" | "employee"
-  const [email, setEmail]     = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError]     = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const submit = async () => {
-    if (!email || !password) { setError("Please enter email and password"); return; }
-    setLoading(true); setError("");
-    try {
-      if (loginType === "admin") {
-        const res = await api.post("/auth/login", { email, password });
-        const { user, token } = res.data;
-        if (user.role !== "admin") { setError("Access denied. Admin only."); setLoading(false); return; }
-        localStorage.setItem("adminToken", token);
-        localStorage.setItem("adminUser", JSON.stringify(user));
-        onLogin({ ...user, loginType: "admin" });
-      } else {
-        const res = await api.post("/employees/login", { email, password });
-        const { employee, token } = res.data;
-        if (!["manager"].includes(employee.role)) {
-          setError("Access denied. Manager role required."); setLoading(false); return;
-        }
-        localStorage.setItem("adminToken", token);
-        localStorage.setItem("adminUser", JSON.stringify({ ...employee, loginType: "employee" }));
-        onLogin({ ...employee, loginType: "employee" });
-      }
-    } catch (e) {
-      setError(e.response?.data?.message || "Invalid email or password");
+    // Beyond 30 days
+    const maxAllowed = new Date(todayDate);
+    maxAllowed.setDate(maxAllowed.getDate() + 30);
+    if (chosen > maxAllowed) {
+      setErrors((e) => ({ ...e, eventDate: "Bookings only accepted within the next 30 days" }));
+      return;
     }
-    setLoading(false);
+
+    // Valid date — fetch slots and open picker
+    if (form.hallId) {
+      api.get(`/bookings/slots/${form.hallId}?date=${dateVal}`)
+        .then((res) => setBookedSlots(res.data.bookedSlots || []))
+        .catch(() => setBookedSlots([]));
+    } else {
+      setBookedSlots([]);
+    }
+    setShowTimeSlots(true);
   };
 
-  return (
-    <div style={{ background: "#07050f", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif", padding: "1rem" }}>
-      <style>{FONTS}</style>
-      <div style={{ width: "100%", maxWidth: 440, background: "linear-gradient(145deg,#1a1035,#120d2a)", border: "1px solid rgba(167,139,250,0.2)", borderRadius: "24px", padding: "2.5rem" }}>
-        <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-          <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.8rem" }}>
-            <span style={{ color: "#a855f7" }}>Noor</span><span style={{ color: "white" }}> Mahal</span>
-          </p>
-          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.72rem", letterSpacing: "0.2em", textTransform: "uppercase", marginTop: 4 }}>Management Portal</p>
-        </div>
+  const handleSlotSelected = (slotId) => {
+    const slot = ALL_TIME_SLOTS.find((s) => s.id === slotId);
+    set("timeSlot", slotId);
+    set("timeSlotLabel", `${slot.label} (${slot.startTime} – ${slot.endTime})`);
+    setShowTimeSlots(false);
+  };
 
-        {/* Admin login only */}
-        <div style={{ display: "flex", background: "rgba(255,255,255,0.04)", borderRadius: "12px", padding: "4px", marginBottom: "1.75rem", border: "1px solid rgba(167,139,250,0.12)" }}>
-          {[["admin","Admin"]].map(([val, lbl]) => (
-            <button key={val} onClick={() => { setLoginType(val); setError(""); }}
-              style={{ flex: 1, padding: "0.55rem", borderRadius: "9px", border: "none", cursor: "pointer", fontSize: "0.82rem", fontWeight: 600, fontFamily: "'DM Sans',sans-serif", transition: "all 0.2s",
-                background: loginType === val ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "transparent",
-                color: loginType === val ? "white" : "rgba(255,255,255,0.35)",
-              }}>
-              "🛡 Admin"
-            </button>
-          ))}
-        </div>
+  const set = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((e) => ({ ...e, [k]: "" }));
+  };
 
-        <h2 style={{ color: "white", fontFamily: "'Playfair Display',serif", fontWeight: 400, fontSize: "1.3rem", marginBottom: "0.3rem" }}>Welcome back</h2>
-        <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.82rem", marginBottom: "1.5rem" }}>
-          "Sign in to manage halls and bookings"
-        </p>
+  const totalPrice = selectedHall ? selectedHall.pricePerHead * form.guests : 0;
+  const tax        = Math.round(totalPrice * 0.16);
+  const grandTotal = totalPrice + tax;
 
-        <div style={{ marginBottom: "1rem" }}>
-          <label style={labelStyle}>Email Address</label>
-          <input style={inputStyle()} value={email} onChange={e => setEmail(e.target.value)} type="email" placeholder="Enter your email" />
-        </div>
-        <div style={{ marginBottom: "1.25rem" }}>
-          <label style={labelStyle}>Password</label>
-          <input style={inputStyle()} value={password} onChange={e => setPassword(e.target.value)} type="password" placeholder="••••••••" onKeyDown={e => e.key === "Enter" && submit()} />
-        </div>
-
-        {error && (
-          <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: "10px", padding: "0.75rem 1rem", marginBottom: "1rem", color: "#f87171", fontSize: "0.83rem" }}>
-            ✕ {error}
-          </div>
-        )}
-
-        <button onClick={submit} disabled={loading} style={{ ...btnPrimary, width: "100%", padding: "0.85rem", fontSize: "0.95rem", opacity: loading ? 0.6 : 1 }}>
-          {loading ? "Signing in..." : "Sign In →"}
-        </button>
-
-        <div style={{ textAlign: "center", marginTop: "1.5rem" }}>
-          <a href="/" style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.8rem", textDecoration: "none" }}>← Back to site</a>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
-/* ── Toast ── */
-function Toast({ msg, type, onDone }) {
-  useEffect(() => { const t = setTimeout(onDone, 3000); return () => clearTimeout(t); }, []);
-  return (
-    <div style={{ position: "fixed", bottom: "1.5rem", right: "1.5rem", zIndex: 9999, padding: "0.75rem 1.25rem", borderRadius: "12px", fontSize: "0.85rem", background: type === "success" ? "rgba(34,197,94,0.15)" : "rgba(239,68,68,0.15)", border: `1px solid ${type === "success" ? "rgba(34,197,94,0.4)" : "rgba(239,68,68,0.4)"}`, color: type === "success" ? "#4ade80" : "#f87171", backdropFilter: "blur(12px)" }}>
-      {type === "success" ? "✓ " : "✕ "}{msg}
-    </div>
-  );
-}
-
-/* ── Stat Card ── */
-function StatCard({ label, value, icon, color }) {
-  return (
-    <div style={{ ...cardStyle, display: "flex", alignItems: "center", gap: "1rem" }}>
-      <div style={{ width: 48, height: 48, borderRadius: "12px", flexShrink: 0, background: `${color}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.3rem", border: `1px solid ${color}33` }}>{icon}</div>
-      <div>
-        <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>{label}</p>
-        <p style={{ color: "white", fontSize: "1.5rem", fontWeight: 700, fontFamily: "'Playfair Display',serif", marginTop: 2 }}>{value}</p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Hall Modal ── */
-function HallModal({ hall, onClose, onSave }) {
-  const [form, setForm] = useState(hall || { name: "", location: "Karachi", pricePerHead: "", totalSeats: "", description: "", image: "" });
-  const [err, setErr] = useState({});
-  const [loading, setLoading] = useState(false);
-  const set = (k, v) => { setForm(f => ({ ...f, [k]: v })); setErr(e => ({ ...e, [k]: "" })); };
-  const submit = async () => {
+  const validate = (s) => {
     const e = {};
-    if (!form.name.trim()) e.name = "Required";
-    if (!form.pricePerHead) e.pricePerHead = "Required";
-    if (!form.totalSeats) e.totalSeats = "Required";
-    if (Object.keys(e).length) { setErr(e); return; }
+    if (s === 1) {
+      if (!form.clientName.trim())                 e.clientName  = "Name is required";
+      else if (form.clientName.trim().length > 15) e.clientName  = "Name cannot exceed 15 characters";
+      if (!form.clientPhone.trim())                e.clientPhone = "Phone is required";
+      else if (!/^[0-9+\-\s]+$/.test(form.clientPhone)) e.clientPhone = "Phone must contain numbers only";
+      else if (form.clientPhone.replace(/\s/g,"").length > 14) e.clientPhone = "Phone cannot exceed 14 digits";
+      if (form.clientEmail && form.clientEmail.length > 30)
+        e.clientEmail = "Email cannot exceed 30 characters";
+      else if (form.clientEmail && !/\S+@\S+\.\S+/.test(form.clientEmail))
+        e.clientEmail = "Invalid email format";
+    }
+    if (s === 2) {
+      if (!form.hallId)    e.hallId    = "Please select a hall";
+      if (!form.eventDate) e.eventDate = "Please select a date";
+      if (form.eventDate) {
+        const chosen = new Date(form.eventDate);
+        const todayD = new Date(today);
+        todayD.setHours(0,0,0,0); chosen.setHours(0,0,0,0);
+        if (chosen < todayD) e.eventDate = "Date cannot be in the past";
+        else {
+          const max = new Date(todayD); max.setDate(max.getDate() + 30);
+          if (chosen > max) e.eventDate = "Bookings only accepted within the next 30 days";
+          else if (bookedDates.includes(form.eventDate)) e.eventDate = "This date is fully booked";
+        }
+      }
+      if (!form.timeSlot)  e.timeSlot  = "Please select a time slot";
+    }
+    if (s === 3) {
+      if (form.hallId?.startsWith("demo_")) { e.submit = "⚠️ Demo halls cannot be booked. Please add real halls via the Admin panel or fix your MongoDB connection first."; }
+      if (!form.paymentMethod) e.paymentMethod = "Select a payment method";
+      if (form.paymentMethod && form.paymentMethod !== "Cash" && !form.transactionId.trim())
+        e.transactionId = "Transaction ID is required";
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async () => {
     setLoading(true);
     try {
-      const res = hall?._id ? await api.put(`/halls/${hall._id}`, form) : await api.post("/halls", form);
-      onSave(res.data.hall, !hall?._id);
-    } catch (ex) { setErr({ submit: ex.response?.data?.message || "Error saving hall" }); }
+      const res = await api.post("/bookings", { ...form, totalPrice: grandTotal });
+      if (res.data.success) {
+        // Use ref from backend (name-based) or fallback
+        const ref = res.data.booking?.bookingRef ||
+          "NM-" + (form.clientName || "GUE").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4) +
+          "-" + String(Math.floor(10 + Math.random() * 90));
+        setBookingRef(ref);
+        setBookingId(res.data.booking?._id || null);
+        setStep(4);
+      } else {
+        setErrors({ submit: res.data.message });
+      }
+    } catch (err) {
+      setErrors({ submit: err.response?.data?.message || "Server error. Try again." });
+    }
     setLoading(false);
   };
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(7,5,15,0.85)", backdropFilter: "blur(10px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem" }} onClick={e => e.target === e.currentTarget && onClose()}>
-      <div style={{ width: "100%", maxWidth: 480, borderRadius: "20px", background: "linear-gradient(145deg,#1a1035,#120d2a)", border: "1px solid rgba(167,139,250,0.22)", padding: "1.75rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <h3 style={{ fontFamily: "'Playfair Display',serif", color: "white", fontSize: "1.2rem" }}>{hall?._id ? "Edit Hall" : "Add New Hall"}</h3>
-          <button onClick={onClose} style={{ background: "none", border: "none", color: "rgba(167,139,250,0.5)", fontSize: "1.2rem", cursor: "pointer" }}>✕</button>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem", marginBottom: "1rem" }}>
-          <div style={{ gridColumn: "1/-1" }}>
-            <label style={labelStyle}>Hall Name *</label>
-            <input style={inputStyle(err.name)} value={form.name} onChange={e => set("name", e.target.value)} placeholder="Royal Banquet Hall" />
-            {err.name && <p style={{ color: "#f87171", fontSize: "0.72rem", marginTop: 3 }}>{err.name}</p>}
-          </div>
-          <div>
-            <label style={labelStyle}>Price Per Head (PKR) *</label>
-            <input style={inputStyle(err.pricePerHead)} type="number" value={form.pricePerHead} onChange={e => set("pricePerHead", e.target.value)} placeholder="1500" />
-            {err.pricePerHead && <p style={{ color: "#f87171", fontSize: "0.72rem", marginTop: 3 }}>{err.pricePerHead}</p>}
-          </div>
-          <div>
-            <label style={labelStyle}>Total Seats *</label>
-            <input style={inputStyle(err.totalSeats)} type="number" value={form.totalSeats} onChange={e => set("totalSeats", e.target.value)} placeholder="500" />
-            {err.totalSeats && <p style={{ color: "#f87171", fontSize: "0.72rem", marginTop: 3 }}>{err.totalSeats}</p>}
-          </div>
-          <div style={{ gridColumn: "1/-1" }}>
-            <label style={labelStyle}>Location</label>
-            <input style={inputStyle()} value={form.location} onChange={e => set("location", e.target.value)} placeholder="Clifton, Karachi" />
-          </div>
-          <div style={{ gridColumn: "1/-1" }}>
-            <label style={labelStyle}>Image URL</label>
-            <input style={inputStyle()} value={form.image} onChange={e => set("image", e.target.value)} placeholder="https://images.unsplash.com/..." />
-          </div>
-          <div style={{ gridColumn: "1/-1" }}>
-            <label style={labelStyle}>Description</label>
-            <textarea style={{ ...inputStyle(), resize: "vertical", minHeight: 70 }} value={form.description} onChange={e => set("description", e.target.value)} placeholder="Hall description..." />
-          </div>
-        </div>
-        {err.submit && <p style={{ color: "#f87171", fontSize: "0.8rem", marginBottom: "0.75rem", textAlign: "center" }}>{err.submit}</p>}
-        <div style={{ display: "flex", gap: "0.75rem", justifyContent: "flex-end" }}>
-          <button style={btnGhost} onClick={onClose}>Cancel</button>
-          <button style={{ ...btnPrimary, opacity: loading ? 0.6 : 1 }} onClick={submit} disabled={loading}>{loading ? "Saving..." : hall?._id ? "Save Changes" : "Add Hall"}</button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-/* ── Halls Tab ── */
-function HallsTab({ toast }) {
-  const [halls, setHalls] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [modal, setModal] = useState(null);
-  useEffect(() => {
-    api.get("/halls").then(res => setHalls(res.data.halls || res.data || [])).catch(() => setHalls([])).finally(() => setLoading(false));
-  }, []);
-  const handleSave = (hall, isNew) => {
-    if (isNew) setHalls(h => [hall, ...h]); else setHalls(h => h.map(x => x._id === hall._id ? hall : x));
-    setModal(null); toast(isNew ? "Hall added successfully" : "Hall updated", "success");
+  const next = () => {
+    if (step < 3 && validate(step)) setStep((s) => s + 1);
+    else if (step === 3 && validate(3)) handleSubmit();
   };
-  const deleteHall = async (id) => {
-    if (!window.confirm("Delete this hall?")) return;
-    try { await api.delete(`/halls/${id}`); setHalls(h => h.filter(x => x._id !== id)); toast("Hall deleted", "success"); }
-    catch { toast("Failed to delete", "error"); }
-  };
+
   return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", color: "white", fontSize: "1.4rem", fontWeight: 400 }}>Manage <em style={{ color: "#a855f7" }}>Halls</em></h2>
-        <button style={btnPrimary} onClick={() => setModal("new")}>+ Add Hall</button>
-      </div>
-      {loading ? <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", padding: "3rem" }}>Loading halls...</p>
-        : halls.length === 0 ? (
-          <div style={{ ...cardStyle, textAlign: "center", padding: "3rem" }}>
-            <p style={{ fontSize: "2.5rem", marginBottom: "0.75rem" }}>🏛️</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", marginBottom: "1rem" }}>No halls yet. Add your first hall.</p>
-            <button style={btnPrimary} onClick={() => setModal("new")}>+ Add First Hall</button>
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: "1rem" }}>
-            {halls.map(h => (
-              <div key={h._id} style={cardStyle}>
-                {h.image && <img src={h.image} alt={h.name} style={{ width: "100%", height: 140, objectFit: "cover", borderRadius: 10, marginBottom: "1rem" }} />}
-                <h3 style={{ fontFamily: "'Playfair Display',serif", color: "white", fontSize: "1.05rem", marginBottom: "0.5rem" }}>{h.name}</h3>
-                <p style={{ color: "#c084fc", fontSize: "0.82rem", marginBottom: "0.4rem" }}>PKR {h.pricePerHead?.toLocaleString()}/head · {h.totalSeats?.toLocaleString()} seats</p>
-                <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "0.78rem", marginBottom: "1rem" }}>{h.location}</p>
-                <div style={{ display: "flex", gap: "0.5rem" }}>
-                  <button style={btnGhost} onClick={() => setModal(h)}>✏ Edit</button>
-                  <button style={btnDanger} onClick={() => deleteHall(h._id)}>🗑 Delete</button>
-                </div>
+    <>
+      <style>{`
+        .bm-modal-scroll { overflow-y: auto; }
+        .bm-modal-scroll::-webkit-scrollbar { width: 3px; }
+        .bm-modal-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.25); border-radius: 2px; }
+
+        /* Step bar — compress on tiny screens */
+        @media (max-width: 400px) {
+          .bm-step-label { display: none; }
+          .bm-step-circle { width: 24px !important; height: 24px !important; font-size: 10px !important; }
+        }
+
+        /* Name/Phone row → stack on mobile */
+        @media (max-width: 480px) {
+          .bm-two-col { grid-template-columns: 1fr !important; }
+        }
+
+        /* Payment grid → 2 cols on mobile instead of 3 */
+        @media (max-width: 400px) {
+          .bm-pay-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        /* Header padding tighter on small screens */
+        @media (max-width: 400px) {
+          .bm-header { padding: 1rem 1rem 0 !important; }
+          .bm-body   { padding: 0 1rem 0.5rem !important; }
+          .bm-footer { padding: 1rem !important; }
+        }
+
+        /* Confirm/summary row wrap */
+        @media (max-width: 380px) {
+          .bm-summary-row { flex-direction: column; align-items: flex-start !important; gap: 2px; }
+          .bm-summary-val { text-align: left !important; }
+        }
+      `}</style>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-3"
+        style={{ background: "rgba(7,5,15,0.72)", backdropFilter: "blur(4px)" }}
+      >
+        <div
+          className="relative w-full max-w-lg rounded-2xl overflow-hidden bm-modal-scroll"
+          style={{
+            background: "linear-gradient(145deg,#1a1035,#120d2a)",
+            border: "1px solid rgba(167,139,250,0.2)",
+            maxHeight: "92vh",
+            overflowY: "auto",
+            width: "100%",
+          }}
+        >
+          {/* Header */}
+          <div className="p-6 pb-0 bm-header">
+            <div className="flex justify-between items-start mb-5">
+              <div>
+                <h2
+                  className="text-xl font-semibold text-white"
+                  style={{ fontFamily: "'Playfair Display',serif" }}
+                >
+                  {step === 4 ? "Booking Confirmed!" : "Reserve Your Event"}
+                </h2>
+                <p className="text-xs mt-1 tracking-widest uppercase" style={{ color: "#a855f7" }}>
+                  {step < 4 ? `Step ${step} of 3` : "We look forward to serving you"}
+                </p>
               </div>
-            ))}
-          </div>
-        )}
-      {(modal === "new" || (modal && modal._id)) && <HallModal hall={modal === "new" ? null : modal} onClose={() => setModal(null)} onSave={handleSave} />}
-    </div>
-  );
-}
-
-/* ── Bookings Tab ── */
-function BookingsTab({ toast }) {
-  const [bookings, setBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState("All");
-  useEffect(() => {
-    api.get("/bookings").then(res => setBookings(res.data.bookings || [])).catch(() => setBookings([])).finally(() => setLoading(false));
-  }, []);
-  const updateStatus = async (id, status) => {
-    try { await api.put(`/bookings/${id}`, { status }); setBookings(b => b.map(x => x._id === id ? { ...x, status } : x)); toast(`Booking ${status}`, "success"); }
-    catch { toast("Update failed", "error"); }
-  };
-  const deleteBooking = async (id) => {
-    if (!window.confirm("Delete this booking?")) return;
-    try { await api.delete(`/bookings/${id}`); setBookings(b => b.filter(x => x._id !== id)); toast("Booking deleted", "success"); }
-    catch { toast("Failed to delete", "error"); }
-  };
-  const filtered = filter === "All" ? bookings : bookings.filter(b => b.status === filter);
-  const statusColor = { Pending: "#f59e0b", Confirmed: "#22c55e", Cancelled: "#ef4444" };
-  return (
-    <div>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "0.75rem" }}>
-        <h2 style={{ fontFamily: "'Playfair Display',serif", color: "white", fontSize: "1.4rem", fontWeight: 400 }}>All <em style={{ color: "#a855f7" }}>Bookings</em></h2>
-        <div style={{ display: "flex", gap: "0.5rem" }}>
-          {["All", "Pending", "Confirmed", "Cancelled"].map(s => (
-            <button key={s} onClick={() => setFilter(s)} style={{ padding: "0.35rem 0.9rem", borderRadius: "999px", fontSize: "0.75rem", border: `1px solid ${filter === s ? "rgba(167,139,250,0.5)" : "rgba(167,139,250,0.15)"}`, background: filter === s ? "rgba(124,58,237,0.3)" : "transparent", color: filter === s ? "white" : "rgba(192,132,252,0.6)", cursor: "pointer" }}>{s}</button>
-          ))}
-        </div>
-      </div>
-      {loading ? <p style={{ color: "rgba(255,255,255,0.3)", textAlign: "center", padding: "3rem" }}>Loading bookings...</p>
-        : filtered.length === 0 ? <div style={{ ...cardStyle, textAlign: "center", padding: "3rem" }}><p style={{ color: "rgba(255,255,255,0.3)" }}>No bookings found.</p></div>
-        : (
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-            {filtered.map(b => (
-              <div key={b._id} style={{ ...cardStyle, padding: "1.25rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.4rem", flexWrap: "wrap" }}>
-                      <p style={{ color: "white", fontWeight: 600 }}>{b.clientName}</p>
-                      <span style={{ fontSize: "0.65rem", padding: "2px 8px", borderRadius: "999px", background: `${statusColor[b.status]}20`, color: statusColor[b.status], border: `1px solid ${statusColor[b.status]}44` }}>{b.status}</span>
-                      {b.bookingRef && (
-                        <span style={{ fontSize: "0.62rem", padding: "2px 8px", borderRadius: "999px", background: "rgba(167,139,250,0.1)", color: "rgba(192,132,252,0.8)", border: "1px solid rgba(167,139,250,0.2)", letterSpacing: "0.05em" }}>
-                          {b.bookingRef}
-                        </span>
-                      )}
-                    </div>
-                    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.78rem" }}>
-                      📞 {b.clientPhone} · 🏛️ {b.hallId?.name || "—"} · 📅 {b.eventDate ? new Date(b.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) : "—"} · 🕐 {b.timeSlot || "—"} · 🎉 {b.eventType} · 👥 {b.guests} guests
-                    </p>
-                    {b.paymentMethod && (
-                      <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.72rem", marginTop: "0.2rem" }}>
-                        💳 {b.paymentMethod}{b.transactionId ? ` · Ref: ${b.transactionId}` : ""}
-                      </p>
-                    )}
-                  </div>
-                  <div style={{ textAlign: "right" }}>
-                    <p style={{ color: "#c084fc", fontWeight: 700, marginBottom: "0.5rem" }}>PKR {b.totalPrice?.toLocaleString()}</p>
-                    <div style={{ display: "flex", gap: "0.4rem", justifyContent: "flex-end", flexWrap: "wrap" }}>
-                      {b.status === "Pending" && (
-                        <button
-                          style={{ ...btnGhost, fontSize: "0.72rem", padding: "0.3rem 0.7rem", color: "#4ade80", borderColor: "rgba(34,197,94,0.3)" }}
-                          onClick={() => updateStatus(b._id, "Confirmed")}
-                          title="Confirm booking — SMS will be sent to client"
-                        >
-                          ✓ Confirm & SMS
-                        </button>
-                      )}
-                      {b.status !== "Cancelled" && (
-                        <button style={{ ...btnDanger, fontSize: "0.72rem", padding: "0.3rem 0.7rem" }} onClick={() => updateStatus(b._id, "Cancelled")}>
-                          ✕ Cancel
-                        </button>
-                      )}
-                      <button style={{ ...btnDanger, fontSize: "0.72rem", padding: "0.3rem 0.7rem" }} onClick={() => deleteBooking(b._id)}>🗑</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-    </div>
-  );
-}
-
-/* ── Main ── */
-export default function AdminPanel() {
-  const [user, setUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("adminUser") || "null"); } catch { return null; }
-  });
-  const [stats, setStats] = useState({ halls: 0, bookings: 0, pending: 0, revenue: 0 });
-  const [toast, setToastMsg] = useState(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // Derive active tab from URL: /admin → dashboard, /admin/halls → halls, /admin/bookings → bookings
-  const pathTab = location.pathname.replace(/^\/admin\/?/, "") || "dashboard";
-  const activeTab = ["dashboard","halls","bookings"].includes(pathTab) ? pathTab : "dashboard";
-
-  const showToast = (msg, type = "success") => setToastMsg({ msg, type });
-  const logout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
-    setUser(null);
-    navigate("/admin");
-  };
-
-  useEffect(() => {
-    if (!user) return;
-    Promise.all([api.get("/halls").catch(() => ({ data: {} })), api.get("/bookings").catch(() => ({ data: {} }))]).then(([hr, br]) => {
-      const halls = hr.data.halls || hr.data || [];
-      const bookings = br.data.bookings || br.data || [];
-      const pending = bookings.filter(b => b.status === "Pending").length;
-      const revenue = bookings.filter(b => b.status === "Confirmed").reduce((s, b) => s + (b.totalPrice || 0), 0);
-      setStats({ halls: halls.length, bookings: bookings.length, pending, revenue });
-    });
-  }, [activeTab, user]);
-
-  if (!user) return <LoginPage onLogin={u => { setUser(u); navigate("/admin/dashboard"); }} />;
-
-  const TABS = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "halls",     label: "Halls",     icon: "🏛️" },
-    { id: "bookings",  label: "Bookings",  icon: "📋" },
-  ];
-
-  const switchTab = (id) => { navigate(`/admin/${id}`); setSidebarOpen(false); };
-
-  return (
-    <div style={{ background: "#07050f", minHeight: "100vh", color: "white", fontFamily: "'DM Sans',sans-serif" }}>
-      <style>{FONTS}{ADMIN_CSS}</style>
-
-      {/* Mobile top bar */}
-      <div className="admin-topbar">
-        <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "transparent", border: "none", color: "white", cursor: "pointer", fontSize: "1.4rem", lineHeight: 1, padding: "0.25rem" }}>
-          ☰
-        </button>
-        <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.1rem" }}>
-          <span style={{ color: "#a855f7" }}>Noor</span><span style={{ color: "white" }}> Mahal</span>
-        </p>
-        <button onClick={logout} style={{ ...btnDanger, fontSize: "0.72rem", padding: "0.3rem 0.7rem" }}>Logout</button>
-      </div>
-
-      {/* Sidebar overlay */}
-      <div className={`sidebar-overlay${sidebarOpen ? " open" : ""}`} onClick={() => setSidebarOpen(false)} />
-
-      <div className="admin-layout">
-        {/* Sidebar */}
-        <aside className={`admin-sidebar${sidebarOpen ? " open" : ""}`}>
-          <div style={{ marginBottom: "2rem", paddingLeft: "0.5rem" }}>
-            <p style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.2rem" }}><span style={{ color: "#a855f7" }}>Noor</span><span style={{ color: "white" }}> Mahal</span></p>
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.65rem", letterSpacing: "0.15em", textTransform: "uppercase", marginTop: 2 }}>
-              "Admin Panel"
-            </p>
-          </div>
-          <nav style={{ flex: 1 }}>
-            {TABS.map(t => (
-              <button key={t.id} onClick={() => switchTab(t.id)} style={{ width: "100%", display: "flex", alignItems: "center", gap: "0.65rem", padding: "0.65rem 0.75rem", borderRadius: "10px", marginBottom: "0.25rem", border: "none", cursor: "pointer", fontSize: "0.85rem", textAlign: "left", background: activeTab === t.id ? "rgba(124,58,237,0.25)" : "transparent", color: activeTab === t.id ? "white" : "rgba(255,255,255,0.45)", borderLeft: activeTab === t.id ? "2px solid #a855f7" : "2px solid transparent" }}>
-                <span>{t.icon}</span><span>{t.label}</span>
-                {t.id === "bookings" && stats.pending > 0 && <span style={{ marginLeft: "auto", background: "#a855f7", color: "white", fontSize: "0.62rem", padding: "1px 6px", borderRadius: "999px" }}>{stats.pending}</span>}
+              <button
+                onClick={onClose}
+                className="text-xl leading-none transition-colors"
+                style={{ color: "rgba(167,139,250,0.5)" }}
+                onMouseEnter={(e) => (e.target.style.color = "white")}
+                onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.5)")}
+              >
+                ✕
               </button>
-            ))}
-          </nav>
-          <div style={{ borderTop: "1px solid rgba(167,139,250,0.1)", paddingTop: "1rem", marginTop: "0.5rem" }}>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.75rem", paddingLeft: "0.75rem", marginBottom: "0.5rem" }}>{user.email}</p>
-            <button onClick={logout} style={{ ...btnDanger, width: "100%", textAlign: "center" }}>Logout</button>
-          </div>
-        </aside>
+            </div>
 
-        {/* Main content */}
-        <main className="admin-main">
-          {activeTab === "dashboard" && (
-            <div>
-              <h1 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.5rem,4vw,2rem)", fontWeight: 300, marginBottom: "2rem" }}>Welcome to <em style={{ color: "#a855f7" }}>Admin</em></h1>
-              <div className="stats-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: "1rem", marginBottom: "2rem" }}>
-                <StatCard label="Total Halls" value={stats.halls} icon="🏛️" color="#a855f7" />
-                <StatCard label="Total Bookings" value={stats.bookings} icon="📋" color="#06b6d4" />
-                <StatCard label="Pending" value={stats.pending} icon="⏳" color="#f59e0b" />
-                <StatCard label="Revenue (PKR)" value={`${(stats.revenue / 1000).toFixed(0)}K`} icon="💰" color="#22c55e" />
+            {/* Step bar */}
+            <div className="flex items-center mb-6">
+              {STEP_LABELS.map((label, i) => (
+                <div key={i} className="flex items-center flex-1 last:flex-none">
+                  <div className="flex flex-col items-center">
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all bm-step-circle"
+                      style={{
+                        background:
+                          i + 1 < step
+                            ? "#7c3aed"
+                            : i + 1 === step
+                            ? "rgba(124,58,237,0.3)"
+                            : "rgba(255,255,255,0.06)",
+                        color: i + 1 <= step ? "white" : "rgba(167,139,250,0.5)",
+                        border: i + 1 === step ? "2px solid #a855f7" : "none",
+                      }}
+                    >
+                      {i + 1 < step ? "✓" : i + 1}
+                    </div>
+                    <span
+                      className="text-[10px] mt-1 tracking-wider uppercase bm-step-label"
+                      style={{ color: i + 1 === step ? "#c084fc" : "rgba(255,255,255,0.25)" }}
+                    >
+                      {label}
+                    </span>
+                  </div>
+                  {i < STEP_LABELS.length - 1 && (
+                    <div
+                      className="flex-1 h-px mx-2 mb-4 transition-all"
+                      style={{ background: i + 1 < step ? "#7c3aed" : "rgba(255,255,255,0.08)" }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Body */}
+          <div className="px-6 pb-2 bm-body">
+
+            {/* ── STEP 1: Contact Details ── */}
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3 bm-two-col">
+                  <Field label="Full Name *" error={errors.clientName}>
+                    <input
+                      className={inputClass(errors.clientName)}
+                      placeholder="Enter your full name"
+                      maxLength={15}
+                      value={form.clientName}
+                      onChange={(e) => set("clientName", e.target.value)}
+                    />
+                  </Field>
+                  <Field label="Phone *" error={errors.clientPhone}>
+                    <input
+                      className={inputClass(errors.clientPhone)}
+                      placeholder="+92 3XX XXXXXXX"
+                      maxLength={14}
+                      value={form.clientPhone}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^[0-9+\-\s]*$/.test(val)) set("clientPhone", val);
+                      }}
+                    />
+                  </Field>
+                </div>
+                <Field label="Email" error={errors.clientEmail}>
+                  <input
+                    className={inputClass(errors.clientEmail)}
+                    type="email"
+                    placeholder="your@email.com"
+                    maxLength={30}
+                    value={form.clientEmail}
+                    onChange={(e) => set("clientEmail", e.target.value)}
+                  />
+                </Field>
+                <Field label="Special Requests">
+                  <input
+                    className={inputClass()}
+                    placeholder="Decoration style, dietary needs..."
+                    maxLength={200}
+                    value={form.specialRequests}
+                    onChange={(e) => set("specialRequests", e.target.value)}
+                  />
+                </Field>
               </div>
-              <div style={{ ...cardStyle }}>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: "1rem" }}>Quick Actions</p>
-                <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
-                  <button style={btnPrimary} onClick={() => switchTab("halls")}>+ Add Hall</button>
-                  <button style={btnGhost} onClick={() => switchTab("bookings")}>View Bookings</button>
+            )}
+
+            {/* ── STEP 2: Hall & Date ── */}
+            {step === 2 && (
+              <div className="space-y-4">
+
+                {/* Event Type first — helps user filter */}
+                <div className="grid grid-cols-2 gap-3 bm-two-col">
+                  <Field label="Event Type">
+                    <CustomSelect
+                      value={form.eventType}
+                      onChange={(val) => set("eventType", val)}
+                      options={EVENT_TYPES}
+                      icons={EVENT_ICONS}
+                    />
+                  </Field>
+                  <Field label="No. of Guests">
+                    <input
+                      className={inputClass()}
+                      type="number"
+                      min="1"
+                      value={form.guests}
+                      onChange={(e) => set("guests", parseInt(e.target.value) || 1)}
+                    />
+                  </Field>
+                </div>
+
+                {/* Hall selector */}
+                <Field label="Select Hall *" error={errors.hallId}>
+                  <CustomSelect
+                    value={form.hallId}
+                    onChange={(val) => { set("hallId", val); set("timeSlot", ""); set("eventDate", ""); }}
+                    options={[
+                      ...halls.map((h) => ({
+                        value: h._id,
+                        label: `${h.name} · ${h.totalSeats} seats · PKR ${h.pricePerHead?.toLocaleString()}/head`,
+                      }))
+                    ]}
+                    placeholder="-- Choose a Hall --"
+                    error={errors.hallId}
+                    icons={{}}
+                  />
+                </Field>
+
+                {/* Selected hall info card */}
+                {selectedHall && (
+                  <div
+                    className="rounded-xl p-3 text-sm"
+                    style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.18)" }}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="font-medium" style={{ color: "#c084fc" }}>{selectedHall.name}</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                          {selectedHall.location} · {selectedHall.totalSeats} seats
+                        </p>
+                      </div>
+                      {selectedHall.pricePerHead && (
+                        <p className="text-xs font-semibold" style={{ color: "#a855f7" }}>
+                          PKR {selectedHall.pricePerHead?.toLocaleString()}/head
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Event Date */}
+                <Field label="Event Date *" error={errors.eventDate}>
+                  <div style={{ position: "relative" }}>
+                    <input
+                      className={inputClass(errors.eventDate)}
+                      type="date"
+                      min={today}
+                      max={maxDate}
+                      value={form.eventDate}
+                      onChange={(e) => handleDateChange(e.target.value)}
+                      style={{ colorScheme: "dark" }}
+                    />
+                    <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
+                      Bookings accepted for the next 30 days only · Latest: {new Date(maxDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
+                </Field>
+
+                {/* Time slot display (after selection) */}
+                {form.timeSlot ? (
+                  <div
+                    className="rounded-xl px-4 py-3 flex items-center justify-between"
+                    style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(167,139,250,0.3)" }}
+                  >
+                    <div>
+                      <p className="text-xs tracking-wider uppercase mb-0.5" style={{ color: "rgba(192,132,252,0.6)" }}>
+                        Selected Time Slot
+                      </p>
+                      <p className="text-sm font-medium text-white">{form.timeSlotLabel}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowTimeSlots(true)}
+                      className="text-xs px-3 py-1.5 rounded-lg transition-all"
+                      style={{ border: "1px solid rgba(167,139,250,0.3)", color: "#c084fc" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.2)")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      Change
+                    </button>
+                  </div>
+                ) : form.eventDate && (
+                  /* Prompt to pick time slot if date is selected but no slot yet */
+                  <button
+                    type="button"
+                    onClick={() => setShowTimeSlots(true)}
+                    className="w-full rounded-xl px-4 py-3 text-sm transition-all"
+                    style={{
+                      border: errors.timeSlot ? "1px solid rgba(239,68,68,0.5)" : "1px dashed rgba(167,139,250,0.3)",
+                      color: errors.timeSlot ? "#f87171" : "#c084fc",
+                      background: errors.timeSlot ? "rgba(239,68,68,0.05)" : "transparent",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.08)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = errors.timeSlot ? "rgba(239,68,68,0.05)" : "transparent")}
+                  >
+                    🕐 {errors.timeSlot ? errors.timeSlot : "Tap to select available time slot"}
+                  </button>
+                )}
+
+                {bookedDates.length > 0 && (
+                  <div className="text-xs rounded-lg p-2.5" style={{ background: "rgba(239,68,68,0.08)", color: "#f87171" }}>
+                    ⚠ Already fully booked on: {bookedDates.join(", ")}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── STEP 3: Payment ── */}
+            {step === 3 && (
+              <div className="space-y-4">
+                <div
+                  className="rounded-xl overflow-hidden"
+                  style={{ border: "1px solid rgba(167,139,250,0.18)" }}
+                >
+                  <div
+                    className="px-4 py-2 text-xs tracking-widest uppercase"
+                    style={{ background: "rgba(167,139,250,0.08)", color: "#a855f7" }}
+                  >
+                    Estimated Budget
+                  </div>
+                  {[
+                    ["Guest",      form.clientName],
+                    ["Hall",       selectedHall?.name],
+                    ["Date",       form.eventDate ? new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) : "—"],
+                    ["Time Slot",  form.timeSlotLabel],
+                    ["Event",      form.eventType],
+                    ["Guests",     form.guests],
+                    ["Room Rate",  `PKR ${totalPrice.toLocaleString()}`],
+                    ["Tax (16%)",  `PKR ${tax.toLocaleString()}`],
+                  ].map(([k, v]) => (
+                    <div
+                      key={k}
+                      className="flex justify-between px-4 py-2 text-sm bm-summary-row"
+                      style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
+                    >
+                      <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
+                      <span className="bm-summary-val" style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
+                    </div>
+                  ))}
+                  <div
+                    className="flex justify-between px-4 py-3"
+                    style={{ borderTop: "1px solid rgba(167,139,250,0.25)" }}
+                  >
+                    <span className="text-white font-semibold">Grand Total</span>
+                    <span className="font-bold text-lg" style={{ color: "#c084fc" }}>
+                      PKR {grandTotal.toLocaleString()}
+                    </span>
+                  </div>
+                  {/* Ref note — visible on bill before booking is submitted */}
+                  <div className="px-4 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.04)", background: "rgba(124,58,237,0.04)" }}>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+                      📌 A unique booking reference (e.g. NM-{(form.clientName || "YOU").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4)}-47) will be generated after confirmation. Use it to track your booking at <span style={{ color: "#a855f7" }}>/booking-status</span>
+                    </p>
+                  </div>
+                </div>
+
+                <Field label="Payment Method *" error={errors.paymentMethod}>
+                  <div className="grid grid-cols-3 gap-2 bm-pay-grid">
+                    {PAY_METHODS.map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => { set("paymentMethod", m); }}
+                        className="py-2 px-1 rounded-lg text-xs font-medium transition-all"
+                        style={{
+                          border: `1px solid ${form.paymentMethod === m ? "rgba(167,139,250,0.6)" : "rgba(167,139,250,0.15)"}`,
+                          background: form.paymentMethod === m ? "rgba(124,58,237,0.4)" : "transparent",
+                          color: form.paymentMethod === m ? "white" : "rgba(192,132,252,0.7)",
+                        }}
+                      >
+                        {m}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+
+                {form.paymentMethod && form.paymentMethod !== "Cash" && (
+                  <Field label={`${form.paymentMethod} Reference / Transaction ID *`} error={errors.transactionId}>
+                    <input
+                      className={inputClass(errors.transactionId)}
+                      placeholder="Enter reference / transaction ID"
+                      value={form.transactionId}
+                      onChange={(e) => set("transactionId", e.target.value)}
+                    />
+                  </Field>
+                )}
+
+                {errors.submit && (
+                  <p
+                    className="text-sm text-center rounded-lg p-2"
+                    style={{ color: "#f87171", background: "rgba(239,68,68,0.08)" }}
+                  >
+                    {errors.submit}
+                  </p>
+                )}
+              </div>
+            )}
+
+            {/* ── STEP 4: Pending / Confirmed ── */}
+            {step === 4 && (
+              <div className="py-2">
+                {/* Status banner */}
+                {confirmedStatus === "Confirmed" ? (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(34,197,94,0.2)", border: "2px solid #22c55e" }}>✓</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Confirmed!</p>
+                    <p className="text-xs mt-1" style={{ color: "#4ade80" }}>Manager has approved your booking. An SMS has been sent to your number.</p>
+                  </div>
+                ) : confirmedStatus === "Cancelled" ? (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(239,68,68,0.2)", border: "2px solid #ef4444" }}>✕</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Cancelled</p>
+                    <p className="text-xs mt-1" style={{ color: "#f87171" }}>Your booking has been cancelled. Please contact us for more details.</p>
+                  </div>
+                ) : (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(245,158,11,0.2)", border: "2px solid #f59e0b" }}>⏳</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Awaiting Manager Approval</p>
+                    <p className="text-xs mt-1" style={{ color: "#fcd34d" }}>
+                      Your request has been received. You will receive an SMS on <strong style={{ color: "white" }}>{form.clientPhone}</strong> once the manager confirms.
+                    </p>
+                    {/* Pulsing dot */}
+                    <div className="flex items-center justify-center gap-1.5 mt-3">
+                      {[0, 150, 300].map((d) => (
+                        <div key={d} style={{
+                          width: 6, height: 6, borderRadius: "50%", background: "#f59e0b",
+                          animation: `pulse 1.2s ${d}ms ease-in-out infinite`,
+                        }}/>
+                      ))}
+                    </div>
+                    <style>{`@keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }`}</style>
+                  </div>
+                )}
+
+                {/* Reference card */}
+                <div className="rounded-xl p-4 mb-4" style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}>
+                  <p className="text-xs tracking-widest uppercase mb-1 text-center" style={{ color: "#a855f7" }}>Booking Reference</p>
+                  <p className="text-white font-bold text-2xl tracking-widest text-center" style={{ fontFamily: "'Playfair Display',serif" }}>
+                    {bookingRef}
+                  </p>
+                  <p className="text-xs text-center mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    Save this reference for your records
+                  </p>
+                </div>
+
+                {/* Status badge */}
+                <div className="flex justify-center mb-3">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium" style={{
+                    background: confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.15)"
+                              : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.15)"
+                              : "rgba(245,158,11,0.15)",
+                    color: confirmedStatus === "Confirmed" ? "#4ade80"
+                         : confirmedStatus === "Cancelled" ? "#f87171"
+                         : "#fcd34d",
+                    border: `1px solid ${confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.3)"
+                           : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.3)"
+                           : "rgba(245,158,11,0.3)"}`,
+                  }}>
+                    Status: {confirmedStatus}
+                  </span>
+                </div>
+
+                {/* Summary rows */}
+                {[
+                  ["Guest",      form.clientName],
+                  ["Phone",      form.clientPhone],
+                  ["Hall",       selectedHall?.name],
+                  ["Date",       new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })],
+                  ["Time Slot",  form.timeSlotLabel],
+                  ["Event",      form.eventType],
+                  ["Guests",     form.guests],
+                  ["Payment",    form.paymentMethod],
+                  ["Total",      `PKR ${grandTotal.toLocaleString()}`],
+                ].map(([k, v]) => (
+                  <div key={k} className="flex justify-between py-1.5 text-sm bm-summary-row"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                    <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
+                    <span className="font-medium text-white bm-summary-val">{v}</span>
+                  </div>
+                ))}
+
+                {confirmedStatus === "Pending" && (
+                  <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
+                    This page checks for updates automatically every 12 seconds.
+                  </p>
+                )}
+                <div style={{ textAlign: "center", marginTop: "0.75rem" }}>
+                  <a href="/booking-status"
+                    style={{ color: "#a855f7", fontSize: "0.78rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+                    onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                  >
+                    🔖 Check status anytime at noormahal.pk/booking-status
+                  </a>
                 </div>
               </div>
-            </div>
-          )}
-          {activeTab === "halls" && <HallsTab toast={showToast} />}
-          {activeTab === "bookings" && <BookingsTab toast={showToast} />}
-        </main>
+            )}
+          </div>
+
+          {/* Footer buttons */}
+          <div className="p-6 pt-4 flex gap-3 justify-end bm-footer">
+            {step > 1 && step < 4 && (
+              <button
+                onClick={() => setStep((s) => s - 1)}
+                className="px-5 py-2.5 rounded-xl text-sm transition-all"
+                style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+              >
+                ← Back
+              </button>
+            )}
+            {step < 4 ? (
+              <button
+                onClick={next}
+                disabled={loading}
+                className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
+                style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", opacity: loading ? 0.6 : 1 }}
+              >
+                {loading ? "Booking..." : step === 3 ? "Confirm Booking →" : "Next →"}
+              </button>
+            ) : (
+              <button
+                onClick={onClose}
+                className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
+                style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}
+              >
+                Done
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-      {toast && <Toast msg={toast.msg} type={toast.type} onDone={() => setToastMsg(null)} />}
-    </div>
+
+      {/* Time Slot Sub-modal — rendered outside the main modal so it layers on top */}
+      {showTimeSlots && (
+        <TimeSlotModal
+          date={form.eventDate}
+          hallName={selectedHall?.name || "Hall"}
+          bookedSlots={bookedSlots}
+          onSelect={handleSlotSelected}
+          onClose={() => setShowTimeSlots(false)}
+        />
+      )}
+    </>
   );
 }

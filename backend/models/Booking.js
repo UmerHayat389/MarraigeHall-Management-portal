@@ -14,10 +14,10 @@ const bookingSchema = new mongoose.Schema(
     eventType:       { type: String, default: "Walima" },
     eventDate:       { type: Date, required: true },
 
-    // NEW: which time slot is booked — morning / afternoon / evening
+    // NEW: which time slot is booked — afternoon / evening / latenight
     timeSlot: {
       type: String,
-      enum: ["morning", "afternoon", "evening"],
+      enum: ["afternoon", "evening", "latenight"],
       required: true,
     },
 

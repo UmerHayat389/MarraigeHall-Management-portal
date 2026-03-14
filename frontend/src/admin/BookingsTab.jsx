@@ -9,6 +9,8 @@ export default function BookingsTab({ toast }) {
   const [filter, setFilter]     = useState("All");
   const [selected, setSelected] = useState(null);
   const [search, setSearch]     = useState("");
+  const [page, setPage]         = useState(1);
+  const PER_PAGE = 10;
 
   useEffect(() => {
     api.get("/bookings").then(r => setBookings(r.data.bookings||[])).catch(()=>{}).finally(()=>setLoading(false));
@@ -33,9 +35,21 @@ export default function BookingsTab({ toast }) {
     } catch { toast("Failed to delete","error"); }
   };
 
+  // Reset to page 1 when filter or search changes
+  useEffect(() => { setPage(1); }, [filter, search]);
+
   const filtered = bookings
     .filter(b => filter==="All" || b.status===filter)
-    .filter(b => !search || b.clientName?.toLowerCase().includes(search.toLowerCase()) || b.bookingRef?.toLowerCase().includes(search.toLowerCase()) || b.clientPhone?.includes(search));
+    .filter(b => !search ||
+      b.clientName?.toLowerCase().includes(search.toLowerCase()) ||
+      b.bookingRef?.toLowerCase().includes(search.toLowerCase()) ||
+      b.clientPhone?.includes(search) ||
+      b.eventType?.toLowerCase().includes(search.toLowerCase()) ||
+      b.hallId?.name?.toLowerCase().includes(search.toLowerCase())
+    );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
+  const paginated  = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
   const counts = {
     All: bookings.length,
@@ -52,7 +66,7 @@ export default function BookingsTab({ toast }) {
           <h2 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
             All <em style={{ color:"#9333ea", fontStyle:"italic" }}>Bookings</em>
           </h2>
-          <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.8rem", margin:0 }}>{bookings.length} total bookings</p>
+          <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.8rem", margin:0 }}>{filtered.length !== bookings.length ? `${filtered.length} of ${bookings.length} bookings` : `${bookings.length} total bookings`}</p>
         </div>
 
         {/* Search */}
@@ -91,7 +105,7 @@ export default function BookingsTab({ toast }) {
         </div>
       ) : (
         <div style={{ display:"flex", flexDirection:"column", gap:"0.55rem" }}>
-          {filtered.map(b => (
+          {paginated.map(b => (
             <div key={b._id} className="bk-card" onClick={()=>setSelected(b)}>
               <div className="bk-row" style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
                 {/* Left info */}
@@ -129,6 +143,60 @@ export default function BookingsTab({ toast }) {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Pagination ── */}
+      {!loading && filtered.length > PER_PAGE && (
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"1.25rem", flexWrap:"wrap", gap:"0.5rem" }}>
+          {/* Info text */}
+          <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.78rem", margin:0 }}>
+            Showing {(page-1)*PER_PAGE+1}–{Math.min(page*PER_PAGE, filtered.length)} of {filtered.length} bookings
+          </p>
+
+          {/* Page buttons */}
+          <div style={{ display:"flex", alignItems:"center", gap:"0.35rem" }}>
+            {/* Prev */}
+            <button
+              onClick={()=>setPage(p=>Math.max(1,p-1))}
+              disabled={page===1}
+              style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color: page===1?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:"0.78rem", cursor:page===1?"not-allowed":"pointer", transition:"all 0.15s", fontWeight:600 }}
+              onMouseEnter={e=>{ if(page>1){ e.currentTarget.style.background="rgba(109,40,217,0.2)"; e.currentTarget.style.color="white"; }}}
+              onMouseLeave={e=>{ e.currentTarget.style.background="rgba(255,255,255,0.03)"; e.currentTarget.style.color=page===1?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)"; }}>
+              ← Prev
+            </button>
+
+            {/* Page number pills */}
+            {Array.from({ length: totalPages }, (_,i) => i+1)
+              .filter(n => n===1 || n===totalPages || Math.abs(n-page)<=1)
+              .reduce((acc, n, idx, arr) => {
+                if (idx>0 && n-arr[idx-1]>1) acc.push("...");
+                acc.push(n);
+                return acc;
+              }, [])
+              .map((n, idx) => n==="..." ? (
+                <span key={`dot-${idx}`} style={{ color:"rgba(255,255,255,0.2)", fontSize:"0.78rem", padding:"0 2px" }}>…</span>
+              ) : (
+                <button key={n} onClick={()=>setPage(n)} style={{
+                  width:34, height:34, borderRadius:9, border:`1px solid ${page===n?"rgba(147,51,234,0.6)":"rgba(139,92,246,0.2)"}`,
+                  background: page===n?"linear-gradient(135deg,rgba(109,40,217,0.5),rgba(147,51,234,0.3))":"rgba(255,255,255,0.03)",
+                  color: page===n?"white":"rgba(192,132,252,0.6)", fontSize:"0.8rem", fontWeight: page===n?700:500,
+                  cursor:"pointer", transition:"all 0.15s",
+                  boxShadow: page===n?"0 0 0 2px rgba(147,51,234,0.2)":"none",
+                }}>{n}</button>
+              ))
+            }
+
+            {/* Next */}
+            <button
+              onClick={()=>setPage(p=>Math.min(totalPages,p+1))}
+              disabled={page===totalPages}
+              style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color: page===totalPages?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:"0.78rem", cursor:page===totalPages?"not-allowed":"pointer", transition:"all 0.15s", fontWeight:600 }}
+              onMouseEnter={e=>{ if(page<totalPages){ e.currentTarget.style.background="rgba(109,40,217,0.2)"; e.currentTarget.style.color="white"; }}}
+              onMouseLeave={e=>{ e.currentTarget.style.background="rgba(255,255,255,0.03)"; e.currentTarget.style.color=page===totalPages?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)"; }}>
+              Next →
+            </button>
+          </div>
         </div>
       )}
 
