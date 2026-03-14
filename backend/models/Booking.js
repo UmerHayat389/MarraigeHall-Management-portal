@@ -7,6 +7,9 @@ const bookingSchema = new mongoose.Schema(
     clientEmail:     { type: String, default: "" },
     userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
+    // Human-readable reference e.g. NM-UMER-A3X
+    bookingRef:      { type: String, default: "" },
+
     hallId:          { type: mongoose.Schema.Types.ObjectId, ref: "Hall", required: true },
     eventType:       { type: String, default: "Walima" },
     eventDate:       { type: Date, required: true },

@@ -43,6 +43,15 @@ export default function Navbar({ onBookNow }) {
               {l}
             </a>
           ))}
+          <a
+            href="/booking-status"
+            className="text-sm transition-colors"
+            style={{ color: "rgba(167,139,250,0.6)", letterSpacing: "0.05em" }}
+            onMouseEnter={(e) => (e.target.style.color = "#c084fc")}
+            onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.6)")}
+          >
+            Track Booking
+          </a>
         </div>
 
         {/* Book Now */}

@@ -55,6 +55,123 @@ export default function Home() {
         select option { background:#1a1035; color:white; }
         ::-webkit-scrollbar { width:4px; }
         ::-webkit-scrollbar-thumb { background:rgba(167,139,250,0.3); border-radius:2px; }
+
+        /* ── Halls grid: always 3 cols, responsive ── */
+        .halls-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.5rem;
+        }
+        @media (max-width: 900px) {
+          .halls-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 580px) {
+          .halls-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Packages grid ── */
+        .packages-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+        @media (max-width: 900px) {
+          .packages-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 580px) {
+          .packages-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Testimonials grid ── */
+        .testimonials-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+        }
+        @media (max-width: 900px) {
+          .testimonials-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 580px) {
+          .testimonials-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── Contact grid ── */
+        .contact-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1.25rem;
+          margin-bottom: 3rem;
+        }
+        @media (max-width: 900px) {
+          .contact-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 580px) {
+          .contact-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── About section ── */
+        .about-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 4rem;
+          align-items: center;
+        }
+        @media (max-width: 768px) {
+          .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
+
+        /* ── About stats inner grid ── */
+        .about-stats-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 1rem;
+        }
+
+        /* ── Hero stats ── */
+        .hero-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1px;
+          border-radius: 16px;
+          overflow: hidden;
+          border: 1px solid rgba(167,139,250,0.15);
+        }
+
+        /* ── Hero buttons ── */
+        .hero-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        @media (max-width: 480px) {
+          .hero-buttons { flex-direction: column; align-items: center; }
+          .hero-buttons a, .hero-buttons button { width: 100%; max-width: 260px; text-align: center; }
+        }
+
+        /* ── Section padding ── */
+        @media (max-width: 640px) {
+          .section-pad { padding: 4rem 1rem !important; }
+          .section-title { font-size: clamp(1.6rem, 5vw, 2.2rem) !important; }
+          .hero-title { font-size: clamp(2.2rem, 8vw, 3.5rem) !important; }
+        }
+
+        /* ── Footer ── */
+        .footer-inner {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 1rem;
+        }
+        @media (max-width: 580px) {
+          .footer-inner { flex-direction: column; text-align: center; }
+        }
+
+        /* ── CTA banner padding ── */
+        @media (max-width: 580px) {
+          .cta-banner { padding: 2.5rem 1.25rem !important; }
+        }
       `}</style>
 
       <Navbar onBookNow={() => openModal()} />
@@ -77,7 +194,7 @@ export default function Home() {
           <p className="anim-3" style={{ color: "rgba(255,255,255,0.5)", fontSize: "1.1rem", maxWidth: "520px", margin: "0 auto 2.5rem", lineHeight: 1.7 }}>
             Exquisite venues for Nikkah, Walima, and every celebration that deserves to be remembered forever.
           </p>
-          <div className="anim-4" style={{ display: "flex", gap: "1rem", justifyContent: "center", flexWrap: "wrap" }}>
+          <div className="anim-4 hero-buttons">
             <button onClick={() => openModal()}
               style={{ padding: "1rem 2.5rem", borderRadius: "9999px", background: "linear-gradient(135deg,#7c3aed,#a855f7)", color: "white", fontWeight: 600, fontSize: "0.95rem", border: "none", cursor: "pointer", boxShadow: "0 8px 30px rgba(124,58,237,0.4)", transition: "transform 0.2s" }}
               onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
@@ -116,13 +233,13 @@ export default function Home() {
             </h2>
           </div>
           {halls.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "1.5rem" }}>
+            <div className="halls-grid">
               {halls.map((h, i) => (
                 <HallCard key={h._id} hall={h} onBook={openModal} index={i} />
               ))}
             </div>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "1.5rem" }}>
+            <div className="halls-grid">
               {hallImages.map((img, i) => (
                 <div key={i} style={{ borderRadius: "16px", overflow: "hidden", border: "1px solid rgba(167,139,250,0.12)", background: "rgba(255,255,255,0.02)", cursor: "pointer", transition: "transform 0.3s" }}
                   onClick={() => openModal()}
@@ -154,7 +271,7 @@ export default function Home() {
               Event <em style={{ color: "#a855f7" }}>Packages</em>
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "1.25rem" }}>
+          <div className="packages-grid">
             {packages.map((pkg, i) => (
               <div key={i} style={{ borderRadius: "16px", padding: "1.5rem", border: "1px solid rgba(167,139,250,0.12)", background: "rgba(255,255,255,0.02)", transition: "transform 0.3s, box-shadow 0.3s" }}
                 onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 20px 40px rgba(124,58,237,0.15)"; }}
@@ -182,7 +299,8 @@ export default function Home() {
 
       {/* ── ABOUT ── */}
       <section id="about" style={{ padding: "6rem 1.5rem" }}>
-        <div style={{ maxWidth: "1152px", margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "4rem", alignItems: "center" }}>
+        <div style={{ maxWidth: "1152px", margin: "0 auto" }}>
+        <div className="about-grid">
           <div>
             <p className="gold-dot" style={{ color: "#a855f7", fontSize: "0.7rem", letterSpacing: "0.35em", textTransform: "uppercase", marginBottom: "0.75rem" }}>Our Story</p>
             <h2 style={{ fontFamily: "'Playfair Display',serif", fontSize: "clamp(1.8rem,3.5vw,2.8rem)", fontWeight: 300, marginBottom: "1.5rem", lineHeight: 1.2 }}>
@@ -212,6 +330,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        </div>
       </section>
 
       {/* ── TESTIMONIALS ── */}
@@ -223,7 +342,7 @@ export default function Home() {
               What Our <em style={{ color: "#a855f7" }}>Guests</em> Say
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: "1.25rem" }}>
+          <div className="testimonials-grid">
             {testimonials.map((t, i) => (
               <div key={i} style={{ borderRadius: "16px", padding: "1.75rem", border: "1px solid rgba(167,139,250,0.12)", background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ display: "flex", gap: "3px", marginBottom: "1rem" }}>
@@ -254,7 +373,7 @@ export default function Home() {
               Plan Your <em style={{ color: "#a855f7" }}>Dream Event</em>
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: "1.25rem", marginBottom: "3rem" }}>
+          <div className="contact-grid">
             {[["📍", "Location", "Clifton Block 5, Karachi"], ["📞", "Phone", "+92 21 3456 7890"], ["✉️", "Email", "bookings@noormahal.pk"]].map(([icon, label, val]) => (
               <div key={label} style={{ borderRadius: "16px", padding: "1.75rem", textAlign: "center", border: "1px solid rgba(167,139,250,0.12)", background: "rgba(255,255,255,0.02)" }}>
                 <div style={{ fontSize: "1.75rem", marginBottom: "0.75rem" }}>{icon}</div>
@@ -285,7 +404,7 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: "1px solid rgba(167,139,250,0.1)", padding: "2.5rem 1.5rem" }}>
-        <div style={{ maxWidth: "1152px", margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "1rem" }}>
+        <div style={{ maxWidth: "1152px", margin: "0 auto" }} className="footer-inner">
           <div style={{ fontFamily: "'Playfair Display',serif", fontSize: "1.2rem" }}>
             <span style={{ color: "#a855f7" }}>Noor</span>
             <span style={{ color: "white" }}> Mahal</span>

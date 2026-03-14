@@ -3,7 +3,7 @@ import api from "../services/api";
 
 const STEP_LABELS = ["Details", "Hall & Date", "Payment", "Confirmed"];
 const EVENT_TYPES = ["Nikkah", "Walima", "Barat", "Birthday", "Conference", "Anniversary", "Other"];
-const PAY_METHODS = ["JazzCash", "EasyPaisa", "Card", "Bank Transfer", "Cash", "Crypto"];
+const PAY_METHODS = ["JazzCash", "EasyPaisa", "Bank Transfer", "Cash"];
 
 // Time slots definition — in a real app these would come from the backend
 // Format: { id, label, startTime, endTime }
@@ -35,7 +35,82 @@ function Field({ label, error, children }) {
   );
 }
 
-/* ─── Time Slot Picker Sub-modal ─────────────────────────────────────────── */
+/* ─── Custom Dropdown ────────────────────────────────────────────────────── */
+const EVENT_ICONS = { Nikkah: "☪️", Walima: "🌸", Barat: "💐", Birthday: "🎂", Conference: "🎤", Anniversary: "💍", Other: "✨" };
+
+function CustomSelect({ value, onChange, options, placeholder = "Select...", error, icons = {} }) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const selected = options.find((o) => (o.value ?? o) === value);
+  const label = selected ? (selected.label ?? selected) : null;
+  const icon = icons[label] || icons[value] || null;
+
+  return (
+    <div ref={ref} style={{ position: "relative", userSelect: "none" }}>
+      {/* Trigger */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-all flex items-center justify-between"
+        style={{
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : open ? "rgba(167,139,250,0.5)" : "rgba(167,139,250,0.2)"}`,
+          background: error ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)",
+        }}
+      >
+        <span style={{ display: "flex", alignItems: "center", gap: "8px", color: label ? "white" : "rgba(255,255,255,0.3)" }}>
+          {icon && <span style={{ fontSize: "1rem" }}>{icon}</span>}
+          {label || placeholder}
+        </span>
+        <span style={{ color: "rgba(167,139,250,0.6)", fontSize: "0.7rem", transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+      </button>
+
+      {/* Dropdown panel */}
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 999,
+          background: "linear-gradient(145deg,#1e1240,#160e35)",
+          border: "1px solid rgba(167,139,250,0.25)", borderRadius: "12px",
+          overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
+        }}>
+          {options.map((opt) => {
+            const val = opt.value ?? opt;
+            const lbl = opt.label ?? opt;
+            const ico = icons[lbl] || icons[val] || null;
+            const isActive = val === value;
+            return (
+              <button
+                key={val}
+                type="button"
+                onClick={() => { onChange(val); setOpen(false); }}
+                className="w-full px-3 py-2.5 text-sm text-left flex items-center gap-3 transition-all"
+                style={{
+                  background: isActive ? "rgba(124,58,237,0.3)" : "transparent",
+                  color: isActive ? "white" : "rgba(255,255,255,0.7)",
+                  borderLeft: isActive ? "2px solid #a855f7" : "2px solid transparent",
+                }}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(124,58,237,0.15)"; }}
+                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
+              >
+                {ico && <span style={{ fontSize: "1rem", width: "20px", textAlign: "center" }}>{ico}</span>}
+                <span>{lbl}</span>
+                {isActive && <span style={{ marginLeft: "auto", color: "#a855f7", fontSize: "0.75rem" }}>✓</span>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) {
   const [selected, setSelected] = useState(null);
 
@@ -208,9 +283,9 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
   const [selectedHall, setSelectedHall] = useState(preselectedHall || null);
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [loading, setLoading]         = useState(false);
-  const [payVerified, setPayVerified] = useState(false);
-  const [verifying, setVerifying]     = useState(false);
   const [bookingRef, setBookingRef]   = useState("");
+  const [bookingId, setBookingId]     = useState(null);
+  const [confirmedStatus, setConfirmedStatus] = useState("Pending"); // tracks polled status
   const [errors, setErrors]           = useState({});
 
   const [form, setForm] = useState({
@@ -238,13 +313,34 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
       .catch(() => {});
   }, []);
 
+  /* Poll booking status every 12s once on step 4 */
+  useEffect(() => {
+    if (step !== 4 || !bookingId || confirmedStatus === "Confirmed" || confirmedStatus === "Cancelled") return;
+    const interval = setInterval(async () => {
+      try {
+        const res = await api.get(`/bookings/${bookingId}/status`);
+        if (res.data.success) setConfirmedStatus(res.data.status);
+      } catch {}
+    }, 12000);
+    return () => clearInterval(interval);
+  }, [step, bookingId, confirmedStatus]);
+
   /* Fetch booked dates when hall changes */
   useEffect(() => {
     if (!form.hallId) return;
     api.get(`/bookings/slots/${form.hallId}`)
       .then((res) => {
         const data = res.data.bookedDates || [];
-        setBookedDates(data.map((b) => b.eventDate?.split("T")[0]));
+        const todayStr = new Date().toISOString().split("T")[0];
+        const valid = data
+          .map((b) => b.eventDate?.split("T")[0])
+          .filter((d) => {
+            if (!d || d.length !== 10) return false;
+            const year = parseInt(d.split("-")[0]);
+            if (year < 2024 || year > 2100) return false; // filter out corrupted years
+            return d >= todayStr; // only show future dates
+          });
+        setBookedDates(valid);
       })
       .catch(() => {});
     const found = halls.find((h) => h._id === form.hallId);
@@ -252,19 +348,49 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
   }, [form.hallId, halls]);
 
   /* When date is picked, fetch booked time slots for that date & open time-slot modal */
+  const maxDate = (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().split("T")[0];
+  })();
+
   const handleDateChange = (dateVal) => {
     set("eventDate", dateVal);
     set("timeSlot", "");
     set("timeSlotLabel", "");
-    if (!dateVal) return;
+    setErrors((e) => ({ ...e, eventDate: "" }));
+
+    // Only proceed if date is fully entered (yyyy-mm-dd = 10 chars)
+    if (!dateVal || dateVal.length < 10) return;
+
+    const chosen = new Date(dateVal);
+    const todayDate = new Date(today);
+    todayDate.setHours(0, 0, 0, 0);
+    chosen.setHours(0, 0, 0, 0);
+
+    // Past date
+    if (chosen < todayDate) {
+      setErrors((e) => ({ ...e, eventDate: "Date cannot be in the past" }));
+      return;
+    }
+
+    // Beyond 30 days
+    const maxAllowed = new Date(todayDate);
+    maxAllowed.setDate(maxAllowed.getDate() + 30);
+    if (chosen > maxAllowed) {
+      setErrors((e) => ({ ...e, eventDate: "Bookings only accepted within the next 30 days" }));
+      return;
+    }
+
+    // Valid date — fetch slots and open picker
     if (form.hallId) {
       api.get(`/bookings/slots/${form.hallId}?date=${dateVal}`)
         .then((res) => setBookedSlots(res.data.bookedSlots || []))
         .catch(() => setBookedSlots([]));
     } else {
-      setBookedSlots([]); // No hall yet — all slots available
+      setBookedSlots([]);
     }
-    setShowTimeSlots(true); // Always open time slot picker when date chosen
+    setShowTimeSlots(true);
   };
 
   const handleSlotSelected = (slotId) => {
@@ -294,9 +420,18 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
     if (s === 2) {
       if (!form.hallId)    e.hallId    = "Please select a hall";
       if (!form.eventDate) e.eventDate = "Please select a date";
+      if (form.eventDate) {
+        const chosen = new Date(form.eventDate);
+        const todayD = new Date(today);
+        todayD.setHours(0,0,0,0); chosen.setHours(0,0,0,0);
+        if (chosen < todayD) e.eventDate = "Date cannot be in the past";
+        else {
+          const max = new Date(todayD); max.setDate(max.getDate() + 30);
+          if (chosen > max) e.eventDate = "Bookings only accepted within the next 30 days";
+          else if (bookedDates.includes(form.eventDate)) e.eventDate = "This date is fully booked";
+        }
+      }
       if (!form.timeSlot)  e.timeSlot  = "Please select a time slot";
-      if (form.eventDate && bookedDates.includes(form.eventDate))
-        e.eventDate = "This date is fully booked";
     }
     if (s === 3) {
       if (form.hallId?.startsWith("demo_")) { e.submit = "⚠️ Demo halls cannot be booked. Please add real halls via the Admin panel or fix your MongoDB connection first."; }
@@ -308,18 +443,17 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
     return Object.keys(e).length === 0;
   };
 
-  const handleVerify = () => {
-    if (!form.transactionId.trim()) { setErrors({ transactionId: "Enter transaction ID first" }); return; }
-    setVerifying(true);
-    setTimeout(() => { setVerifying(false); setPayVerified(true); }, 1500);
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     try {
       const res = await api.post("/bookings", { ...form, totalPrice: grandTotal });
       if (res.data.success) {
-        setBookingRef("NM-" + Math.random().toString(36).substr(2, 6).toUpperCase());
+        // Use ref from backend (name-based) or fallback
+        const ref = res.data.booking?.bookingRef ||
+          "NM-" + (form.clientName || "GUE").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4) +
+          "-" + Math.random().toString(36).toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,4);
+        setBookingRef(ref);
+        setBookingId(res.data.booking?._id || null);
         setStep(4);
       } else {
         setErrors({ submit: res.data.message });
@@ -337,22 +471,56 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
 
   return (
     <>
+      <style>{`
+        .bm-modal-scroll { overflow-y: auto; }
+        .bm-modal-scroll::-webkit-scrollbar { width: 3px; }
+        .bm-modal-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.25); border-radius: 2px; }
+
+        /* Step bar — compress on tiny screens */
+        @media (max-width: 400px) {
+          .bm-step-label { display: none; }
+          .bm-step-circle { width: 24px !important; height: 24px !important; font-size: 10px !important; }
+        }
+
+        /* Name/Phone row → stack on mobile */
+        @media (max-width: 480px) {
+          .bm-two-col { grid-template-columns: 1fr !important; }
+        }
+
+        /* Payment grid → 2 cols on mobile instead of 3 */
+        @media (max-width: 400px) {
+          .bm-pay-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+
+        /* Header padding tighter on small screens */
+        @media (max-width: 400px) {
+          .bm-header { padding: 1rem 1rem 0 !important; }
+          .bm-body   { padding: 0 1rem 0.5rem !important; }
+          .bm-footer { padding: 1rem !important; }
+        }
+
+        /* Confirm/summary row wrap */
+        @media (max-width: 380px) {
+          .bm-summary-row { flex-direction: column; align-items: flex-start !important; gap: 2px; }
+          .bm-summary-val { text-align: left !important; }
+        }
+      `}</style>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "rgba(7,5,15,0.88)", backdropFilter: "blur(10px)" }}
-        onClick={(e) => e.target === e.currentTarget && onClose()}
+        className="fixed inset-0 z-50 flex items-center justify-center p-3"
+        style={{ background: "rgba(7,5,15,0.72)", backdropFilter: "blur(4px)" }}
       >
         <div
-          className="relative w-full max-w-lg rounded-2xl overflow-hidden"
+          className="relative w-full max-w-lg rounded-2xl overflow-hidden bm-modal-scroll"
           style={{
             background: "linear-gradient(145deg,#1a1035,#120d2a)",
             border: "1px solid rgba(167,139,250,0.2)",
-            maxHeight: "90vh",
+            maxHeight: "92vh",
             overflowY: "auto",
+            width: "100%",
           }}
         >
           {/* Header */}
-          <div className="p-6 pb-0">
+          <div className="p-6 pb-0 bm-header">
             <div className="flex justify-between items-start mb-5">
               <div>
                 <h2
@@ -382,7 +550,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                 <div key={i} className="flex items-center flex-1 last:flex-none">
                   <div className="flex flex-col items-center">
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all"
+                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all bm-step-circle"
                       style={{
                         background:
                           i + 1 < step
@@ -397,7 +565,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                       {i + 1 < step ? "✓" : i + 1}
                     </div>
                     <span
-                      className="text-[10px] mt-1 tracking-wider uppercase"
+                      className="text-[10px] mt-1 tracking-wider uppercase bm-step-label"
                       style={{ color: i + 1 === step ? "#c084fc" : "rgba(255,255,255,0.25)" }}
                     >
                       {label}
@@ -415,16 +583,16 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
           </div>
 
           {/* Body */}
-          <div className="px-6 pb-2">
+          <div className="px-6 pb-2 bm-body">
 
             {/* ── STEP 1: Contact Details ── */}
             {step === 1 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 bm-two-col">
                   <Field label="Full Name *" error={errors.clientName}>
                     <input
                       className={inputClass(errors.clientName)}
-                      placeholder="Ahmed Khan"
+                      placeholder="Enter your full name"
                       value={form.clientName}
                       onChange={(e) => set("clientName", e.target.value)}
                     />
@@ -432,7 +600,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                   <Field label="Phone *" error={errors.clientPhone}>
                     <input
                       className={inputClass(errors.clientPhone)}
-                      placeholder="+92 300 1234567"
+                      placeholder="+92 3XX XXXXXXX"
                       value={form.clientPhone}
                       onChange={(e) => set("clientPhone", e.target.value)}
                     />
@@ -442,7 +610,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                   <input
                     className={inputClass(errors.clientEmail)}
                     type="email"
-                    placeholder="ahmed@email.com"
+                    placeholder="your@email.com"
                     value={form.clientEmail}
                     onChange={(e) => set("clientEmail", e.target.value)}
                   />
@@ -463,18 +631,14 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
               <div className="space-y-4">
 
                 {/* Event Type first — helps user filter */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-2 gap-3 bm-two-col">
                   <Field label="Event Type">
-                    <select
-                      className={inputClass()}
+                    <CustomSelect
                       value={form.eventType}
-                      onChange={(e) => set("eventType", e.target.value)}
-                      style={{ background: "rgba(255,255,255,0.05)" }}
-                    >
-                      {EVENT_TYPES.map((t) => (
-                        <option key={t} style={{ background: "#1a1035" }}>{t}</option>
-                      ))}
-                    </select>
+                      onChange={(val) => set("eventType", val)}
+                      options={EVENT_TYPES}
+                      icons={EVENT_ICONS}
+                    />
                   </Field>
                   <Field label="No. of Guests">
                     <input
@@ -489,19 +653,19 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
 
                 {/* Hall selector */}
                 <Field label="Select Hall *" error={errors.hallId}>
-                  <select
-                    className={inputClass(errors.hallId)}
+                  <CustomSelect
                     value={form.hallId}
-                    onChange={(e) => { set("hallId", e.target.value); set("timeSlot", ""); set("eventDate", ""); }}
-                    style={{ background: errors.hallId ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)" }}
-                  >
-                    <option value="" style={{ background: "#1a1035" }}>-- Choose a Hall --</option>
-                    {halls.map((h) => (
-                      <option key={h._id} value={h._id} style={{ background: "#1a1035" }}>
-                        {h.name} · {h.totalSeats} seats · PKR {h.pricePerHead?.toLocaleString()}/head
-                      </option>
-                    ))}
-                  </select>
+                    onChange={(val) => { set("hallId", val); set("timeSlot", ""); set("eventDate", ""); }}
+                    options={[
+                      ...halls.map((h) => ({
+                        value: h._id,
+                        label: `${h.name} · ${h.totalSeats} seats · PKR ${h.pricePerHead?.toLocaleString()}/head`,
+                      }))
+                    ]}
+                    placeholder="-- Choose a Hall --"
+                    error={errors.hallId}
+                    icons={{}}
+                  />
                 </Field>
 
                 {/* Selected hall info card */}
@@ -528,13 +692,20 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
 
                 {/* Event Date */}
                 <Field label="Event Date *" error={errors.eventDate}>
-                  <input
-                    className={inputClass(errors.eventDate)}
-                    type="date"
-                    min={today}
-                    value={form.eventDate}
-                    onChange={(e) => handleDateChange(e.target.value)}
-                  />
+                  <div style={{ position: "relative" }}>
+                    <input
+                      className={inputClass(errors.eventDate)}
+                      type="date"
+                      min={today}
+                      max={maxDate}
+                      value={form.eventDate}
+                      onChange={(e) => handleDateChange(e.target.value)}
+                      style={{ colorScheme: "dark" }}
+                    />
+                    <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
+                      Bookings accepted for the next 30 days only · Latest: {new Date(maxDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
+                    </p>
+                  </div>
                 </Field>
 
                 {/* Time slot display (after selection) */}
@@ -600,8 +771,9 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                     Estimated Budget
                   </div>
                   {[
+                    ["Guest",      form.clientName],
                     ["Hall",       selectedHall?.name],
-                    ["Date",       form.eventDate],
+                    ["Date",       form.eventDate ? new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) : "—"],
                     ["Time Slot",  form.timeSlotLabel],
                     ["Event",      form.eventType],
                     ["Guests",     form.guests],
@@ -610,11 +782,11 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                   ].map(([k, v]) => (
                     <div
                       key={k}
-                      className="flex justify-between px-4 py-2 text-sm"
+                      className="flex justify-between px-4 py-2 text-sm bm-summary-row"
                       style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
                     >
                       <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
-                      <span style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
+                      <span className="bm-summary-val" style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
                     </div>
                   ))}
                   <div
@@ -626,15 +798,21 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                       PKR {grandTotal.toLocaleString()}
                     </span>
                   </div>
+                  {/* Ref note — visible on bill before booking is submitted */}
+                  <div className="px-4 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.04)", background: "rgba(124,58,237,0.04)" }}>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
+                      📌 A unique booking reference (e.g. NM-{(form.clientName || "YOU").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4)}-XXXX) will be generated after confirmation. Use it to track your booking at <span style={{ color: "#a855f7" }}>/booking-status</span>
+                    </p>
+                  </div>
                 </div>
 
                 <Field label="Payment Method *" error={errors.paymentMethod}>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-2 bm-pay-grid">
                     {PAY_METHODS.map((m) => (
                       <button
                         key={m}
                         type="button"
-                        onClick={() => { set("paymentMethod", m); setPayVerified(false); }}
+                        onClick={() => { set("paymentMethod", m); }}
                         className="py-2 px-1 rounded-lg text-xs font-medium transition-all"
                         style={{
                           border: `1px solid ${form.paymentMethod === m ? "rgba(167,139,250,0.6)" : "rgba(167,139,250,0.15)"}`,
@@ -649,27 +827,13 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                 </Field>
 
                 {form.paymentMethod && form.paymentMethod !== "Cash" && (
-                  <Field label={`${form.paymentMethod} Transaction ID *`} error={errors.transactionId}>
-                    <div className="flex gap-2">
-                      <input
-                        className={`${inputClass(errors.transactionId)} flex-1`}
-                        placeholder="Enter reference / transaction ID"
-                        value={form.transactionId}
-                        onChange={(e) => set("transactionId", e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        onClick={handleVerify}
-                        disabled={verifying || payVerified}
-                        className="px-3 rounded-lg text-xs font-semibold whitespace-nowrap text-white transition-all"
-                        style={{
-                          background: payVerified ? "#16a34a" : "linear-gradient(135deg,#7c3aed,#a855f7)",
-                          opacity: verifying ? 0.7 : 1,
-                        }}
-                      >
-                        {verifying ? "..." : payVerified ? "✓ Done" : "Verify"}
-                      </button>
-                    </div>
+                  <Field label={`${form.paymentMethod} Reference / Transaction ID *`} error={errors.transactionId}>
+                    <input
+                      className={inputClass(errors.transactionId)}
+                      placeholder="Enter reference / transaction ID"
+                      value={form.transactionId}
+                      onChange={(e) => set("transactionId", e.target.value)}
+                    />
                   </Field>
                 )}
 
@@ -684,58 +848,112 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
               </div>
             )}
 
-            {/* ── STEP 4: Confirmation ── */}
+            {/* ── STEP 4: Pending / Confirmed ── */}
             {step === 4 && (
-              <div className="text-center py-2">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"
-                  style={{ background: "rgba(124,58,237,0.2)", border: "2px solid #7c3aed" }}
-                >
-                  ✓
-                </div>
-                <div
-                  className="rounded-xl p-4 mb-4"
-                  style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}
-                >
-                  <p className="text-xs tracking-widest uppercase mb-1" style={{ color: "#a855f7" }}>
-                    Booking Reference
-                  </p>
-                  <p
-                    className="text-white font-bold text-2xl tracking-widest"
-                    style={{ fontFamily: "'Playfair Display',serif" }}
-                  >
+              <div className="py-2">
+                {/* Status banner */}
+                {confirmedStatus === "Confirmed" ? (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(34,197,94,0.2)", border: "2px solid #22c55e" }}>✓</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Confirmed!</p>
+                    <p className="text-xs mt-1" style={{ color: "#4ade80" }}>Manager has approved your booking. An SMS has been sent to your number.</p>
+                  </div>
+                ) : confirmedStatus === "Cancelled" ? (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(239,68,68,0.2)", border: "2px solid #ef4444" }}>✕</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Cancelled</p>
+                    <p className="text-xs mt-1" style={{ color: "#f87171" }}>Your booking has been cancelled. Please contact us for more details.</p>
+                  </div>
+                ) : (
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(245,158,11,0.2)", border: "2px solid #f59e0b" }}>⏳</div>
+                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Awaiting Manager Approval</p>
+                    <p className="text-xs mt-1" style={{ color: "#fcd34d" }}>
+                      Your request has been received. You will receive an SMS on <strong style={{ color: "white" }}>{form.clientPhone}</strong> once the manager confirms.
+                    </p>
+                    {/* Pulsing dot */}
+                    <div className="flex items-center justify-center gap-1.5 mt-3">
+                      {[0, 150, 300].map((d) => (
+                        <div key={d} style={{
+                          width: 6, height: 6, borderRadius: "50%", background: "#f59e0b",
+                          animation: `pulse 1.2s ${d}ms ease-in-out infinite`,
+                        }}/>
+                      ))}
+                    </div>
+                    <style>{`@keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }`}</style>
+                  </div>
+                )}
+
+                {/* Reference card */}
+                <div className="rounded-xl p-4 mb-4" style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}>
+                  <p className="text-xs tracking-widest uppercase mb-1 text-center" style={{ color: "#a855f7" }}>Booking Reference</p>
+                  <p className="text-white font-bold text-2xl tracking-widest text-center" style={{ fontFamily: "'Playfair Display',serif" }}>
                     {bookingRef}
                   </p>
+                  <p className="text-xs text-center mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>
+                    Save this reference for your records
+                  </p>
                 </div>
+
+                {/* Status badge */}
+                <div className="flex justify-center mb-3">
+                  <span className="text-xs px-3 py-1.5 rounded-full font-medium" style={{
+                    background: confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.15)"
+                              : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.15)"
+                              : "rgba(245,158,11,0.15)",
+                    color: confirmedStatus === "Confirmed" ? "#4ade80"
+                         : confirmedStatus === "Cancelled" ? "#f87171"
+                         : "#fcd34d",
+                    border: `1px solid ${confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.3)"
+                           : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.3)"
+                           : "rgba(245,158,11,0.3)"}`,
+                  }}>
+                    Status: {confirmedStatus}
+                  </span>
+                </div>
+
+                {/* Summary rows */}
                 {[
                   ["Guest",      form.clientName],
                   ["Phone",      form.clientPhone],
                   ["Hall",       selectedHall?.name],
-                  ["Date",       form.eventDate],
+                  ["Date",       new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })],
                   ["Time Slot",  form.timeSlotLabel],
                   ["Event",      form.eventType],
                   ["Guests",     form.guests],
                   ["Payment",    form.paymentMethod],
-                  ["Total Paid", `PKR ${grandTotal.toLocaleString()}`],
+                  ["Total",      `PKR ${grandTotal.toLocaleString()}`],
                 ].map(([k, v]) => (
-                  <div
-                    key={k}
-                    className="flex justify-between py-1.5 text-sm"
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
-                  >
+                  <div key={k} className="flex justify-between py-1.5 text-sm bm-summary-row"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                     <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
-                    <span className="font-medium text-white">{v}</span>
+                    <span className="font-medium text-white bm-summary-val">{v}</span>
                   </div>
                 ))}
-                <p className="text-xs mt-4" style={{ color: "rgba(255,255,255,0.25)" }}>
-                  Confirmation sent to your phone. Thank you for choosing Noor Mahal!
-                </p>
+
+                {confirmedStatus === "Pending" && (
+                  <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
+                    This page checks for updates automatically every 12 seconds.
+                  </p>
+                )}
+                <div style={{ textAlign: "center", marginTop: "0.75rem" }}>
+                  <a href="/booking-status"
+                    style={{ color: "#a855f7", fontSize: "0.78rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
+                    onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
+                    onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                  >
+                    🔖 Check status anytime at noormahal.pk/booking-status
+                  </a>
+                </div>
               </div>
             )}
           </div>
 
           {/* Footer buttons */}
-          <div className="p-6 pt-4 flex gap-3 justify-end">
+          <div className="p-6 pt-4 flex gap-3 justify-end bm-footer">
             {step > 1 && step < 4 && (
               <button
                 onClick={() => setStep((s) => s - 1)}

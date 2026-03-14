@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 
 const employeeSchema = new mongoose.Schema(
   {
@@ -13,6 +14,11 @@ const employeeSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+    },
+    password: {
+      type: String,
+      default: "",
+      select: false,
     },
     phone: {
       type: String,
@@ -38,5 +44,14 @@ const employeeSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+employeeSchema.pre("save", function (next) {
+  if (!this.isModified("password") || !this.password) return next();
+  bcrypt.hash(this.password, 10, (err, hash) => {
+    if (err) return next(err);
+    this.password = hash;
+    next();
+  });
+});
 
 module.exports = mongoose.model("Employee", employeeSchema);
