@@ -6,16 +6,29 @@ export const statusColor = {
   Pending:   "#f59e0b",
   Confirmed: "#10b981",
   Cancelled: "#ef4444",
+  Completed: "#818cf8",
 };
 export const statusBg = {
   Pending:   "rgba(245,158,11,0.12)",
   Confirmed: "rgba(16,185,129,0.12)",
   Cancelled: "rgba(239,68,68,0.12)",
+  Completed: "rgba(129,140,248,0.12)",
 };
 export const statusBorder = {
   Pending:   "rgba(245,158,11,0.3)",
   Confirmed: "rgba(16,185,129,0.3)",
   Cancelled: "rgba(239,68,68,0.3)",
+  Completed: "rgba(129,140,248,0.3)",
+};
+
+// Returns "Completed" if Confirmed and event date has passed, otherwise the real status
+export const getDisplayStatus = (booking) => {
+  if (
+    booking?.status === "Confirmed" &&
+    booking?.eventDate &&
+    new Date(booking.eventDate) < new Date(new Date().setHours(0, 0, 0, 0))
+  ) return "Completed";
+  return booking?.status || "Pending";
 };
 
 export const btnPrimary = {

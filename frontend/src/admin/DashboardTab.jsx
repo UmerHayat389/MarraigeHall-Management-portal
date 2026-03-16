@@ -1,5 +1,5 @@
 import React from "react";
-import { statusColor, statusBg, statusBorder } from "./adminTheme";
+import { statusColor, statusBg, statusBorder, getDisplayStatus } from "./adminTheme";
 
 function MiniBarChart({ data, color="#9333ea" }) {
   const max = Math.max(...data.map(d=>d.value), 1);
@@ -26,9 +26,9 @@ export default function DashboardTab({ stats, bookings, switchTab }) {
     return { label:d.toLocaleDateString("en",{weekday:"short"}), value:count };
   });
 
-  const confirmed = bookings.filter(b=>b.status==="Confirmed").length;
-  const pending   = bookings.filter(b=>b.status==="Pending").length;
-  const cancelled = bookings.filter(b=>b.status==="Cancelled").length;
+  const confirmed = bookings.filter(b=>getDisplayStatus(b)==="Confirmed").length;
+  const pending   = bookings.filter(b=>getDisplayStatus(b)==="Pending").length;
+  const cancelled = bookings.filter(b=>getDisplayStatus(b)==="Cancelled").length;
   const total     = bookings.length || 1;
 
   const recent = [...bookings].sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).slice(0,5);
@@ -111,7 +111,7 @@ export default function DashboardTab({ stats, bookings, switchTab }) {
                   <p style={{ color:"white", fontSize:"0.86rem", fontWeight:500, margin:"0 0 2px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{b.clientName}</p>
                   <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.72rem", margin:0 }}>{b.hallId?.name||"—"} · {b.timeSlot||"—"}</p>
                 </div>
-                <span className="badge" style={{ background:statusBg[b.status], color:statusColor[b.status], border:`1px solid ${statusBorder[b.status]}`, marginLeft:"0.5rem", flexShrink:0 }}>{b.status}</span>
+                <span className="badge" style={{ background:statusBg[getDisplayStatus(b)], color:statusColor[getDisplayStatus(b)], border:`1px solid ${statusBorder[getDisplayStatus(b)]}`, marginLeft:"0.5rem", flexShrink:0 }}>{getDisplayStatus(b)}</span>
               </div>
             ))
           }

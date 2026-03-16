@@ -64,13 +64,20 @@ const bookingSchema = new mongoose.Schema({
     enum: ['Pending', 'Confirmed', 'Cancelled'],
     default: 'Pending'
   },
-  // NEW: Array of selected dish IDs
+  // Array of selected dish IDs
   selectedDishes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Dish'
-  }]
+  }],
+
+  // "our-menu" | "self-catering" | "" (empty = old booking, not specified)
+  cateringOption: {
+    type: String,
+    default: ''
+  }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Booking', bookingSchema);
+// Prevent OverwriteModelError when both Booking.js and Booking_model.js are loaded
+module.exports = mongoose.models.Booking || mongoose.model('Booking', bookingSchema);

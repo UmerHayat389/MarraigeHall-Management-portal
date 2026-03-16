@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
-import { statusColor, statusBg, statusBorder, btnGhost, btnDanger } from "./adminTheme";
+import { statusColor, statusBg, statusBorder, btnGhost, btnDanger, getDisplayStatus } from "./adminTheme";
 import BookingDetailModal from "./BookingDetailModal";
 
 export default function BookingsTab({ toast }) {
@@ -39,7 +39,7 @@ export default function BookingsTab({ toast }) {
   useEffect(() => { setPage(1); }, [filter, search]);
 
   const filtered = bookings
-    .filter(b => filter==="All" || b.status===filter)
+    .filter(b => filter==="All" || getDisplayStatus(b)===filter)
     .filter(b => !search ||
       b.clientName?.toLowerCase().includes(search.toLowerCase()) ||
       b.bookingRef?.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,7 +78,7 @@ export default function BookingsTab({ toast }) {
 
       {/* Filter tabs */}
       <div className="filter-row" style={{ display:"flex", gap:"0.4rem", marginBottom:"1.25rem" }}>
-        {["All","Pending","Confirmed","Cancelled"].map(s => (
+        {["All","Pending","Confirmed","Cancelled","Completed"].map(s => (
           <button key={s} onClick={()=>setFilter(s)} style={{
             padding:"0.38rem 0.9rem", borderRadius:"999px", fontSize:"0.75rem", fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600,
             border:`1px solid ${filter===s ? "rgba(147,51,234,0.55)" : "rgba(139,92,246,0.18)"}`,
@@ -104,45 +104,90 @@ export default function BookingsTab({ toast }) {
           <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.9rem" }}>No bookings match your filter</p>
         </div>
       ) : (
-        <div style={{ display:"flex", flexDirection:"column", gap:"0.55rem" }}>
-          {paginated.map(b => (
-            <div key={b._id} className="bk-card" onClick={()=>setSelected(b)}>
-              <div className="bk-row" style={{ display:"flex", justifyContent:"space-between", flexWrap:"wrap", gap:"0.75rem", alignItems:"center" }}>
-                {/* Left info */}
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ display:"flex", alignItems:"center", gap:"0.55rem", marginBottom:"0.38rem", flexWrap:"wrap" }}>
-                    <p style={{ color:"white", fontWeight:600, fontSize:"0.95rem", margin:0 }}>{b.clientName}</p>
-                    <span className="badge" style={{ background:statusBg[b.status], color:statusColor[b.status], border:`1px solid ${statusBorder[b.status]}` }}>{b.status}</span>
-                    {b.bookingRef && (
-                      <span className="badge" style={{ background:"rgba(139,92,246,0.12)", color:"rgba(196,139,252,0.85)", border:"1px solid rgba(139,92,246,0.22)" }}>{b.bookingRef}</span>
-                    )}
+        <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+          {paginated.map(b => {
+            const ds  = getDisplayStatus(b);
+            const sc  = statusColor[ds] || "#888";
+            const sbg = statusBg[ds]    || "transparent";
+            const sbd = statusBorder[ds]|| "transparent";
+            const dateStr = b.eventDate
+              ? new Date(b.eventDate).toLocaleDateString("en-PK",{day:"numeric",month:"short",year:"numeric"})
+              : "—";
+            const slot = b.timeSlot ? b.timeSlot.charAt(0).toUpperCase()+b.timeSlot.slice(1) : "—";
+            return (
+              <div
+                key={b._id}
+                onClick={() => setSelected(b)}
+                style={{
+                  display:"flex", alignItems:"stretch", borderRadius:12, overflow:"hidden", cursor:"pointer",
+                  border:"1px solid rgba(139,92,246,0.13)",
+                  background:"rgba(255,255,255,0.025)",
+                  transition:"all 0.16s",
+                }}
+                onMouseEnter={e=>{ e.currentTarget.style.borderColor="rgba(147,51,234,0.38)"; e.currentTarget.style.background="rgba(109,40,217,0.07)"; }}
+                onMouseLeave={e=>{ e.currentTarget.style.borderColor="rgba(139,92,246,0.13)"; e.currentTarget.style.background="rgba(255,255,255,0.025)"; }}
+              >
+                {/* Status accent bar */}
+                <div style={{ width:3, flexShrink:0, background:sc }} />
+
+                {/* Main content */}
+                <div style={{ flex:1, padding:"12px 16px", minWidth:0, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
+                  {/* Left: name + meta */}
+                  <div style={{ minWidth:0 }}>
+                    <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
+                      <span style={{ color:"white", fontWeight:600, fontSize:"0.88rem" }}>{b.clientName}</span>
+                      <span style={{ fontSize:"0.6rem", fontWeight:700, padding:"2px 7px", borderRadius:99, textTransform:"uppercase", letterSpacing:"0.07em", background:sbg, color:sc, border:`1px solid ${sbd}`, flexShrink:0 }}>{ds}</span>
+                      {b.bookingRef && <span style={{ fontSize:"0.63rem", fontWeight:600, padding:"2px 7px", borderRadius:99, background:"rgba(139,92,246,0.1)", color:"rgba(196,139,252,0.65)", border:"1px solid rgba(139,92,246,0.18)", flexShrink:0 }}>{b.bookingRef}</span>}
+                    </div>
+                    {/* Essential info — only hall, date, slot */}
+                    <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
+                      <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.5)" }}>{b.hallId?.name||"—"}</span>
+                      <span style={{ color:"rgba(255,255,255,0.18)", fontSize:"0.65rem" }}>·</span>
+                      <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.5)" }}>{dateStr}</span>
+                      <span style={{ color:"rgba(255,255,255,0.18)", fontSize:"0.65rem" }}>·</span>
+                      <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.5)" }}>{slot}</span>
+                      <span style={{ color:"rgba(255,255,255,0.18)", fontSize:"0.65rem" }}>·</span>
+                      <span style={{ fontSize:"0.75rem", color:"rgba(255,255,255,0.4)" }}>{b.guests} guests</span>
+                    </div>
                   </div>
-                  <p style={{ color:"rgba(255,255,255,0.38)", fontSize:"0.77rem", margin:0, lineHeight:1.6 }}>
-                    🏛️ {b.hallId?.name||"—"} &nbsp;·&nbsp;
-                    📅 {b.eventDate ? new Date(b.eventDate).toLocaleDateString("en-PK",{day:"numeric",month:"short",year:"numeric"}) : "—"} &nbsp;·&nbsp;
-                    🕐 {b.timeSlot ? b.timeSlot.charAt(0).toUpperCase()+b.timeSlot.slice(1) : "—"} &nbsp;·&nbsp;
-                    🎉 {b.eventType} &nbsp;·&nbsp;
-                    👥 {b.guests} guests
-                  </p>
+
+                  {/* Right: price */}
+                  <span style={{ color:"#c084fc", fontWeight:700, fontSize:"0.9rem", flexShrink:0 }}>
+                    PKR {b.totalPrice?.toLocaleString()}
+                  </span>
                 </div>
 
-                {/* Right actions */}
-                <div className="bk-actions" style={{ display:"flex", alignItems:"center", gap:"0.45rem", flexShrink:0 }}>
-                  <span style={{ color:"#c084fc", fontWeight:700, fontSize:"0.9rem", marginRight:"0.2rem" }}>PKR {b.totalPrice?.toLocaleString()}</span>
-                  {b.status==="Pending" && (
-                    <button style={{ ...btnGhost, color:"#34d399", borderColor:"rgba(16,185,129,0.3)", fontSize:"0.72rem", padding:"0.32rem 0.72rem" }}
-                      onClick={e=>{e.stopPropagation();updateStatus(b._id,"Confirmed");}}>✓ Confirm</button>
+                {/* Action buttons */}
+                <div
+                  style={{ display:"flex", alignItems:"center", gap:6, padding:"0 14px", borderLeft:"1px solid rgba(139,92,246,0.1)", flexShrink:0 }}
+                  onClick={e => e.stopPropagation()}
+                >
+                  {ds === "Pending" && (
+                    <button
+                      onClick={() => updateStatus(b._id,"Confirmed")}
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 13px", borderRadius:8, fontSize:"0.75rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(16,185,129,0.4)", background:"rgba(16,185,129,0.12)", color:"#4ade80", whiteSpace:"nowrap", transition:"all 0.15s" }}
+                      onMouseEnter={e=>{ e.currentTarget.style.background="rgba(16,185,129,0.25)"; e.currentTarget.style.borderColor="rgba(16,185,129,0.6)"; }}
+                      onMouseLeave={e=>{ e.currentTarget.style.background="rgba(16,185,129,0.12)"; e.currentTarget.style.borderColor="rgba(16,185,129,0.4)"; }}
+                    ><span style={{fontSize:11}}>✓</span> Confirm</button>
                   )}
-                  {b.status!=="Cancelled" && (
-                    <button style={{ ...btnDanger, fontSize:"0.72rem", padding:"0.32rem 0.72rem" }}
-                      onClick={e=>{e.stopPropagation();updateStatus(b._id,"Cancelled");}}>✕ Cancel</button>
+                  {ds !== "Cancelled" && ds !== "Completed" && (
+                    <button
+                      onClick={() => updateStatus(b._id,"Cancelled")}
+                      style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 13px", borderRadius:8, fontSize:"0.75rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(239,68,68,0.35)", background:"rgba(239,68,68,0.1)", color:"#f87171", whiteSpace:"nowrap", transition:"all 0.15s" }}
+                      onMouseEnter={e=>{ e.currentTarget.style.background="rgba(239,68,68,0.22)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.55)"; }}
+                      onMouseLeave={e=>{ e.currentTarget.style.background="rgba(239,68,68,0.1)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.35)"; }}
+                    ><span style={{fontSize:11}}>✕</span> Cancel</button>
                   )}
-                  <button style={{ ...btnDanger, fontSize:"0.72rem", padding:"0.32rem 0.62rem" }}
-                    onClick={e=>{e.stopPropagation();deleteBooking(b._id);}}>🗑</button>
+                  <button
+                    onClick={() => deleteBooking(b._id)}
+                    style={{ display:"flex", alignItems:"center", justifyContent:"center", width:32, height:32, borderRadius:8, cursor:"pointer", border:"1px solid rgba(239,68,68,0.25)", background:"rgba(239,68,68,0.07)", color:"#f87171", fontSize:"0.85rem", transition:"all 0.15s", flexShrink:0 }}
+                    onMouseEnter={e=>{ e.currentTarget.style.background="rgba(239,68,68,0.2)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.5)"; }}
+                    onMouseLeave={e=>{ e.currentTarget.style.background="rgba(239,68,68,0.07)"; e.currentTarget.style.borderColor="rgba(239,68,68,0.25)"; }}
+                  >🗑</button>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

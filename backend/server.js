@@ -31,6 +31,9 @@ app.use("/api/bookings",  require("./routes/bookingRoutes"));
 app.use("/api/employees", require("./routes/employeeRoutes"));
 app.use("/api/dishes",    require("./routes/dishes.routes"));
 
+// ── TEMPORARY: One-time dish fix route — REMOVE after fixing all bookings ─────
+app.use("/api/fix",       require("./routes/fixDishesRoute"));
+
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "Server is running", timestamp: new Date().toISOString() });

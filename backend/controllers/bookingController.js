@@ -107,6 +107,8 @@ exports.createBooking = async (req, res) => {
       specialRequests: specialRequests || "",
       bookingRef,
       status: "Pending",
+      cateringOption:  req.body.cateringOption || "",
+      selectedDishes:  Array.isArray(req.body.selectedDishes) ? req.body.selectedDishes : [],
     });
 
     await booking.populate("hallId", "name location");
@@ -298,5 +300,17 @@ exports.getClientHistory = async (req, res) => {
   } catch (error) {
     console.error("getClientHistory error:", error.message);
     res.status(500).json({ success: false, message: "Could not fetch client history" });
+  }
+};
+// @route GET /api/bookings/ref/:bookingRef
+exports.getBookingByRef = async (req, res) => {
+  try {
+    const booking = await Booking.findOne({ bookingRef: req.params.bookingRef.toUpperCase() })
+      .populate("hallId", "name location image pricePerHead totalSeats");
+    if (!booking) return res.status(404).json({ success: false, message: "Booking not found" });
+    res.json({ success: true, booking });
+  } catch (error) {
+    console.error("getBookingByRef error:", error.message);
+    res.status(500).json({ success: false, message: "Could not fetch booking" });
   }
 };

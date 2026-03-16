@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
-import { statusColor, statusBg, statusBorder } from "./adminTheme";
+import { statusColor, statusBg, statusBorder, getDisplayStatus } from "./adminTheme";
 import BookingDetailModal from "./BookingDetailModal";
 
 const SLOTS      = ["afternoon","evening","latenight"];
@@ -63,7 +63,7 @@ export default function CalendarTab({ toast }) {
   for (let d=1; d<=daysInMonth; d++) cells.push(d);
 
   const monthBks   = bookings.filter(b => { if(!b.eventDate) return false; const d=new Date(b.eventDate); return d.getFullYear()===year && d.getMonth()===month; });
-  const confirmed  = monthBks.filter(b=>b.status==="Confirmed");
+  const confirmed  = monthBks.filter(b=>b.status==="Confirmed" || getDisplayStatus(b)==="Completed");
   const revenue    = confirmed.reduce((s,b)=>s+(b.totalPrice||0),0);
 
   const selectedDateLabel = selected
@@ -285,7 +285,7 @@ export default function CalendarTab({ toast }) {
                 ) : (
                   <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
                     {dayBookings.map(b=>{
-                      const sc  = statusColor[b.status]||"#888";
+                      const sc  = statusColor[getDisplayStatus(b)]||"#888";
                       const s   = b.timeSlot;
                       const sc2 = s ? SLOT_COLOR[s] : "#9333ea";
                       return (
@@ -302,7 +302,7 @@ export default function CalendarTab({ toast }) {
                             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.28rem" }}>
                               <p style={{ color:"white", fontWeight:700, fontSize:"0.82rem", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:"55%" }}>{b.clientName}</p>
                               <span style={{ fontSize:"0.58rem", fontWeight:700, color:sc, background:`${sc}16`, border:`1px solid ${sc}35`, borderRadius:999, padding:"1px 7px", flexShrink:0 }}>
-                                {b.status==="Confirmed"?"✓ ":b.status==="Cancelled"?"✕ ":"⏳ "}{b.status}
+                                {getDisplayStatus(b)==="Completed"?"★ ":getDisplayStatus(b)==="Confirmed"?"✓ ":getDisplayStatus(b)==="Cancelled"?"✕ ":"⏳ "}{getDisplayStatus(b)}
                               </span>
                             </div>
 
@@ -331,7 +331,7 @@ export default function CalendarTab({ toast }) {
                             )}
 
                             {/* Confirm / Cancel quick actions */}
-                            {b.status==="Pending"&&(
+                            {getDisplayStatus(b)==="Pending"&&(
                               <div style={{ display:"flex", gap:"0.35rem", marginTop:"0.45rem" }}>
                                 <button onClick={e=>{e.stopPropagation();updateStatus(b._id,"Confirmed");}}
                                   style={{ flex:1, padding:"4px 0", borderRadius:7, border:"1px solid rgba(16,185,129,0.38)", background:"rgba(16,185,129,0.1)", color:"#34d399", fontSize:"0.62rem", fontWeight:700, cursor:"pointer", transition:"all 0.14s" }}

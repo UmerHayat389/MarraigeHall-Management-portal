@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../services/api";
 
-const STEP_LABELS = ["Details", "Hall & Date", "Payment", "Confirmed"];
+const STEP_LABELS = ["Details", "Hall & Date", "Menu", "Payment", "Confirmed"];
 const EVENT_TYPES = ["Nikkah", "Walima", "Barat", "Birthday", "Conference", "Anniversary", "Other"];
 const PAY_METHODS = ["JazzCash", "EasyPaisa", "Bank Transfer", "Cash"];
 
@@ -110,14 +110,14 @@ function CustomSelect({ value, onChange, options, placeholder = "Select...", err
 }
 
 
-function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) {
+function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSelect, onClose }) {
   const [selected, setSelected] = useState(null);
 
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: "rgba(7,5,15,0.75)", backdropFilter: "blur(8px)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      style={{ background: "rgba(7,5,15,0.45)", backdropFilter: "blur(4px)" }}
+      onClick={undefined}
     >
       <div
         className="w-full max-w-sm rounded-2xl overflow-hidden"
@@ -154,6 +154,17 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) 
             className="h-px mt-3"
             style={{ background: "rgba(167,139,250,0.12)" }}
           />
+          {/* Live availability indicator */}
+          <div className="flex items-center gap-1.5 mt-2">
+            <div style={{
+              width: 6, height: 6, borderRadius: "50%",
+              background: loading ? "#f59e0b" : "#22c55e",
+              animation: "pulse 1.2s ease-in-out infinite",
+            }}/>
+            <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.3)", letterSpacing: "0.05em" }}>
+              {loading ? "CHECKING AVAILABILITY..." : "LIVE AVAILABILITY"}
+            </span>
+          </div>
         </div>
 
         {/* Slots */}
@@ -237,244 +248,169 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) 
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   NEW: DISHES SELECTION MODAL
+   INLINE DISH SELECTOR — embedded in Step 2 below the time slot field
+   Mirrors the hall card style: same purple border, same card background.
    ══════════════════════════════════════════════════════════════════════════ */
-function DishesSelectionModal({ onClose, onConfirm, initialSelection = [] }) {
-  const [dishes, setDishes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [selected, setSelected] = useState(initialSelection);
-  const [cateringOption, setCateringOption] = useState(initialSelection.length > 0 ? 'provided' : null);
+const CATEGORY_META = [
+  { key: "Starter Menu",      icon: "🥗", short: "Starters"  },
+  { key: "Main Course Menu",  icon: "🍛", short: "Main"      },
+  { key: "Dessert Menu",      icon: "🍰", short: "Desserts"  },
+  { key: "Drinks Menu",       icon: "🥤", short: "Drinks"    },
+];
+
+const MAX_PER_CATEGORY = 2;
+
+function InlineDishSelector({ selected, onChange }) {
+  const [dishes, setDishes]       = useState([]);
+  const [loadingDishes, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("Starter Menu");
+  const [catError, setCatError]   = useState("");
 
   useEffect(() => {
-    // Fetch dishes from backend
     api.get("/dishes")
       .then(r => setDishes(r.data.dishes || []))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
-  const toggleDish = (dishId) => {
-    setSelected(prev => 
-      prev.includes(dishId) 
-        ? prev.filter(id => id !== dishId)
-        : [...prev, dishId]
-    );
-  };
-
-  const groupedDishes = {
-    'Starter Menu': dishes.filter(d => d.category === 'Starter Menu'),
-    'Main Course Menu': dishes.filter(d => d.category === 'Main Course Menu'),
-    'Dessert Menu': dishes.filter(d => d.category === 'Dessert Menu'),
-    'Drinks Menu': dishes.filter(d => d.category === 'Drinks Menu'),
-  };
-
-  const CATEGORY_ICONS = {
-    'Starter Menu': '🥗',
-    'Main Course Menu': '🍛',
-    'Dessert Menu': '🍰',
-    'Drinks Menu': '🥤',
-  };
-
-  const handleConfirm = () => {
-    if (cateringOption === 'self') {
-      onConfirm([]);
-    } else {
-      onConfirm(selected);
+  const toggle = (id, category) => {
+    setCatError("");
+    if (selected.includes(id)) {
+      onChange(selected.filter(x => x !== id));
+      return;
     }
+    const catIds = dishes.filter(d => d.category === category).map(d => d._id);
+    const catCount = selected.filter(x => catIds.includes(x)).length;
+    if (catCount >= MAX_PER_CATEGORY) {
+      setCatError(`Max ${MAX_PER_CATEGORY} items from ${category.replace(" Menu", "")}`);
+      return;
+    }
+    onChange([...selected, id]);
   };
+
+  const tabDishes = dishes.filter(d => d.category === activeTab);
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: "rgba(7,5,15,0.85)", backdropFilter: "blur(10px)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      className="rounded-xl overflow-hidden"
+      style={{ border: "1px solid rgba(147,51,234,0.2)", background: "rgba(147,51,234,0.08)" }}
     >
-      <div
-        className="w-full max-w-2xl max-h-[85vh] rounded-2xl overflow-hidden flex flex-col"
-        style={{
-          background: "linear-gradient(145deg,#1a1035,#120d2a)",
-          border: "1px solid rgba(167,139,250,0.25)",
-        }}
-      >
-        {/* Header */}
-        <div className="p-6 pb-4 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
-          <div className="flex justify-between items-start">
-            <div>
-              <h3
-                className="text-xl font-semibold text-white mb-1"
-                style={{ fontFamily: "'Playfair Display',serif" }}
-              >
-                Select Menu Options
-              </h3>
-              <p className="text-xs" style={{ color: "rgba(192,132,252,0.6)" }}>
-                Choose dishes from our menu or opt for self-catering
-              </p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-lg leading-none transition-colors"
-              style={{ color: "rgba(167,139,250,0.45)" }}
-              onMouseEnter={(e) => (e.target.style.color = "white")}
-              onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.45)")}
-            >
-              ✕
-            </button>
-          </div>
+      {/* Header */}
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px 8px" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ fontSize:15 }}>🍽️</span>
+          <span style={{ fontSize:13, fontWeight:600, color:"white" }}>Menu Selection</span>
+          <span style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>(max {MAX_PER_CATEGORY}/category)</span>
         </div>
+        {selected.length > 0 && (
+          <span style={{ fontSize:11, padding:"2px 8px", borderRadius:99, background:"rgba(147,51,234,0.25)", color:"#c084fc" }}>
+            {selected.length} selected
+          </span>
+        )}
+      </div>
 
-        {/* Catering Option Selection */}
-        <div className="p-6 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
-          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "rgba(192,132,252,0.7)" }}>
-            Catering Preference
-          </p>
-          <div className="grid grid-cols-2 gap-3">
+      {/* Category tabs — 4 equal columns, no wrap */}
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:4, padding:"0 16px 8px" }}>
+        {CATEGORY_META.map(cat => {
+          const catIds = dishes.filter(d => d.category === cat.key).map(d => d._id);
+          const catSelected = selected.filter(x => catIds.includes(x)).length;
+          const isActive = activeTab === cat.key;
+          const atLimit = catSelected >= MAX_PER_CATEGORY && dishes.filter(d => d.category === cat.key).length > 0;
+          return (
             <button
-              onClick={() => setCateringOption('provided')}
-              className="p-4 rounded-xl text-left transition-all"
+              key={cat.key}
+              type="button"
+              onClick={() => { setActiveTab(cat.key); setCatError(""); }}
               style={{
-                border: `2px solid ${cateringOption === 'provided' ? '#9333ea' : 'rgba(167,139,250,0.2)'}`,
-                background: cateringOption === 'provided' ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.03)',
+                background: isActive ? "rgba(124,58,237,0.4)" : "rgba(255,255,255,0.04)",
+                border: `1px solid ${isActive ? "rgba(147,51,234,0.6)" : atLimit ? "rgba(239,68,68,0.35)" : "rgba(167,139,250,0.12)"}`,
+                borderRadius: 8,
+                padding: "6px 2px",
+                color: isActive ? "white" : "rgba(255,255,255,0.45)",
+                display:"flex", flexDirection:"column", alignItems:"center", gap:2,
+                cursor:"pointer", transition:"all 0.15s", minWidth:0,
               }}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">🍽️</span>
-                <span className="text-sm font-semibold text-white">Our Menu</span>
-                {cateringOption === 'provided' && <span className="ml-auto text-purple-400">✓</span>}
-              </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                Select dishes from our curated menu
-              </p>
+              <span style={{ fontSize:14, lineHeight:1 }}>{cat.icon}</span>
+              <span style={{ fontSize:10, fontWeight:600, lineHeight:1, whiteSpace:"nowrap" }}>{cat.short}</span>
+              {catSelected > 0 && (
+                <span style={{
+                  fontSize: 9, lineHeight:"1.4", padding:"0 3px", borderRadius:3,
+                  background: atLimit ? "#ef4444" : "#7c3aed", color:"white"
+                }}>
+                  {catSelected}/{MAX_PER_CATEGORY}
+                </span>
+              )}
             </button>
+          );
+        })}
+      </div>
 
-            <button
-              onClick={() => setCateringOption('self')}
-              className="p-4 rounded-xl text-left transition-all"
-              style={{
-                border: `2px solid ${cateringOption === 'self' ? '#9333ea' : 'rgba(167,139,250,0.2)'}`,
-                background: cateringOption === 'self' ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.03)',
-              }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-2xl">👨‍🍳</span>
-                <span className="text-sm font-semibold text-white">Self-Catering</span>
-                {cateringOption === 'self' && <span className="ml-auto text-purple-400">✓</span>}
-              </div>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                I'll arrange my own catering
-              </p>
-            </button>
-          </div>
+      {/* Error banner */}
+      {catError && (
+        <div style={{ margin:"0 16px 8px", padding:"6px 10px", borderRadius:8, background:"rgba(239,68,68,0.1)", border:"1px solid rgba(239,68,68,0.25)" }}>
+          <p style={{ fontSize:11, color:"#f87171", margin:0 }}>⚠ {catError}</p>
         </div>
+      )}
 
-        {/* Dishes List (only show if "Our Menu" is selected) */}
-        {cateringOption === 'provided' && (
-          <div className="flex-1 overflow-y-auto p-6">
-            {loading ? (
-              <div className="text-center py-8" style={{ color: "rgba(255,255,255,0.3)" }}>
-                <div className="text-2xl mb-2">🍽️</div>
-                Loading menu...
-              </div>
-            ) : dishes.length === 0 ? (
-              <div className="text-center py-8" style={{ color: "rgba(255,255,255,0.3)" }}>
-                <div className="text-2xl mb-2">📋</div>
-                No dishes available yet
-              </div>
-            ) : (
-              <div className="space-y-5">
-                {Object.entries(groupedDishes).map(([category, categoryDishes]) => {
-                  if (categoryDishes.length === 0) return null;
-                  
-                  return (
-                    <div key={category}>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-xl">{CATEGORY_ICONS[category]}</span>
-                        <h4 className="text-sm font-semibold text-white uppercase tracking-wide">
-                          {category}
-                        </h4>
-                        <div className="flex-1 h-px" style={{ background: "rgba(167,139,250,0.12)" }} />
+      {/* Dish grid — 2 columns, image on top like hall card */}
+      <div style={{ padding:"0 16px 16px" }}>
+        {loadingDishes ? (
+          <p style={{ fontSize:11, textAlign:"center", padding:"12px 0", color:"rgba(255,255,255,0.3)" }}>Loading menu...</p>
+        ) : tabDishes.length === 0 ? (
+          <p style={{ fontSize:11, textAlign:"center", padding:"12px 0", color:"rgba(255,255,255,0.25)" }}>No items in this category yet</p>
+        ) : (
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:4 }}>
+            {tabDishes.map(dish => {
+              const checked = selected.includes(dish._id);
+              const catIds = dishes.filter(d => d.category === dish.category).map(d => d._id);
+              const catCount = selected.filter(x => catIds.includes(x)).length;
+              const blocked = !checked && catCount >= MAX_PER_CATEGORY;
+              return (
+                <button
+                  key={dish._id}
+                  type="button"
+                  onClick={() => !blocked && toggle(dish._id, dish.category)}
+                  style={{
+                    border: `1px solid ${checked ? "#9333ea" : blocked ? "rgba(239,68,68,0.2)" : "rgba(167,139,250,0.14)"}`,
+                    background: checked ? "rgba(124,58,237,0.18)" : blocked ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.03)",
+                    borderRadius:6, padding:"4px 8px 4px 4px",
+                    textAlign:"left", cursor: blocked ? "not-allowed" : "pointer",
+                    opacity: blocked ? 0.5 : 1, transition:"all 0.15s",
+                    display:"flex", alignItems:"center", gap:7, width:"100%",
+                  }}
+                >
+                  {/* 28×28 thumbnail */}
+                  <div style={{
+                    width:28, height:28, borderRadius:4, overflow:"hidden",
+                    background:"rgba(124,58,237,0.15)", flexShrink:0,
+                  }}>
+                    {dish.image ? (
+                      <img src={dish.image} alt={dish.name} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
+                    ) : (
+                      <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                        <span style={{ fontSize:12, opacity:0.4 }}>{CATEGORY_META.find(c => c.key === dish.category)?.icon || "🍽️"}</span>
                       </div>
-                      
-                      <div className="grid grid-cols-2 gap-2.5">
-                        {categoryDishes.map(dish => (
-                          <button
-                            key={dish._id}
-                            onClick={() => toggleDish(dish._id)}
-                            className="p-3 rounded-lg text-left transition-all"
-                            style={{
-                              border: `1px solid ${selected.includes(dish._id) ? '#9333ea' : 'rgba(167,139,250,0.15)'}`,
-                              background: selected.includes(dish._id) ? 'rgba(124,58,237,0.15)' : 'rgba(255,255,255,0.02)',
-                            }}
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="text-sm font-medium text-white">{dish.name}</span>
-                              {selected.includes(dish._id) && (
-                                <span className="text-purple-400 text-sm flex-shrink-0">✓</span>
-                              )}
-                            </div>
-                            {dish.description && (
-                              <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)", lineHeight: "1.4" }}>
-                                {dish.description}
-                              </p>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-
-            {cateringOption === 'provided' && selected.length > 0 && (
-              <div className="mt-4 p-3 rounded-lg" style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.25)" }}>
-                <p className="text-xs font-medium" style={{ color: "#c084fc" }}>
-                  {selected.length} dish{selected.length !== 1 ? 'es' : ''} selected
-                </p>
-              </div>
-            )}
+                    )}
+                  </div>
+                  {/* Name */}
+                  <p style={{ flex:1, fontSize:11, fontWeight:600, color: checked ? "white" : "rgba(255,255,255,0.8)", margin:0, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis" }}>
+                    {dish.name}
+                  </p>
+                  {/* Check */}
+                  {checked && (
+                    <div style={{ width:14, height:14, borderRadius:"50%", flexShrink:0, background:"#7c3aed", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"white", fontWeight:700 }}>✓</div>
+                  )}
+                </button>
+              );
+            })}
           </div>
         )}
-
-        {cateringOption === 'self' && (
-          <div className="flex-1 flex items-center justify-center p-8">
-            <div className="text-center">
-              <div className="text-4xl mb-3">👨‍🍳</div>
-              <p className="text-sm font-medium text-white mb-2">Self-Catering Selected</p>
-              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                You'll arrange your own catering for the event
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Footer Actions */}
-        <div className="p-6 pt-4 border-t flex gap-3 justify-end" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
-          <button
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-xl text-sm transition-all"
-            style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
-            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleConfirm}
-            disabled={cateringOption === null}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-            style={{
-              background: cateringOption !== null ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "rgba(124,58,237,0.3)",
-              opacity: cateringOption !== null ? 1 : 0.6,
-              cursor: cateringOption !== null ? "pointer" : "not-allowed",
-            }}
-          >
-            {cateringOption === 'self' ? 'Continue without Menu' : 'Confirm Selection'}
-          </button>
-        </div>
       </div>
     </div>
   );
 }
+
 
 export default function BookingModal({ hall: initialHall, onClose, onSuccess }) {
   const [step, setStep] = useState(1);
@@ -492,7 +428,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
     paymentMethod: "",
     transactionId: "",
     specialRequests: "",
-    selectedDishes: [], // NEW: Array of dish IDs
+    selectedDishes: [],
+    cateringOption: "", // "our-menu" | "self-catering"
   });
   const [errors, setErrors] = useState({});
   const [bookingRef, setBookingRef] = useState("");
@@ -501,7 +438,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
   const [halls, setHalls] = useState([]);
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
-  const [showDishesModal, setShowDishesModal] = useState(false); // NEW: Control dishes modal
+  const [slotsLoading, setSlotsLoading] = useState(false);
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -516,16 +453,29 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
     }
   }, [initialHall]);
 
+  // Fetch booked slots whenever hallId or date changes, and poll every 10s while slot modal is open
   useEffect(() => {
-    if (form.hallId && form.eventDate) {
-      api.get(`/bookings/check-slots?hallId=${form.hallId}&date=${form.eventDate}`)
+    if (!form.hallId || !form.eventDate) return;
+
+    const fetchSlots = () => {
+      setSlotsLoading(true);
+      api.get(`/bookings/slots/${form.hallId}?date=${form.eventDate}`)
         .then((r) => setBookedSlots(r.data.bookedSlots || []))
-        .catch(() => setBookedSlots([]));
+        .catch(() => setBookedSlots([]))
+        .finally(() => setSlotsLoading(false));
+    };
+
+    fetchSlots(); // immediate fetch on hallId/date change
+
+    // Poll every 10s only while the time slot modal is open (real-time updates)
+    if (showTimeSlots) {
+      const interval = setInterval(fetchSlots, 10000);
+      return () => clearInterval(interval);
     }
-  }, [form.hallId, form.eventDate]);
+  }, [form.hallId, form.eventDate, showTimeSlots]);
 
   useEffect(() => {
-    if (step === 4 && bookingRef) {
+    if (step === 5 && bookingRef) {
       const interval = setInterval(() => {
         api.get(`/bookings/ref/${bookingRef}`)
           .then((r) => {
@@ -546,6 +496,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
     setShowTimeSlots(false);
   };
 
+  // If a previously-selected slot gets booked by someone else, clear it
+  useEffect(() => {
+    if (form.timeSlot && bookedSlots.includes(form.timeSlot)) {
+      set("timeSlot", "");
+      set("timeSlotLabel", "");
+    }
+  }, [bookedSlots]);
+
   const next = () => {
     const e = {};
 
@@ -553,7 +511,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
       if (!form.clientName.trim()) e.clientName = "Name required";
       if (!form.clientPhone.trim()) e.clientPhone = "Phone required";
       else if (!/^03\d{9}$/.test(form.clientPhone.replace(/\s/g, "")))
-        e.clientPhone = "Format: 03XXXXXXXXX";
+        e.clientPhone = "Must be 11 digits starting with 03 (e.g. 03001234567)";
       if (form.clientEmail && !/^\S+@\S+\.\S+$/.test(form.clientEmail))
         e.clientEmail = "Invalid email";
       if (!form.eventType) e.eventType = "Event type required";
@@ -567,8 +525,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
       if (!form.guests || form.guests < 1) e.guests = "At least 1 guest required";
       else if (selectedHall && Number(form.guests) > selectedHall.totalSeats)
         e.guests = `Exceeds hall capacity of ${selectedHall.totalSeats.toLocaleString()} guests`;
+
     } else if (step === 3) {
-      // NEW: Dishes selection is optional (user can skip or select self-catering)
+      // Must choose catering option; if "our-menu" must pick at least 1 dish
+      if (!form.cateringOption) e.cateringOption = "Please select a catering option";
+      else if (form.cateringOption === "our-menu" && form.selectedDishes.length === 0)
+        e.cateringOption = "Please select at least one dish, or choose Self-Catering";
+
+    } else if (step === 4) {
       if (!form.paymentMethod) e.paymentMethod = "Select payment method";
       if (!form.transactionId.trim()) e.transactionId = "Transaction ID required";
     }
@@ -578,7 +542,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
       return;
     }
 
-    if (step === 3) {
+    if (step === 4) {
       submitBooking();
     } else {
       setStep((s) => s + 1);
@@ -592,7 +556,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
       const res = await api.post("/bookings", payload);
       setBookingRef(res.data.booking.bookingRef);
       setConfirmedStatus(res.data.booking.status);
-      setStep(4);
+      setStep(5);
       if (onSuccess) onSuccess();
     } catch (ex) {
       setErrors({ submit: ex.response?.data?.message || "Booking failed. Please try again." });
@@ -617,24 +581,28 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
     <>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "rgba(7,5,15,0.85)", backdropFilter: "blur(10px)" }}
-        onClick={(e) => e.target === e.currentTarget && step !== 4 && onClose()}
+        style={{ background: "rgba(7,5,15,0.45)", backdropFilter: "blur(4px)" }}
+        onClick={undefined}
       >
         <style>
           {`
             .bm-scroll::-webkit-scrollbar { width: 3px; }
             .bm-scroll::-webkit-scrollbar-thumb { background: rgba(147,51,234,0.4); border-radius: 2px; }
-            @media (max-width: 640px) {
+            @media (max-width: 480px) {
+              .bm-modal { border-radius: 16px !important; margin: 0 8px; }
+              .bm-header { padding: 16px 16px 14px !important; }
+              .bm-content { padding: 14px 14px !important; }
+              .bm-footer { padding: 12px 14px !important; flex-direction: column; }
+              .bm-footer button { width: 100% !important; justify-content: center; }
               .bm-summary-row { flex-direction: column; align-items: flex-start; gap: 2px; }
               .bm-summary-val { font-size: 0.9rem !important; }
-              .bm-footer { flex-direction: column; }
-              .bm-footer button { width: 100%; }
+              .bm-catering-grid { grid-template-columns: 1fr !important; }
             }
           `}
         </style>
 
         <div
-          className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden bm-scroll"
+          className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden bm-scroll bm-modal"
           style={{
             background: "linear-gradient(145deg,#1b1142,#12093a)",
             border: "1px solid rgba(167,139,250,0.25)",
@@ -643,7 +611,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
         >
           {/* Header */}
           <div
-            className="p-6 pb-5"
+            className="p-6 pb-5 bm-header"
             style={{
               background: "linear-gradient(135deg,rgba(124,58,237,0.15),rgba(147,51,234,0.08))",
               borderBottom: "1px solid rgba(167,139,250,0.15)",
@@ -658,10 +626,10 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                   Reserve Your Event
                 </h2>
                 <p className="text-xs mt-1.5 uppercase tracking-widest" style={{ color: "#a855f7" }}>
-                  Step {step} of 3
+                  Step {step} of 4
                 </p>
               </div>
-              {step !== 4 && (
+              {step !== 5 && (
                 <button
                   onClick={onClose}
                   className="text-xl leading-none transition-colors"
@@ -676,7 +644,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
 
             {/* Progress dots */}
             <div className="flex items-center gap-2">
-              {[1, 2, 3, 4].map((s) => (
+              {[1, 2, 3, 4, 5].map((s) => (
                 <React.Fragment key={s}>
                   <div
                     className="transition-all"
@@ -692,7 +660,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                           : "rgba(167,139,250,0.2)",
                     }}
                   />
-                  {s < 4 && (
+                  {s < 5 && (
                     <div
                       className="flex-1 h-px"
                       style={{ background: s < step ? "#10b981" : "rgba(167,139,250,0.15)" }}
@@ -704,7 +672,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-6 bm-content">
             {/* ── STEP 1: Client details ── */}
             {step === 1 && (
               <div className="space-y-4">
@@ -722,8 +690,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     <input
                       className={inputClass(errors.clientPhone)}
                       value={form.clientPhone}
-                      onChange={(e) => set("clientPhone", e.target.value)}
+                      onChange={(e) => {
+                        // Strip everything except digits, then set
+                        const digits = e.target.value.replace(/[^\d]/g, "");
+                        set("clientPhone", digits);
+                      }}
                       placeholder="03001234567"
+                      inputMode="numeric"
+                      maxLength={11}
                     />
                   </Field>
                   <Field label="Email (optional)" error={errors.clientEmail}>
@@ -804,7 +778,6 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     value={form.guests}
                     onChange={(e) => set("guests", e.target.value)}
                     placeholder={selectedHall ? `Max ${selectedHall.totalSeats.toLocaleString()} guests` : "e.g. 250"}
-                    max={selectedHall ? selectedHall.totalSeats : undefined}
                   />
                   {selectedHall && form.guests && !errors.guests && Number(form.guests) <= selectedHall.totalSeats && (
                     <p style={{ fontSize:"0.7rem", marginTop:4, color:"rgba(167,139,250,0.5)" }}>
@@ -843,8 +816,72 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
               </div>
             )}
 
-            {/* ── STEP 3: Payment & Dishes ── */}
+            {/* ── STEP 3: Menu Selection ── */}
             {step === 3 && (
+              <div className="space-y-4">
+                {/* Catering choice cards */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "rgba(192,132,252,0.7)" }}>
+                    Catering Preference
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 bm-catering-grid">
+                    {[
+                      { val: "our-menu",      icon: "🍽️", title: "Our Menu",      sub: "Select dishes from our curated menu" },
+                      { val: "self-catering", icon: "👨‍🍳", title: "Self-Catering", sub: "I'll arrange my own catering"         },
+                    ].map(opt => {
+                      const active = form.cateringOption === opt.val;
+                      return (
+                        <button
+                          key={opt.val}
+                          type="button"
+                          onClick={() => { set("cateringOption", opt.val); if (opt.val === "self-catering") set("selectedDishes", []); }}
+                          className="p-4 rounded-xl text-left transition-all"
+                          style={{
+                            border: `2px solid ${active ? "#9333ea" : "rgba(167,139,250,0.2)"}`,
+                            background: active ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.03)",
+                          }}
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <span style={{ fontSize: 22 }}>{opt.icon}</span>
+                            <span className="text-sm font-semibold text-white">{opt.title}</span>
+                            {active && <span className="ml-auto" style={{ color: "#a855f7" }}>✓</span>}
+                          </div>
+                          <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{opt.sub}</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors.cateringOption && (
+                    <p className="text-red-400 text-xs mt-2">{errors.cateringOption}</p>
+                  )}
+                </div>
+
+                {/* Dish tabs — only when "Our Menu" is selected */}
+                {form.cateringOption === "our-menu" && (
+                  <InlineDishSelector
+                    selected={form.selectedDishes}
+                    onChange={(v) => set("selectedDishes", v)}
+                  />
+                )}
+
+                {/* Self-catering confirmation */}
+                {form.cateringOption === "self-catering" && (
+                  <div
+                    className="p-4 rounded-xl text-center"
+                    style={{ background: "rgba(147,51,234,0.08)", border: "1px solid rgba(147,51,234,0.2)" }}
+                  >
+                    <div style={{ fontSize: 32 }} className="mb-2">👨‍🍳</div>
+                    <p className="text-sm font-medium text-white mb-1">Self-Catering Selected</p>
+                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                      You'll arrange your own catering for the event
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── STEP 4: Payment ── */}
+            {step === 4 && (
               <div className="space-y-4">
                 {/* Estimated Budget */}
                 <div
@@ -891,39 +928,13 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                       <span style={{ color: "rgba(255,255,255,0.5)" }}>Guests</span>
                       <span className="text-white font-medium">{form.guests}</span>
                     </div>
-                    
-                    {/* NEW: Dishes Selection Button */}
-                    <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(167,139,250,0.15)" }}>
-                      <button
-                        type="button"
-                        onClick={() => setShowDishesModal(true)}
-                        className="w-full p-3 rounded-lg transition-all text-left"
-                        style={{
-                          border: "1px solid rgba(167,139,250,0.25)",
-                          background: form.selectedDishes.length > 0 ? "rgba(147,51,234,0.15)" : "rgba(255,255,255,0.05)",
-                        }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.2)")}
-                        onMouseLeave={(e) => (e.currentTarget.style.background = form.selectedDishes.length > 0 ? "rgba(147,51,234,0.15)" : "rgba(255,255,255,0.05)")}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">🍽️</span>
-                            <div>
-                              <p className="text-sm font-medium text-white">
-                                {form.selectedDishes.length > 0 
-                                  ? `${form.selectedDishes.length} Dishes Selected`
-                                  : 'Add Dishes (Optional)'}
-                              </p>
-                              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                                {form.selectedDishes.length > 0 
-                                  ? 'Click to modify selection'
-                                  : 'Select from menu or choose self-catering'}
-                              </p>
-                            </div>
-                          </div>
-                          <span style={{ color: "#c084fc" }}>→</span>
-                        </div>
-                      </button>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Menu</span>
+                      <span className="text-white font-medium">
+                        {form.cateringOption === "self-catering"
+                          ? "Self-Catering"
+                          : `${form.selectedDishes.length} dish${form.selectedDishes.length !== 1 ? "es" : ""} selected`}
+                      </span>
                     </div>
 
                     <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(167,139,250,0.15)" }}>
@@ -988,8 +999,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
               </div>
             )}
 
-            {/* ── STEP 4: Confirmed ── */}
-            {step === 4 && (
+            {/* ── STEP 5: Confirmed ── */}
+            {step === 5 && (
               <div className="py-2">
                 {confirmedStatus === "Confirmed" ? (
                   <div className="text-center mb-4">
@@ -1129,7 +1140,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                   ["Time Slot", form.timeSlotLabel],
                   ["Event", form.eventType],
                   ["Guests", form.guests],
-                  ["Dishes", form.selectedDishes.length > 0 ? `${form.selectedDishes.length} dishes selected` : "Self-catering"],
+                  ["Dishes", form.cateringOption === "self-catering" ? "Self-Catering" : `${form.selectedDishes.length} dish${form.selectedDishes.length !== 1 ? "es" : ""} selected`],
                   ["Payment", form.paymentMethod],
                   ["Total", `PKR ${grandTotal.toLocaleString()}`],
                 ].map(([k, v]) => (
@@ -1171,7 +1182,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
 
           {/* Footer */}
           <div className="p-6 pt-4 flex gap-3 justify-end bm-footer">
-            {step > 1 && step < 4 && (
+            {step > 1 && step < 5 && (
               <button
                 onClick={() => setStep((s) => s - 1)}
                 className="px-5 py-2.5 rounded-xl text-sm transition-all"
@@ -1182,14 +1193,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 ← Back
               </button>
             )}
-            {step < 4 ? (
+            {step < 5 ? (
               <button
                 onClick={next}
                 disabled={loading}
                 className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
                 style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", opacity: loading ? 0.6 : 1 }}
               >
-                {loading ? "Booking..." : step === 3 ? "Confirm Booking →" : "Next →"}
+                {loading ? "Booking..." : step === 4 ? "Confirm Booking →" : "Next →"}
               </button>
             ) : (
               <button
@@ -1210,20 +1221,9 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
           date={form.eventDate}
           hallName={selectedHall?.name || "Hall"}
           bookedSlots={bookedSlots}
+          loading={slotsLoading}
           onSelect={handleSlotSelected}
           onClose={() => setShowTimeSlots(false)}
-        />
-      )}
-
-      {/* NEW: Dishes Selection Modal */}
-      {showDishesModal && (
-        <DishesSelectionModal
-          onClose={() => setShowDishesModal(false)}
-          onConfirm={(selectedDishes) => {
-            set("selectedDishes", selectedDishes);
-            setShowDishesModal(false);
-          }}
-          initialSelection={form.selectedDishes}
         />
       )}
     </>

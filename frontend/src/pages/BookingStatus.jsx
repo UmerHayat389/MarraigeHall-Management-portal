@@ -6,7 +6,13 @@ const FONTS = `@import url('https://fonts.googleapis.com/css2?family=Playfair+Di
 const STATUS_CONFIG = {
   Pending:   { color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.3)",  icon: "⏳", label: "Awaiting Approval",  msg: "Your booking has been received and is waiting for manager approval. You will receive an SMS on your number once it is confirmed." },
   Confirmed: { color: "#22c55e", bg: "rgba(34,197,94,0.12)",   border: "rgba(34,197,94,0.3)",   icon: "✓",  label: "Confirmed",           msg: "Your booking has been confirmed by our manager. We look forward to hosting your event at Noor Mahal!" },
-  Cancelled: { color: "#ef4444", bg: "rgba(239,68,68,0.12)",   border: "rgba(239,68,68,0.3)",   icon: "✕",  label: "Cancelled",           msg: "Your booking has been cancelled. Please contact us if you believe this is a mistake or to make a new booking." },
+  Cancelled:  { color: "#ef4444", bg: "rgba(239,68,68,0.12)",   border: "rgba(239,68,68,0.3)",   icon: "✕",  label: "Cancelled",  msg: "Your booking has been cancelled. Please contact us if you believe this is a mistake or to make a new booking." },
+  Completed:  { color: "#818cf8", bg: "rgba(129,140,248,0.12)", border: "rgba(129,140,248,0.3)", icon: "★",  label: "Completed",  msg: "Your event has been completed. Thank you for choosing Noor Mahal. We hope to host you again!" },
+};
+
+const getDisplayStatus = (b) => {
+  if (b?.status === "Confirmed" && b?.eventDate && new Date(b.eventDate) < new Date(new Date().setHours(0,0,0,0))) return "Completed";
+  return b?.status || "Pending";
 };
 
 export default function BookingStatus() {
@@ -15,26 +21,34 @@ export default function BookingStatus() {
   const [loading, setLoading]     = useState(false);
   const [error, setError]         = useState("");
   const [bookings, setBookings]   = useState(null);
+  const [selected, setSelected]   = useState(null); // which booking is expanded
 
   const search = async () => {
     const n = name.trim();
     const p = phone.trim();
     if (!n && !p) { setError("Please enter your name or phone number"); return; }
-    setLoading(true); setError(""); setBookings(null);
-    try {
-      const res = await api.get("/bookings");
-      const all = res.data.bookings || [];
-      const normalize = (ph) => ph.replace(/\s/g, "").replace(/^\+92/, "0").replace(/^92/, "0");
-      const np = p ? normalize(p) : null;
+    setLoading(true); setError(""); setBookings(null); setSelected(null);
 
-      const found = all.filter(b => {
-        const nameMatch  = n ? b.clientName?.toLowerCase().includes(n.toLowerCase()) : true;
-        const phoneMatch = np ? normalize(b.clientPhone || "") === np : true;
-        // If both provided — must match both; if only one — match that one
-        if (n && p) return nameMatch && phoneMatch;
-        if (n)      return nameMatch;
-        return phoneMatch;
-      });
+    const normalize = (ph) => ph.replace(/\s/g, "").replace(/^\+92/, "0").replace(/^92/, "0");
+
+    try {
+      let found = [];
+
+      if (p) {
+        // Use the dedicated client history endpoint — returns all bookings for this phone
+        const np = normalize(p);
+        const res = await api.get(`/bookings/client/${encodeURIComponent(np)}`);
+        found = res.data.bookings || [];
+        // If name also provided, filter down further
+        if (n && found.length > 0) {
+          found = found.filter(b => b.clientName?.toLowerCase().includes(n.toLowerCase()));
+        }
+      } else {
+        // Phone not given, only name — fall back to full list search
+        const res = await api.get("/bookings");
+        const all = res.data.bookings || [];
+        found = all.filter(b => b.clientName?.toLowerCase().includes(n.toLowerCase()));
+      }
 
       if (found.length === 0) {
         setError("No bookings found. Please check your name or phone number and try again.");
@@ -174,75 +188,115 @@ export default function BookingStatus() {
           {bookings && bookings.length > 0 && (
             <div style={{ marginTop: "1.5rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
               {bookings.map((b, i) => {
-                const cfg = STATUS_CONFIG[b.status] || STATUS_CONFIG.Pending;
-                // Short internal ID for manager reference (last 8 chars of MongoDB _id)
+                const ds = getDisplayStatus(b);
+                const cfg = STATUS_CONFIG[ds] || STATUS_CONFIG.Pending;
                 const internalId = b._id ? b._id.slice(-8).toUpperCase() : "—";
+                const isExpanded = selected === b._id;
+
                 return (
                   <div key={b._id || i} className="bs-card bs-result-card">
-                    {/* Status banner */}
-                    <div style={{ background: cfg.bg, borderBottom: `1px solid ${cfg.border}`, padding: "1rem 1.5rem", display: "flex", alignItems: "flex-start", gap: "1rem" }}>
-                      <div style={{ width: 42, height: 42, borderRadius: "50%", background: `${cfg.color}22`, border: `2px solid ${cfg.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", color: cfg.color, flexShrink: 0, fontWeight: 700 }}>
-                        {cfg.icon}
-                      </div>
-                      <div>
-                        <p style={{ color: cfg.color, fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.2rem" }}>{cfg.label}</p>
-                        <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.78rem", lineHeight: 1.55 }}>{cfg.msg}</p>
-                      </div>
-                    </div>
 
-                    <div style={{ padding: "1.25rem 1.5rem" }}>
-                      {/* Guest name header */}
-                      <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-                        <p style={{ color: "rgba(192,132,252,0.5)", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.25rem" }}>Booking For</p>
-                        <p style={{ color: "white", fontWeight: 600, fontSize: "1.1rem", fontFamily: "'Playfair Display',serif" }}>{b.clientName || "—"}</p>
-                      </div>
-
-                      {/* Reference row — user ref + internal ID */}
-                      <div className="bs-ref-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.18)", borderRadius: "10px", padding: "0.75rem 1rem", marginBottom: "1rem" }}>
-                        <div>
-                          <p style={{ color: "rgba(192,132,252,0.6)", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.2rem" }}>Your Booking Reference</p>
-                          <p style={{ color: "white", fontWeight: 700, fontSize: "1.2rem", letterSpacing: "0.08em", fontFamily: "'Playfair Display',serif" }}>{b.bookingRef || "—"}</p>
-                        </div>
-                        <div className="bs-ref-id" style={{ textAlign: "right" }}>
-                          <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "0.2rem" }}>Internal ID</p>
-                          <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "monospace", letterSpacing: "0.05em" }}>#{internalId}</p>
-                        </div>
-                      </div>
-
-                      {/* Status badge */}
-                      <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
-                        <span style={{ fontSize: "0.72rem", padding: "0.3rem 1rem", borderRadius: "999px", fontWeight: 600, letterSpacing: "0.05em",
-                          background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
-                          Status: {b.status}
+                    {/* ── Compact summary row (always visible, clickable) ── */}
+                    <button
+                      onClick={() => setSelected(isExpanded ? null : b._id)}
+                      style={{
+                        width: "100%", textAlign: "left", background: "none", border: "none",
+                        cursor: "pointer", padding: "0.85rem 1.25rem",
+                        display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.75rem",
+                        borderBottom: isExpanded ? "1px solid rgba(167,139,250,0.12)" : "none",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", minWidth: 0 }}>
+                        {/* Status dot */}
+                        <div style={{ width: 8, height: 8, borderRadius: "50%", background: cfg.color, flexShrink: 0 }} />
+                        {/* Ref */}
+                        <span style={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: "0.95rem", color: "white", letterSpacing: "0.04em", flexShrink: 0 }}>
+                          {b.bookingRef || "—"}
+                        </span>
+                        {/* Hall · Date · Slot */}
+                        <span style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.38)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {b.hallId?.name || "—"} · {fmt(b.eventDate)} · {slotLabel(b.timeSlot)}
                         </span>
                       </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexShrink: 0 }}>
+                        <span style={{ fontSize: "0.68rem", fontWeight: 600, padding: "0.2rem 0.65rem", borderRadius: 99, background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
+                          {ds}
+                        </span>
+                        <span style={{ fontSize: "0.65rem", color: "rgba(255,255,255,0.25)", transition: "transform 0.2s", display: "inline-block", transform: isExpanded ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+                      </div>
+                    </button>
 
-                      {/* Detail rows */}
-                      {[
-                        ["Guest",      b.clientName],
-                        ["Hall",       b.hallId?.name],
-                        ["Date",       fmt(b.eventDate)],
-                        ["Time Slot",  slotLabel(b.timeSlot)],
-                        ["Event Type", b.eventType],
-                        ["Guests",     b.guests],
-                        ["Payment",    b.paymentMethod],
-                        ["Total",      b.totalPrice ? `PKR ${b.totalPrice.toLocaleString()}` : "—"],
-                      ].map(([k, v]) => v && (
-                        <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: "0.85rem", flexWrap: "wrap", gap: "0.25rem" }}>
-                          <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
-                          <span style={{ color: "rgba(255,255,255,0.82)", fontWeight: 500 }}>{v}</span>
+                    {/* ── Full detail (only when expanded) ── */}
+                    {isExpanded && (
+                      <div>
+                        {/* Status banner */}
+                        <div style={{ background: cfg.bg, borderBottom: `1px solid ${cfg.border}`, padding: "1rem 1.5rem", display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+                          <div style={{ width: 42, height: 42, borderRadius: "50%", background: `${cfg.color}22`, border: `2px solid ${cfg.color}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", color: cfg.color, flexShrink: 0, fontWeight: 700 }}>
+                            {cfg.icon}
+                          </div>
+                          <div>
+                            <p style={{ color: cfg.color, fontWeight: 700, fontSize: "0.95rem", marginBottom: "0.2rem" }}>{cfg.label}</p>
+                            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.78rem", lineHeight: 1.55 }}>{cfg.msg}</p>
+                          </div>
                         </div>
-                      ))}
 
-                      {/* Footer note */}
-                      <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", textAlign: "center", marginTop: "1rem", lineHeight: 1.6 }}>
-                        {b.status === "Pending"
-                          ? "⏳ You will receive an SMS on your registered number once the manager confirms."
-                          : b.status === "Confirmed"
-                          ? "✓ An SMS confirmation has been sent to your registered number."
-                          : "For assistance, please contact Noor Mahal directly."}
-                      </p>
-                    </div>
+                        <div style={{ padding: "1.25rem 1.5rem" }}>
+                          {/* Guest name header */}
+                          <div style={{ textAlign: "center", marginBottom: "1rem" }}>
+                            <p style={{ color: "rgba(192,132,252,0.5)", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.25rem" }}>Booking For</p>
+                            <p style={{ color: "white", fontWeight: 600, fontSize: "1.1rem", fontFamily: "'Playfair Display',serif" }}>{b.clientName || "—"}</p>
+                          </div>
+
+                          {/* Reference row */}
+                          <div className="bs-ref-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.18)", borderRadius: "10px", padding: "0.75rem 1rem", marginBottom: "1rem" }}>
+                            <div>
+                              <p style={{ color: "rgba(192,132,252,0.6)", fontSize: "0.6rem", letterSpacing: "0.18em", textTransform: "uppercase", marginBottom: "0.2rem" }}>Your Booking Reference</p>
+                              <p style={{ color: "white", fontWeight: 700, fontSize: "1.2rem", letterSpacing: "0.08em", fontFamily: "'Playfair Display',serif" }}>{b.bookingRef || "—"}</p>
+                            </div>
+                            <div className="bs-ref-id" style={{ textAlign: "right" }}>
+                              <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.6rem", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: "0.2rem" }}>Internal ID</p>
+                              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.72rem", fontFamily: "monospace", letterSpacing: "0.05em" }}>#{internalId}</p>
+                            </div>
+                          </div>
+
+                          {/* Status badge */}
+                          <div style={{ display: "flex", justifyContent: "center", marginBottom: "1rem" }}>
+                            <span style={{ fontSize: "0.72rem", padding: "0.3rem 1rem", borderRadius: "999px", fontWeight: 600, letterSpacing: "0.05em", background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
+                              Status: {ds}
+                            </span>
+                          </div>
+
+                          {/* Detail rows */}
+                          {[
+                            ["Guest",      b.clientName],
+                            ["Hall",       b.hallId?.name],
+                            ["Date",       fmt(b.eventDate)],
+                            ["Time Slot",  slotLabel(b.timeSlot)],
+                            ["Event Type", b.eventType],
+                            ["Guests",     b.guests],
+                            ["Payment",    b.paymentMethod],
+                            ["Total",      b.totalPrice ? `PKR ${b.totalPrice.toLocaleString()}` : "—"],
+                          ].map(([k, v]) => v && (
+                            <div key={k} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.5rem 0", borderBottom: "1px solid rgba(255,255,255,0.04)", fontSize: "0.85rem", flexWrap: "wrap", gap: "0.25rem" }}>
+                              <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
+                              <span style={{ color: "rgba(255,255,255,0.82)", fontWeight: 500 }}>{v}</span>
+                            </div>
+                          ))}
+
+                          {/* Footer note */}
+                          <p style={{ color: "rgba(255,255,255,0.2)", fontSize: "0.72rem", textAlign: "center", marginTop: "1rem", lineHeight: 1.6 }}>
+                            {ds === "Pending"
+                              ? "⏳ You will receive an SMS on your registered number once the manager confirms."
+                              : ds === "Completed"
+                              ? "★ Your event has been completed. Thank you for choosing Noor Mahal!"
+                              : ds === "Confirmed"
+                              ? "✓ An SMS confirmation has been sent to your registered number."
+                              : "For assistance, please contact Noor Mahal directly."}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                   </div>
                 );
               })}

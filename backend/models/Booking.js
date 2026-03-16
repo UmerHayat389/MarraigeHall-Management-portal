@@ -40,6 +40,9 @@ const bookingSchema = new mongoose.Schema(
       ref: "Dish",
       default: [],
     }],
+
+    // "our-menu" | "self-catering" | "" (empty = old booking, not specified)
+    cateringOption: { type: String, default: "" },
   },
   { timestamps: true }
 );
