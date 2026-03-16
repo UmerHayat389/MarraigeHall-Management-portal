@@ -9,11 +9,13 @@ import DashboardTab  from "./DashboardTab";
 import HallsTab      from "./HallsTab";
 import BookingsTab   from "./BookingsTab";
 import CalendarTab   from "./CalendarTab";
+import DishesTab     from "./DishesTab"; // NEW: Import Dishes Tab
 
 const TABS = [
   { id:"dashboard", label:"Dashboard", icon:"📊" },
   { id:"halls",     label:"Halls",     icon:"🏛️" },
   { id:"bookings",  label:"Bookings",  icon:"📋" },
+  { id:"dishes",    label:"Dishes",    icon:"🍽️" }, // NEW: Added Dishes Tab
   { id:"calendar",  label:"Calendar",  icon:"📅" },
 ];
 
@@ -108,6 +110,7 @@ export default function AdminPanel() {
           {activeTab==="dashboard" && <DashboardTab stats={stats} bookings={allBookings} switchTab={switchTab} />}
           {activeTab==="halls"     && <HallsTab     toast={showToast} />}
           {activeTab==="bookings"  && <BookingsTab  toast={showToast} />}
+          {activeTab==="dishes"    && <DishesTab    toast={showToast} />} {/* NEW: Dishes Tab Route */}
           {activeTab==="calendar"  && <CalendarTab  toast={showToast} />}
         </main>
       </div>

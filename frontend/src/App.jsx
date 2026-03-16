@@ -14,6 +14,7 @@ export default function App() {
         <Route path="/admin/dashboard" element={<AdminPanel />} />
         <Route path="/admin/halls"     element={<AdminPanel />} />
         <Route path="/admin/bookings"  element={<AdminPanel />} />
+        <Route path="/admin/dishes"    element={<AdminPanel />} /> {/* NEW: Dishes Route */}
         <Route path="/admin/calendar"  element={<AdminPanel />} />
         <Route path="*"                element={<Navigate to="/" replace />} />
       </Routes>

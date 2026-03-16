@@ -5,8 +5,7 @@ const STEP_LABELS = ["Details", "Hall & Date", "Payment", "Confirmed"];
 const EVENT_TYPES = ["Nikkah", "Walima", "Barat", "Birthday", "Conference", "Anniversary", "Other"];
 const PAY_METHODS = ["JazzCash", "EasyPaisa", "Bank Transfer", "Cash"];
 
-// Time slots definition — in a real app these would come from the backend
-// Format: { id, label, startTime, endTime }
+// Time slots definition
 const ALL_TIME_SLOTS = [
   { id: "afternoon", label: "Afternoon",  startTime: "12:00 PM", endTime: "4:00 PM"  },
   { id: "evening",   label: "Evening",    startTime: "5:00 PM",  endTime: "9:00 PM"  },
@@ -167,89 +166,52 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) 
                 key={slot.id}
                 type="button"
                 disabled={booked}
-                onClick={() => !booked && setSelected(slot.id)}
-                className="w-full rounded-xl px-4 py-3 flex items-center justify-between transition-all"
+                onClick={() => setSelected(slot.id)}
+                className="w-full p-3.5 rounded-xl text-left transition-all"
                 style={{
                   border: `1px solid ${
                     booked
-                      ? "rgba(239,68,68,0.2)"
+                      ? "rgba(239,68,68,0.3)"
                       : active
-                      ? "rgba(167,139,250,0.55)"
-                      : "rgba(167,139,250,0.15)"
+                      ? "rgba(147,51,234,0.65)"
+                      : "rgba(167,139,250,0.18)"
                   }`,
                   background: booked
-                    ? "rgba(239,68,68,0.05)"
+                    ? "rgba(239,68,68,0.08)"
                     : active
-                    ? "rgba(124,58,237,0.28)"
-                    : "rgba(255,255,255,0.02)",
+                    ? "linear-gradient(135deg,rgba(124,58,237,0.35),rgba(147,51,234,0.2))"
+                    : "rgba(255,255,255,0.03)",
                   cursor: booked ? "not-allowed" : "pointer",
-                  opacity: booked ? 0.6 : 1,
-                }}
-                onMouseEnter={(e) => {
-                  if (!booked && !active)
-                    e.currentTarget.style.background = "rgba(124,58,237,0.12)";
-                }}
-                onMouseLeave={(e) => {
-                  if (!booked && !active)
-                    e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                  opacity: booked ? 0.5 : 1,
                 }}
               >
-                <div className="flex items-center gap-3">
-                  {/* Dot indicator */}
-                  <div
-                    style={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: "50%",
-                      background: booked ? "#ef4444" : active ? "#a855f7" : "#22c55e",
-                      flexShrink: 0,
-                    }}
-                  />
-                  <div className="text-left">
-                    <p
-                      className="text-sm font-medium"
-                      style={{ color: booked ? "rgba(255,255,255,0.35)" : "white" }}
-                    >
-                      {slot.label}
-                    </p>
-                    <p
-                      className="text-xs"
-                      style={{ color: "rgba(255,255,255,0.35)", marginTop: "1px" }}
-                    >
-                      {slot.startTime} – {slot.endTime}
-                    </p>
-                  </div>
+                <div className="flex items-center justify-between mb-1">
+                  <span
+                    className="text-sm font-semibold"
+                    style={{ color: booked ? "#f87171" : active ? "white" : "rgba(255,255,255,0.85)" }}
+                  >
+                    {slot.label}
+                  </span>
+                  {booked && (
+                    <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "rgba(239,68,68,0.15)", color: "#f87171" }}>
+                      Booked
+                    </span>
+                  )}
+                  {active && !booked && <span style={{ color: "#a855f7" }}>✓</span>}
                 </div>
-                <span
-                  className="text-xs px-2.5 py-1 rounded-full"
-                  style={{
-                    background: booked
-                      ? "rgba(239,68,68,0.15)"
-                      : active
-                      ? "rgba(124,58,237,0.4)"
-                      : "rgba(34,197,94,0.12)",
-                    color: booked ? "#f87171" : active ? "#e9d5ff" : "#4ade80",
-                    border: `1px solid ${
-                      booked
-                        ? "rgba(239,68,68,0.25)"
-                        : active
-                        ? "rgba(167,139,250,0.4)"
-                        : "rgba(34,197,94,0.25)"
-                    }`,
-                  }}
-                >
-                  {booked ? "Booked" : active ? "Selected" : "Available"}
-                </span>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  {slot.startTime} – {slot.endTime}
+                </p>
               </button>
             );
           })}
         </div>
 
-        {/* Footer */}
-        <div className="p-5 pt-4 flex gap-3 justify-end">
+        {/* Action buttons */}
+        <div className="p-5 pt-3 flex gap-2.5 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-sm transition-all"
+            className="px-4 py-2 rounded-lg text-sm transition-all"
             style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
             onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
@@ -257,16 +219,16 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) 
             Cancel
           </button>
           <button
-            onClick={() => selected && onSelect(selected)}
+            onClick={() => { if (selected) { onSelect(selected); } }}
             disabled={!selected}
-            className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
+            className="px-5 py-2 rounded-lg text-sm font-semibold text-white"
             style={{
-              background: "linear-gradient(135deg,#7c3aed,#a855f7)",
-              opacity: selected ? 1 : 0.4,
+              background: selected ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "rgba(124,58,237,0.3)",
+              opacity: selected ? 1 : 0.6,
               cursor: selected ? "pointer" : "not-allowed",
             }}
           >
-            Confirm Slot →
+            Confirm
           </button>
         </div>
       </div>
@@ -274,374 +236,522 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], onSelect, onClose }) 
   );
 }
 
-/* ─── Main BookingModal ──────────────────────────────────────────────────── */
-export default function BookingModal({ hall: preselectedHall, onClose }) {
-  const [step, setStep]               = useState(1);
-  const [halls, setHalls]             = useState([{ _id: "demo_1", name: "Royal Banquet Hall", location: "Karachi", totalSeats: 800, pricePerHead: 1500 }, { _id: "demo_2", name: "Garden Pavilion", location: "Karachi", totalSeats: 300, pricePerHead: 1200 }, { _id: "demo_3", name: "Grand Ballroom", location: "Karachi", totalSeats: 1200, pricePerHead: 1800 }, { _id: "demo_4", name: "Crystal Suite", location: "Karachi", totalSeats: 150, pricePerHead: 2000 }]);
-  const [bookedDates, setBookedDates] = useState([]);
-  const [bookedSlots, setBookedSlots] = useState([]); // slots booked on selected date
-  const [selectedHall, setSelectedHall] = useState(preselectedHall || null);
-  const [showTimeSlots, setShowTimeSlots] = useState(false);
-  const [loading, setLoading]         = useState(false);
-  const [bookingRef, setBookingRef]   = useState("");
-  const [bookingId, setBookingId]     = useState(null);
-  const [confirmedStatus, setConfirmedStatus] = useState("Pending"); // tracks polled status
-  const [errors, setErrors]           = useState({});
+/* ══════════════════════════════════════════════════════════════════════════
+   NEW: DISHES SELECTION MODAL
+   ══════════════════════════════════════════════════════════════════════════ */
+function DishesSelectionModal({ onClose, onConfirm, initialSelection = [] }) {
+  const [dishes, setDishes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState(initialSelection);
+  const [cateringOption, setCateringOption] = useState(initialSelection.length > 0 ? 'provided' : null);
 
-  const [form, setForm] = useState({
-    clientName: "", clientPhone: "", clientEmail: "",
-    hallId:       preselectedHall?._id || "",
-    eventType:    "Walima",
-    eventDate:    "",
-    timeSlot:     "",        // NEW — selected time slot id
-    timeSlotLabel: "",       // human-readable label
-    guests:       2,
-    paymentMethod: "", transactionId: "",
-    specialRequests: "",
-  });
-
-  const today = new Date().toISOString().split("T")[0];
-
-
-  /* Fetch all halls */
   useEffect(() => {
-    api.get("/halls")
-      .then((res) => {
-        const list = res.data.halls || res.data;
-        if (Array.isArray(list) && list.length > 0) setHalls(list);
-      })
-      .catch(() => {});
+    // Fetch dishes from backend
+    api.get("/dishes")
+      .then(r => setDishes(r.data.dishes || []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
   }, []);
 
-  /* Poll booking status every 12s once on step 4 */
-  useEffect(() => {
-    if (step !== 4 || !bookingId || confirmedStatus === "Confirmed" || confirmedStatus === "Cancelled") return;
-    const interval = setInterval(async () => {
-      try {
-        const res = await api.get(`/bookings/${bookingId}/status`);
-        if (res.data.success) setConfirmedStatus(res.data.status);
-      } catch {}
-    }, 12000);
-    return () => clearInterval(interval);
-  }, [step, bookingId, confirmedStatus]);
+  const toggleDish = (dishId) => {
+    setSelected(prev => 
+      prev.includes(dishId) 
+        ? prev.filter(id => id !== dishId)
+        : [...prev, dishId]
+    );
+  };
 
-  /* Fetch booked dates when hall changes */
-  useEffect(() => {
-    if (!form.hallId) return;
-    api.get(`/bookings/slots/${form.hallId}`)
-      .then((res) => {
-        const data = res.data.bookedDates || [];
-        const todayStr = new Date().toISOString().split("T")[0];
-        const TOTAL_SLOTS = 3; // afternoon, evening, latenight
+  const groupedDishes = {
+    'Starter Menu': dishes.filter(d => d.category === 'Starter Menu'),
+    'Main Course Menu': dishes.filter(d => d.category === 'Main Course Menu'),
+    'Dessert Menu': dishes.filter(d => d.category === 'Dessert Menu'),
+    'Drinks Menu': dishes.filter(d => d.category === 'Drinks Menu'),
+  };
 
-        // Count how many slots are booked per date
-        const slotCount = {};
-        data.forEach((b) => {
-          const d = b.eventDate?.split("T")[0];
-          if (!d || d.length !== 10) return;
-          const year = parseInt(d.split("-")[0]);
-          if (year < 2024 || year > 2100) return;
-          if (d < todayStr) return;
-          slotCount[d] = (slotCount[d] || 0) + 1;
-        });
+  const CATEGORY_ICONS = {
+    'Starter Menu': '🥗',
+    'Main Course Menu': '🍛',
+    'Dessert Menu': '🍰',
+    'Drinks Menu': '🥤',
+  };
 
-        // Only mark date as fully booked when ALL 3 slots are taken
-        const fullyBooked = Object.keys(slotCount).filter(
-          (d) => slotCount[d] >= TOTAL_SLOTS
-        );
-        setBookedDates(fullyBooked);
-      })
-      .catch(() => {});
-    const found = halls.find((h) => h._id === form.hallId);
-    if (found) setSelectedHall(found);
-  }, [form.hallId, halls]);
-
-  /* When date is picked, fetch booked time slots for that date & open time-slot modal */
-  const maxDate = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 30);
-    return d.toISOString().split("T")[0];
-  })();
-
-  const handleDateChange = (dateVal) => {
-    set("eventDate", dateVal);
-    set("timeSlot", "");
-    set("timeSlotLabel", "");
-    setErrors((e) => ({ ...e, eventDate: "" }));
-
-    // Only proceed if date is fully entered (yyyy-mm-dd = 10 chars)
-    if (!dateVal || dateVal.length < 10) return;
-
-    const chosen = new Date(dateVal);
-    const todayDate = new Date(today);
-    todayDate.setHours(0, 0, 0, 0);
-    chosen.setHours(0, 0, 0, 0);
-
-    // Past date
-    if (chosen < todayDate) {
-      setErrors((e) => ({ ...e, eventDate: "Date cannot be in the past" }));
-      return;
-    }
-
-    // Beyond 30 days
-    const maxAllowed = new Date(todayDate);
-    maxAllowed.setDate(maxAllowed.getDate() + 30);
-    if (chosen > maxAllowed) {
-      setErrors((e) => ({ ...e, eventDate: "Bookings only accepted within the next 30 days" }));
-      return;
-    }
-
-    // Valid date — fetch slots and open picker
-    if (form.hallId) {
-      api.get(`/bookings/slots/${form.hallId}?date=${dateVal}`)
-        .then((res) => setBookedSlots(res.data.bookedSlots || []))
-        .catch(() => setBookedSlots([]));
+  const handleConfirm = () => {
+    if (cateringOption === 'self') {
+      onConfirm([]);
     } else {
-      setBookedSlots([]);
+      onConfirm(selected);
     }
-    setShowTimeSlots(true);
   };
 
-  const handleSlotSelected = (slotId) => {
-    const slot = ALL_TIME_SLOTS.find((s) => s.id === slotId);
-    set("timeSlot", slotId);
-    set("timeSlotLabel", `${slot.label} (${slot.startTime} – ${slot.endTime})`);
-    setShowTimeSlots(false);
-  };
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
+      style={{ background: "rgba(7,5,15,0.85)", backdropFilter: "blur(10px)" }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+    >
+      <div
+        className="w-full max-w-2xl max-h-[85vh] rounded-2xl overflow-hidden flex flex-col"
+        style={{
+          background: "linear-gradient(145deg,#1a1035,#120d2a)",
+          border: "1px solid rgba(167,139,250,0.25)",
+        }}
+      >
+        {/* Header */}
+        <div className="p-6 pb-4 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
+          <div className="flex justify-between items-start">
+            <div>
+              <h3
+                className="text-xl font-semibold text-white mb-1"
+                style={{ fontFamily: "'Playfair Display',serif" }}
+              >
+                Select Menu Options
+              </h3>
+              <p className="text-xs" style={{ color: "rgba(192,132,252,0.6)" }}>
+                Choose dishes from our menu or opt for self-catering
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-lg leading-none transition-colors"
+              style={{ color: "rgba(167,139,250,0.45)" }}
+              onMouseEnter={(e) => (e.target.style.color = "white")}
+              onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.45)")}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Catering Option Selection */}
+        <div className="p-6 border-b" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: "rgba(192,132,252,0.7)" }}>
+            Catering Preference
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              onClick={() => setCateringOption('provided')}
+              className="p-4 rounded-xl text-left transition-all"
+              style={{
+                border: `2px solid ${cateringOption === 'provided' ? '#9333ea' : 'rgba(167,139,250,0.2)'}`,
+                background: cateringOption === 'provided' ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.03)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">🍽️</span>
+                <span className="text-sm font-semibold text-white">Our Menu</span>
+                {cateringOption === 'provided' && <span className="ml-auto text-purple-400">✓</span>}
+              </div>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                Select dishes from our curated menu
+              </p>
+            </button>
+
+            <button
+              onClick={() => setCateringOption('self')}
+              className="p-4 rounded-xl text-left transition-all"
+              style={{
+                border: `2px solid ${cateringOption === 'self' ? '#9333ea' : 'rgba(167,139,250,0.2)'}`,
+                background: cateringOption === 'self' ? 'rgba(124,58,237,0.2)' : 'rgba(255,255,255,0.03)',
+              }}
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-2xl">👨‍🍳</span>
+                <span className="text-sm font-semibold text-white">Self-Catering</span>
+                {cateringOption === 'self' && <span className="ml-auto text-purple-400">✓</span>}
+              </div>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                I'll arrange my own catering
+              </p>
+            </button>
+          </div>
+        </div>
+
+        {/* Dishes List (only show if "Our Menu" is selected) */}
+        {cateringOption === 'provided' && (
+          <div className="flex-1 overflow-y-auto p-6">
+            {loading ? (
+              <div className="text-center py-8" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <div className="text-2xl mb-2">🍽️</div>
+                Loading menu...
+              </div>
+            ) : dishes.length === 0 ? (
+              <div className="text-center py-8" style={{ color: "rgba(255,255,255,0.3)" }}>
+                <div className="text-2xl mb-2">📋</div>
+                No dishes available yet
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {Object.entries(groupedDishes).map(([category, categoryDishes]) => {
+                  if (categoryDishes.length === 0) return null;
+                  
+                  return (
+                    <div key={category}>
+                      <div className="flex items-center gap-2 mb-3">
+                        <span className="text-xl">{CATEGORY_ICONS[category]}</span>
+                        <h4 className="text-sm font-semibold text-white uppercase tracking-wide">
+                          {category}
+                        </h4>
+                        <div className="flex-1 h-px" style={{ background: "rgba(167,139,250,0.12)" }} />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {categoryDishes.map(dish => (
+                          <button
+                            key={dish._id}
+                            onClick={() => toggleDish(dish._id)}
+                            className="p-3 rounded-lg text-left transition-all"
+                            style={{
+                              border: `1px solid ${selected.includes(dish._id) ? '#9333ea' : 'rgba(167,139,250,0.15)'}`,
+                              background: selected.includes(dish._id) ? 'rgba(124,58,237,0.15)' : 'rgba(255,255,255,0.02)',
+                            }}
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-sm font-medium text-white">{dish.name}</span>
+                              {selected.includes(dish._id) && (
+                                <span className="text-purple-400 text-sm flex-shrink-0">✓</span>
+                              )}
+                            </div>
+                            {dish.description && (
+                              <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.35)", lineHeight: "1.4" }}>
+                                {dish.description}
+                              </p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {cateringOption === 'provided' && selected.length > 0 && (
+              <div className="mt-4 p-3 rounded-lg" style={{ background: "rgba(147,51,234,0.1)", border: "1px solid rgba(147,51,234,0.25)" }}>
+                <p className="text-xs font-medium" style={{ color: "#c084fc" }}>
+                  {selected.length} dish{selected.length !== 1 ? 'es' : ''} selected
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {cateringOption === 'self' && (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center">
+              <div className="text-4xl mb-3">👨‍🍳</div>
+              <p className="text-sm font-medium text-white mb-2">Self-Catering Selected</p>
+              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                You'll arrange your own catering for the event
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Footer Actions */}
+        <div className="p-6 pt-4 border-t flex gap-3 justify-end" style={{ borderColor: "rgba(167,139,250,0.12)" }}>
+          <button
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl text-sm transition-all"
+            style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
+            onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleConfirm}
+            disabled={cateringOption === null}
+            className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
+            style={{
+              background: cateringOption !== null ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "rgba(124,58,237,0.3)",
+              opacity: cateringOption !== null ? 1 : 0.6,
+              cursor: cateringOption !== null ? "pointer" : "not-allowed",
+            }}
+          >
+            {cateringOption === 'self' ? 'Continue without Menu' : 'Confirm Selection'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function BookingModal({ hall: initialHall, onClose, onSuccess }) {
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    clientName: "",
+    clientPhone: "",
+    clientEmail: "",
+    eventType: "",
+    guests: "",
+    hallId: initialHall?._id || "",
+    eventDate: "",
+    timeSlot: "",
+    timeSlotLabel: "",
+    paymentMethod: "",
+    transactionId: "",
+    specialRequests: "",
+    selectedDishes: [], // NEW: Array of dish IDs
+  });
+  const [errors, setErrors] = useState({});
+  const [bookingRef, setBookingRef] = useState("");
+  const [confirmedStatus, setConfirmedStatus] = useState("Pending");
+  const [selectedHall, setSelectedHall] = useState(initialHall || null);
+  const [halls, setHalls] = useState([]);
+  const [showTimeSlots, setShowTimeSlots] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [showDishesModal, setShowDishesModal] = useState(false); // NEW: Control dishes modal
 
   const set = (k, v) => {
     setForm((f) => ({ ...f, [k]: v }));
     setErrors((e) => ({ ...e, [k]: "" }));
   };
 
-  const totalPrice = selectedHall ? selectedHall.pricePerHead * form.guests : 0;
-  const tax        = Math.round(totalPrice * 0.16);
-  const grandTotal = totalPrice + tax;
+  useEffect(() => {
+    if (!initialHall) {
+      api.get("/halls").then((r) => setHalls(r.data.halls || []));
+    } else {
+      setHalls([initialHall]);
+    }
+  }, [initialHall]);
 
-  const validate = (s) => {
-    const e = {};
-    if (s === 1) {
-      if (!form.clientName.trim())                 e.clientName  = "Name is required";
-      else if (form.clientName.trim().length > 15) e.clientName  = "Name cannot exceed 15 characters";
-      if (!form.clientPhone.trim())                e.clientPhone = "Phone is required";
-      else if (!/^[0-9+\-\s]+$/.test(form.clientPhone)) e.clientPhone = "Phone must contain numbers only";
-      else if (form.clientPhone.replace(/\s/g,"").length > 14) e.clientPhone = "Phone cannot exceed 14 digits";
-      if (form.clientEmail && form.clientEmail.length > 30)
-        e.clientEmail = "Email cannot exceed 30 characters";
-      else if (form.clientEmail && !/\S+@\S+\.\S+/.test(form.clientEmail))
-        e.clientEmail = "Invalid email format";
+  useEffect(() => {
+    if (form.hallId && form.eventDate) {
+      api.get(`/bookings/check-slots?hallId=${form.hallId}&date=${form.eventDate}`)
+        .then((r) => setBookedSlots(r.data.bookedSlots || []))
+        .catch(() => setBookedSlots([]));
     }
-    if (s === 2) {
-      if (!form.hallId)    e.hallId    = "Please select a hall";
-      if (!form.eventDate) e.eventDate = "Please select a date";
-      if (form.eventDate) {
-        const chosen = new Date(form.eventDate);
-        const todayD = new Date(today);
-        todayD.setHours(0,0,0,0); chosen.setHours(0,0,0,0);
-        if (chosen < todayD) e.eventDate = "Date cannot be in the past";
-        else {
-          const max = new Date(todayD); max.setDate(max.getDate() + 30);
-          if (chosen > max) e.eventDate = "Bookings only accepted within the next 30 days";
-          else if (bookedDates.includes(form.eventDate)) e.eventDate = "This date is fully booked";
-        }
-      }
-      if (!form.timeSlot)  e.timeSlot  = "Please select a time slot";
+  }, [form.hallId, form.eventDate]);
+
+  useEffect(() => {
+    if (step === 4 && bookingRef) {
+      const interval = setInterval(() => {
+        api.get(`/bookings/ref/${bookingRef}`)
+          .then((r) => {
+            if (r.data.booking?.status) setConfirmedStatus(r.data.booking.status);
+          })
+          .catch(() => {});
+      }, 12000);
+      return () => clearInterval(interval);
     }
-    if (s === 3) {
-      if (form.hallId?.startsWith("demo_")) { e.submit = "⚠️ Demo halls cannot be booked. Please add real halls via the Admin panel or fix your MongoDB connection first."; }
-      if (!form.paymentMethod) e.paymentMethod = "Select a payment method";
-      if (form.paymentMethod && form.paymentMethod !== "Cash" && !form.transactionId.trim())
-        e.transactionId = "Transaction ID is required";
+  }, [step, bookingRef]);
+
+  const handleSlotSelected = (slotId) => {
+    const slot = ALL_TIME_SLOTS.find((s) => s.id === slotId);
+    if (slot) {
+      set("timeSlot", slot.id);
+      set("timeSlotLabel", `${slot.label} (${slot.startTime} – ${slot.endTime})`);
     }
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    setShowTimeSlots(false);
   };
 
-  const handleSubmit = async () => {
+  const next = () => {
+    const e = {};
+
+    if (step === 1) {
+      if (!form.clientName.trim()) e.clientName = "Name required";
+      if (!form.clientPhone.trim()) e.clientPhone = "Phone required";
+      else if (!/^03\d{9}$/.test(form.clientPhone.replace(/\s/g, "")))
+        e.clientPhone = "Format: 03XXXXXXXXX";
+      if (form.clientEmail && !/^\S+@\S+\.\S+$/.test(form.clientEmail))
+        e.clientEmail = "Invalid email";
+      if (!form.eventType) e.eventType = "Event type required";
+      if (!form.guests || form.guests < 1) e.guests = "At least 1 guest";
+    } else if (step === 2) {
+      if (!form.hallId) e.hallId = "Select a hall";
+      if (!form.eventDate) e.eventDate = "Select a date";
+      else if (new Date(form.eventDate) < new Date().setHours(0, 0, 0, 0))
+        e.eventDate = "Cannot book past dates";
+      if (!form.timeSlot) e.timeSlot = "Select a time slot";
+    } else if (step === 3) {
+      // NEW: Dishes selection is optional (user can skip or select self-catering)
+      if (!form.paymentMethod) e.paymentMethod = "Select payment method";
+      if (!form.transactionId.trim()) e.transactionId = "Transaction ID required";
+    }
+
+    if (Object.keys(e).length) {
+      setErrors(e);
+      return;
+    }
+
+    if (step === 3) {
+      submitBooking();
+    } else {
+      setStep((s) => s + 1);
+    }
+  };
+
+  const submitBooking = async () => {
     setLoading(true);
     try {
-      const res = await api.post("/bookings", { ...form, totalPrice: grandTotal });
-      if (res.data.success) {
-        // Use ref from backend (name-based) or fallback
-        const ref = res.data.booking?.bookingRef ||
-          "NM-" + (form.clientName || "GUE").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4) +
-          "-" + String(Math.floor(10 + Math.random() * 90));
-        setBookingRef(ref);
-        setBookingId(res.data.booking?._id || null);
-        setStep(4);
-      } else {
-        setErrors({ submit: res.data.message });
-      }
-    } catch (err) {
-      setErrors({ submit: err.response?.data?.message || "Server error. Try again." });
+      const payload = { ...form };
+      const res = await api.post("/bookings", payload);
+      setBookingRef(res.data.booking.bookingRef);
+      setConfirmedStatus(res.data.booking.status);
+      setStep(4);
+      if (onSuccess) onSuccess();
+    } catch (ex) {
+      setErrors({ submit: ex.response?.data?.message || "Booking failed. Please try again." });
     }
     setLoading(false);
   };
 
-  const next = () => {
-    if (step < 3 && validate(step)) setStep((s) => s + 1);
-    else if (step === 3 && validate(3)) handleSubmit();
-  };
+  useEffect(() => {
+    if (form.hallId) {
+      const h = halls.find((x) => x._id === form.hallId);
+      setSelectedHall(h || null);
+    }
+  }, [form.hallId, halls]);
+
+  const roomRate = selectedHall?.pricePerHead
+    ? selectedHall.pricePerHead * (parseInt(form.guests) || 0)
+    : 0;
+  const tax = Math.round(roomRate * 0.16);
+  const grandTotal = roomRate + tax;
 
   return (
     <>
-      <style>{`
-        .bm-modal-scroll { overflow-y: auto; }
-        .bm-modal-scroll::-webkit-scrollbar { width: 3px; }
-        .bm-modal-scroll::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.25); border-radius: 2px; }
-
-        /* Step bar — compress on tiny screens */
-        @media (max-width: 400px) {
-          .bm-step-label { display: none; }
-          .bm-step-circle { width: 24px !important; height: 24px !important; font-size: 10px !important; }
-        }
-
-        /* Name/Phone row → stack on mobile */
-        @media (max-width: 480px) {
-          .bm-two-col { grid-template-columns: 1fr !important; }
-        }
-
-        /* Payment grid → 2 cols on mobile instead of 3 */
-        @media (max-width: 400px) {
-          .bm-pay-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-
-        /* Header padding tighter on small screens */
-        @media (max-width: 400px) {
-          .bm-header { padding: 1rem 1rem 0 !important; }
-          .bm-body   { padding: 0 1rem 0.5rem !important; }
-          .bm-footer { padding: 1rem !important; }
-        }
-
-        /* Confirm/summary row wrap */
-        @media (max-width: 380px) {
-          .bm-summary-row { flex-direction: column; align-items: flex-start !important; gap: 2px; }
-          .bm-summary-val { text-align: left !important; }
-        }
-      `}</style>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-3"
-        style={{ background: "rgba(7,5,15,0.72)", backdropFilter: "blur(4px)" }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        style={{ background: "rgba(7,5,15,0.85)", backdropFilter: "blur(10px)" }}
+        onClick={(e) => e.target === e.currentTarget && step !== 4 && onClose()}
       >
+        <style>
+          {`
+            .bm-scroll::-webkit-scrollbar { width: 3px; }
+            .bm-scroll::-webkit-scrollbar-thumb { background: rgba(147,51,234,0.4); border-radius: 2px; }
+            @media (max-width: 640px) {
+              .bm-summary-row { flex-direction: column; align-items: flex-start; gap: 2px; }
+              .bm-summary-val { font-size: 0.9rem !important; }
+              .bm-footer { flex-direction: column; }
+              .bm-footer button { width: 100%; }
+            }
+          `}
+        </style>
+
         <div
-          className="relative w-full max-w-lg rounded-2xl overflow-hidden bm-modal-scroll"
+          className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden bm-scroll"
           style={{
-            background: "linear-gradient(145deg,#1a1035,#120d2a)",
-            border: "1px solid rgba(167,139,250,0.2)",
-            maxHeight: "92vh",
+            background: "linear-gradient(145deg,#1b1142,#12093a)",
+            border: "1px solid rgba(167,139,250,0.25)",
             overflowY: "auto",
-            width: "100%",
           }}
         >
           {/* Header */}
-          <div className="p-6 pb-0 bm-header">
-            <div className="flex justify-between items-start mb-5">
+          <div
+            className="p-6 pb-5"
+            style={{
+              background: "linear-gradient(135deg,rgba(124,58,237,0.15),rgba(147,51,234,0.08))",
+              borderBottom: "1px solid rgba(167,139,250,0.15)",
+            }}
+          >
+            <div className="flex justify-between items-start mb-4">
               <div>
                 <h2
-                  className="text-xl font-semibold text-white"
+                  className="text-2xl font-semibold text-white"
                   style={{ fontFamily: "'Playfair Display',serif" }}
                 >
-                  {step === 4 ? "Booking Confirmed!" : "Reserve Your Event"}
+                  Reserve Your Event
                 </h2>
-                <p className="text-xs mt-1 tracking-widest uppercase" style={{ color: "#a855f7" }}>
-                  {step < 4 ? `Step ${step} of 3` : "We look forward to serving you"}
+                <p className="text-xs mt-1.5 uppercase tracking-widest" style={{ color: "#a855f7" }}>
+                  Step {step} of 3
                 </p>
               </div>
-              <button
-                onClick={onClose}
-                className="text-xl leading-none transition-colors"
-                style={{ color: "rgba(167,139,250,0.5)" }}
-                onMouseEnter={(e) => (e.target.style.color = "white")}
-                onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.5)")}
-              >
-                ✕
-              </button>
+              {step !== 4 && (
+                <button
+                  onClick={onClose}
+                  className="text-xl leading-none transition-colors"
+                  style={{ color: "rgba(167,139,250,0.5)" }}
+                  onMouseEnter={(e) => (e.target.style.color = "white")}
+                  onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.5)")}
+                >
+                  ✕
+                </button>
+              )}
             </div>
 
-            {/* Step bar */}
-            <div className="flex items-center mb-6">
-              {STEP_LABELS.map((label, i) => (
-                <div key={i} className="flex items-center flex-1 last:flex-none">
-                  <div className="flex flex-col items-center">
+            {/* Progress dots */}
+            <div className="flex items-center gap-2">
+              {[1, 2, 3, 4].map((s) => (
+                <React.Fragment key={s}>
+                  <div
+                    className="transition-all"
+                    style={{
+                      width: s === step ? "32px" : "8px",
+                      height: "8px",
+                      borderRadius: "999px",
+                      background:
+                        s < step
+                          ? "#10b981"
+                          : s === step
+                          ? "linear-gradient(90deg,#7c3aed,#a855f7)"
+                          : "rgba(167,139,250,0.2)",
+                    }}
+                  />
+                  {s < 4 && (
                     <div
-                      className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-all bm-step-circle"
-                      style={{
-                        background:
-                          i + 1 < step
-                            ? "#7c3aed"
-                            : i + 1 === step
-                            ? "rgba(124,58,237,0.3)"
-                            : "rgba(255,255,255,0.06)",
-                        color: i + 1 <= step ? "white" : "rgba(167,139,250,0.5)",
-                        border: i + 1 === step ? "2px solid #a855f7" : "none",
-                      }}
-                    >
-                      {i + 1 < step ? "✓" : i + 1}
-                    </div>
-                    <span
-                      className="text-[10px] mt-1 tracking-wider uppercase bm-step-label"
-                      style={{ color: i + 1 === step ? "#c084fc" : "rgba(255,255,255,0.25)" }}
-                    >
-                      {label}
-                    </span>
-                  </div>
-                  {i < STEP_LABELS.length - 1 && (
-                    <div
-                      className="flex-1 h-px mx-2 mb-4 transition-all"
-                      style={{ background: i + 1 < step ? "#7c3aed" : "rgba(255,255,255,0.08)" }}
+                      className="flex-1 h-px"
+                      style={{ background: s < step ? "#10b981" : "rgba(167,139,250,0.15)" }}
                     />
                   )}
-                </div>
+                </React.Fragment>
               ))}
             </div>
           </div>
 
-          {/* Body */}
-          <div className="px-6 pb-2 bm-body">
-
-            {/* ── STEP 1: Contact Details ── */}
+          {/* Content */}
+          <div className="p-6">
+            {/* ── STEP 1: Client details ── */}
             {step === 1 && (
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-3 bm-two-col">
-                  <Field label="Full Name *" error={errors.clientName}>
-                    <input
-                      className={inputClass(errors.clientName)}
-                      placeholder="Enter your full name"
-                      maxLength={15}
-                      value={form.clientName}
-                      onChange={(e) => set("clientName", e.target.value)}
-                    />
-                  </Field>
-                  <Field label="Phone *" error={errors.clientPhone}>
+                <Field label="Full Name *" error={errors.clientName}>
+                  <input
+                    className={inputClass(errors.clientName)}
+                    value={form.clientName}
+                    onChange={(e) => set("clientName", e.target.value)}
+                    placeholder="e.g. Ahmed Khan"
+                  />
+                </Field>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Field label="Phone Number *" error={errors.clientPhone}>
                     <input
                       className={inputClass(errors.clientPhone)}
-                      placeholder="+92 3XX XXXXXXX"
-                      maxLength={14}
                       value={form.clientPhone}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (/^[0-9+\-\s]*$/.test(val)) set("clientPhone", val);
-                      }}
+                      onChange={(e) => set("clientPhone", e.target.value)}
+                      placeholder="03001234567"
+                    />
+                  </Field>
+                  <Field label="Email (optional)" error={errors.clientEmail}>
+                    <input
+                      className={inputClass(errors.clientEmail)}
+                      type="email"
+                      value={form.clientEmail}
+                      onChange={(e) => set("clientEmail", e.target.value)}
+                      placeholder="example@mail.com"
                     />
                   </Field>
                 </div>
-                <Field label="Email" error={errors.clientEmail}>
-                  <input
-                    className={inputClass(errors.clientEmail)}
-                    type="email"
-                    placeholder="your@email.com"
-                    maxLength={30}
-                    value={form.clientEmail}
-                    onChange={(e) => set("clientEmail", e.target.value)}
+
+                <Field label="Event Type *" error={errors.eventType}>
+                  <CustomSelect
+                    value={form.eventType}
+                    onChange={(v) => set("eventType", v)}
+                    options={EVENT_TYPES}
+                    placeholder="Select event type"
+                    icons={EVENT_ICONS}
+                    error={errors.eventType}
                   />
                 </Field>
-                <Field label="Special Requests">
+
+                <Field label="Number of Guests *" error={errors.guests}>
                   <input
-                    className={inputClass()}
-                    placeholder="Decoration style, dietary needs..."
-                    maxLength={200}
-                    value={form.specialRequests}
-                    onChange={(e) => set("specialRequests", e.target.value)}
+                    className={inputClass(errors.guests)}
+                    type="number"
+                    value={form.guests}
+                    onChange={(e) => set("guests", e.target.value)}
+                    placeholder="e.g. 250"
                   />
                 </Field>
               </div>
@@ -650,213 +760,212 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
             {/* ── STEP 2: Hall & Date ── */}
             {step === 2 && (
               <div className="space-y-4">
-
-                {/* Event Type first — helps user filter */}
-                <div className="grid grid-cols-2 gap-3 bm-two-col">
-                  <Field label="Event Type">
+                {!initialHall && (
+                  <Field label="Select Hall *" error={errors.hallId}>
                     <CustomSelect
-                      value={form.eventType}
-                      onChange={(val) => set("eventType", val)}
-                      options={EVENT_TYPES}
-                      icons={EVENT_ICONS}
+                      value={form.hallId}
+                      onChange={(v) => set("hallId", v)}
+                      options={halls.map((h) => ({ value: h._id, label: h.name }))}
+                      placeholder="Choose a venue"
+                      error={errors.hallId}
                     />
                   </Field>
-                  <Field label="No. of Guests">
-                    <input
-                      className={inputClass()}
-                      type="number"
-                      min="1"
-                      value={form.guests}
-                      onChange={(e) => set("guests", parseInt(e.target.value) || 1)}
-                    />
-                  </Field>
-                </div>
+                )}
 
-                {/* Hall selector */}
-                <Field label="Select Hall *" error={errors.hallId}>
-                  <CustomSelect
-                    value={form.hallId}
-                    onChange={(val) => { set("hallId", val); set("timeSlot", ""); set("eventDate", ""); }}
-                    options={[
-                      ...halls.map((h) => ({
-                        value: h._id,
-                        label: `${h.name} · ${h.totalSeats} seats · PKR ${h.pricePerHead?.toLocaleString()}/head`,
-                      }))
-                    ]}
-                    placeholder="-- Choose a Hall --"
-                    error={errors.hallId}
-                    icons={{}}
+                {selectedHall && (
+                  <div
+                    className="p-4 rounded-xl"
+                    style={{
+                      background: "rgba(147,51,234,0.08)",
+                      border: "1px solid rgba(147,51,234,0.2)",
+                    }}
+                  >
+                    <div className="flex gap-3">
+                      {selectedHall.image && (
+                        <img
+                          src={selectedHall.image}
+                          alt={selectedHall.name}
+                          className="w-20 h-20 rounded-lg object-cover"
+                        />
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-white font-semibold text-sm mb-1">
+                          {selectedHall.name}
+                        </h4>
+                        <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
+                          📍 {selectedHall.location || "Karachi"}
+                        </p>
+                        <p className="text-xs font-semibold" style={{ color: "#c084fc" }}>
+                          PKR {selectedHall.pricePerHead?.toLocaleString()}/guest · {selectedHall.totalSeats} capacity
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <Field label="Event Date *" error={errors.eventDate}>
+                  <input
+                    className={inputClass(errors.eventDate)}
+                    type="date"
+                    value={form.eventDate}
+                    onChange={(e) => set("eventDate", e.target.value)}
+                    min={new Date().toISOString().split("T")[0]}
                   />
                 </Field>
 
-                {/* Selected hall info card */}
-                {selectedHall && (
-                  <div
-                    className="rounded-xl p-3 text-sm"
-                    style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.18)" }}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium" style={{ color: "#c084fc" }}>{selectedHall.name}</p>
-                        <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                          {selectedHall.location} · {selectedHall.totalSeats} seats
-                        </p>
-                      </div>
-                      {selectedHall.pricePerHead && (
-                        <p className="text-xs font-semibold" style={{ color: "#a855f7" }}>
-                          PKR {selectedHall.pricePerHead?.toLocaleString()}/head
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Event Date */}
-                <Field label="Event Date *" error={errors.eventDate}>
-                  <div style={{ position: "relative" }}>
-                    <input
-                      className={inputClass(errors.eventDate)}
-                      type="date"
-                      min={today}
-                      max={maxDate}
-                      value={form.eventDate}
-                      onChange={(e) => handleDateChange(e.target.value)}
-                      style={{ colorScheme: "dark" }}
-                    />
-                    <p className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.25)" }}>
-                      Bookings accepted for the next 30 days only · Latest: {new Date(maxDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
-                  </div>
-                </Field>
-
-                {/* Time slot display (after selection) */}
-                {form.timeSlot ? (
-                  <div
-                    className="rounded-xl px-4 py-3 flex items-center justify-between"
-                    style={{ background: "rgba(124,58,237,0.15)", border: "1px solid rgba(167,139,250,0.3)" }}
-                  >
-                    <div>
-                      <p className="text-xs tracking-wider uppercase mb-0.5" style={{ color: "rgba(192,132,252,0.6)" }}>
-                        Selected Time Slot
-                      </p>
-                      <p className="text-sm font-medium text-white">{form.timeSlotLabel}</p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setShowTimeSlots(true)}
-                      className="text-xs px-3 py-1.5 rounded-lg transition-all"
-                      style={{ border: "1px solid rgba(167,139,250,0.3)", color: "#c084fc" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.2)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
-                    >
-                      Change
-                    </button>
-                  </div>
-                ) : form.eventDate && (
-                  /* Prompt to pick time slot if date is selected but no slot yet */
+                <Field label="Time Slot *" error={errors.timeSlot}>
                   <button
                     type="button"
-                    onClick={() => setShowTimeSlots(true)}
-                    className="w-full rounded-xl px-4 py-3 text-sm transition-all"
-                    style={{
-                      border: errors.timeSlot ? "1px solid rgba(239,68,68,0.5)" : "1px dashed rgba(167,139,250,0.3)",
-                      color: errors.timeSlot ? "#f87171" : "#c084fc",
-                      background: errors.timeSlot ? "rgba(239,68,68,0.05)" : "transparent",
+                    onClick={() => {
+                      if (form.hallId && form.eventDate) setShowTimeSlots(true);
+                      else setErrors({ timeSlot: "Select hall & date first" });
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.08)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.background = errors.timeSlot ? "rgba(239,68,68,0.05)" : "transparent")}
+                    className="w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all"
+                    style={{
+                      border: `1px solid ${errors.timeSlot ? "rgba(239,68,68,0.5)" : "rgba(167,139,250,0.2)"}`,
+                      background: errors.timeSlot ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)",
+                      color: form.timeSlotLabel ? "white" : "rgba(255,255,255,0.3)",
+                    }}
                   >
-                    🕐 {errors.timeSlot ? errors.timeSlot : "Tap to select available time slot"}
+                    {form.timeSlotLabel || "Click to select a time slot"}
                   </button>
-                )}
-
-                {bookedDates.length > 0 && (
-                  <div className="text-xs rounded-lg p-2.5" style={{ background: "rgba(239,68,68,0.08)", color: "#f87171" }}>
-                    ⚠ Already fully booked on: {bookedDates.join(", ")}
-                  </div>
-                )}
+                </Field>
               </div>
             )}
 
-            {/* ── STEP 3: Payment ── */}
+            {/* ── STEP 3: Payment & Dishes ── */}
             {step === 3 && (
               <div className="space-y-4">
+                {/* Estimated Budget */}
                 <div
-                  className="rounded-xl overflow-hidden"
-                  style={{ border: "1px solid rgba(167,139,250,0.18)" }}
+                  className="p-5 rounded-xl"
+                  style={{
+                    background: "linear-gradient(135deg,rgba(147,51,234,0.15),rgba(124,58,237,0.08))",
+                    border: "1px solid rgba(147,51,234,0.25)",
+                  }}
                 >
-                  <div
-                    className="px-4 py-2 text-xs tracking-widest uppercase"
-                    style={{ background: "rgba(167,139,250,0.08)", color: "#a855f7" }}
+                  <p
+                    className="text-xs font-semibold uppercase tracking-widest mb-3"
+                    style={{ color: "#a855f7" }}
                   >
                     Estimated Budget
-                  </div>
-                  {[
-                    ["Guest",      form.clientName],
-                    ["Hall",       selectedHall?.name],
-                    ["Date",       form.eventDate ? new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" }) : "—"],
-                    ["Time Slot",  form.timeSlotLabel],
-                    ["Event",      form.eventType],
-                    ["Guests",     form.guests],
-                    ["Room Rate",  `PKR ${totalPrice.toLocaleString()}`],
-                    ["Tax (16%)",  `PKR ${tax.toLocaleString()}`],
-                  ].map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex justify-between px-4 py-2 text-sm bm-summary-row"
-                      style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
-                    >
-                      <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
-                      <span className="bm-summary-val" style={{ color: "rgba(255,255,255,0.75)" }}>{v}</span>
+                  </p>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Guest</span>
+                      <span className="text-white font-medium">{form.clientName}</span>
                     </div>
-                  ))}
-                  <div
-                    className="flex justify-between px-4 py-3"
-                    style={{ borderTop: "1px solid rgba(167,139,250,0.25)" }}
-                  >
-                    <span className="text-white font-semibold">Grand Total</span>
-                    <span className="font-bold text-lg" style={{ color: "#c084fc" }}>
-                      PKR {grandTotal.toLocaleString()}
-                    </span>
-                  </div>
-                  {/* Ref note — visible on bill before booking is submitted */}
-                  <div className="px-4 py-2" style={{ borderTop: "1px solid rgba(255,255,255,0.04)", background: "rgba(124,58,237,0.04)" }}>
-                    <p className="text-xs" style={{ color: "rgba(255,255,255,0.2)" }}>
-                      📌 A unique booking reference (e.g. NM-{(form.clientName || "YOU").replace(/[^a-zA-Z]/g,"").toUpperCase().slice(0,4)}-47) will be generated after confirmation. Use it to track your booking at <span style={{ color: "#a855f7" }}>/booking-status</span>
-                    </p>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Hall</span>
+                      <span className="text-white font-medium">{selectedHall?.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Date</span>
+                      <span className="text-white font-medium">
+                        {new Date(form.eventDate + "T12:00:00").toLocaleDateString("en-PK", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Time Slot</span>
+                      <span className="text-white font-medium">{form.timeSlotLabel}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Event</span>
+                      <span className="text-white font-medium">{form.eventType}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Guests</span>
+                      <span className="text-white font-medium">{form.guests}</span>
+                    </div>
+                    
+                    {/* NEW: Dishes Selection Button */}
+                    <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(167,139,250,0.15)" }}>
+                      <button
+                        type="button"
+                        onClick={() => setShowDishesModal(true)}
+                        className="w-full p-3 rounded-lg transition-all text-left"
+                        style={{
+                          border: "1px solid rgba(167,139,250,0.25)",
+                          background: form.selectedDishes.length > 0 ? "rgba(147,51,234,0.15)" : "rgba(255,255,255,0.05)",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.2)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = form.selectedDishes.length > 0 ? "rgba(147,51,234,0.15)" : "rgba(255,255,255,0.05)")}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg">🍽️</span>
+                            <div>
+                              <p className="text-sm font-medium text-white">
+                                {form.selectedDishes.length > 0 
+                                  ? `${form.selectedDishes.length} Dishes Selected`
+                                  : 'Add Dishes (Optional)'}
+                              </p>
+                              <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                                {form.selectedDishes.length > 0 
+                                  ? 'Click to modify selection'
+                                  : 'Select from menu or choose self-catering'}
+                              </p>
+                            </div>
+                          </div>
+                          <span style={{ color: "#c084fc" }}>→</span>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(167,139,250,0.15)" }}>
+                      <div className="flex justify-between text-sm">
+                        <span style={{ color: "rgba(255,255,255,0.5)" }}>Room Rate</span>
+                        <span className="text-white font-semibold">PKR {roomRate.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm mt-1">
+                        <span style={{ color: "rgba(255,255,255,0.5)" }}>Tax (16%)</span>
+                        <span className="text-white font-semibold">PKR {tax.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div
+                      className="flex justify-between pt-3 mt-2"
+                      style={{ borderTop: "1px solid rgba(167,139,250,0.2)" }}
+                    >
+                      <span className="text-base font-semibold" style={{ color: "#a855f7" }}>
+                        Grand Total
+                      </span>
+                      <span className="text-lg font-bold text-white">PKR {grandTotal.toLocaleString()}</span>
+                    </div>
                   </div>
                 </div>
 
                 <Field label="Payment Method *" error={errors.paymentMethod}>
-                  <div className="grid grid-cols-3 gap-2 bm-pay-grid">
-                    {PAY_METHODS.map((m) => (
-                      <button
-                        key={m}
-                        type="button"
-                        onClick={() => { set("paymentMethod", m); }}
-                        className="py-2 px-1 rounded-lg text-xs font-medium transition-all"
-                        style={{
-                          border: `1px solid ${form.paymentMethod === m ? "rgba(167,139,250,0.6)" : "rgba(167,139,250,0.15)"}`,
-                          background: form.paymentMethod === m ? "rgba(124,58,237,0.4)" : "transparent",
-                          color: form.paymentMethod === m ? "white" : "rgba(192,132,252,0.7)",
-                        }}
-                      >
-                        {m}
-                      </button>
-                    ))}
-                  </div>
+                  <CustomSelect
+                    value={form.paymentMethod}
+                    onChange={(v) => set("paymentMethod", v)}
+                    options={PAY_METHODS}
+                    placeholder="Select payment method"
+                    error={errors.paymentMethod}
+                  />
                 </Field>
 
-                {form.paymentMethod && form.paymentMethod !== "Cash" && (
-                  <Field label={`${form.paymentMethod} Reference / Transaction ID *`} error={errors.transactionId}>
-                    <input
-                      className={inputClass(errors.transactionId)}
-                      placeholder="Enter reference / transaction ID"
-                      value={form.transactionId}
-                      onChange={(e) => set("transactionId", e.target.value)}
-                    />
-                  </Field>
-                )}
+                <Field label="Transaction ID *" error={errors.transactionId}>
+                  <input
+                    className={inputClass(errors.transactionId)}
+                    value={form.transactionId}
+                    onChange={(e) => set("transactionId", e.target.value)}
+                    placeholder="e.g. TXN123456789"
+                  />
+                </Field>
+
+                <Field label="Special Requests (optional)">
+                  <textarea
+                    className={inputClass()}
+                    style={{ resize: "vertical", minHeight: "80px" }}
+                    value={form.specialRequests}
+                    onChange={(e) => set("specialRequests", e.target.value)}
+                    placeholder="Any special requirements or notes..."
+                  />
+                </Field>
 
                 {errors.submit && (
                   <p
@@ -869,49 +978,96 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
               </div>
             )}
 
-            {/* ── STEP 4: Pending / Confirmed ── */}
+            {/* ── STEP 4: Confirmed ── */}
             {step === 4 && (
               <div className="py-2">
-                {/* Status banner */}
                 {confirmedStatus === "Confirmed" ? (
                   <div className="text-center mb-4">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
-                      style={{ background: "rgba(34,197,94,0.2)", border: "2px solid #22c55e" }}>✓</div>
-                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Confirmed!</p>
-                    <p className="text-xs mt-1" style={{ color: "#4ade80" }}>Manager has approved your booking. An SMS has been sent to your number.</p>
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(34,197,94,0.2)", border: "2px solid #22c55e" }}
+                    >
+                      ✓
+                    </div>
+                    <p
+                      className="text-lg font-semibold text-white"
+                      style={{ fontFamily: "'Playfair Display',serif" }}
+                    >
+                      Booking Confirmed!
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: "#4ade80" }}>
+                      Manager has approved your booking. An SMS has been sent to your number.
+                    </p>
                   </div>
                 ) : confirmedStatus === "Cancelled" ? (
                   <div className="text-center mb-4">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
-                      style={{ background: "rgba(239,68,68,0.2)", border: "2px solid #ef4444" }}>✕</div>
-                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Booking Cancelled</p>
-                    <p className="text-xs mt-1" style={{ color: "#f87171" }}>Your booking has been cancelled. Please contact us for more details.</p>
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(239,68,68,0.2)", border: "2px solid #ef4444" }}
+                    >
+                      ✕
+                    </div>
+                    <p
+                      className="text-lg font-semibold text-white"
+                      style={{ fontFamily: "'Playfair Display',serif" }}
+                    >
+                      Booking Cancelled
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: "#f87171" }}>
+                      Your booking has been cancelled. Please contact us for more details.
+                    </p>
                   </div>
                 ) : (
                   <div className="text-center mb-4">
-                    <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
-                      style={{ background: "rgba(245,158,11,0.2)", border: "2px solid #f59e0b" }}>⏳</div>
-                    <p className="text-lg font-semibold text-white" style={{ fontFamily: "'Playfair Display',serif" }}>Awaiting Manager Approval</p>
-                    <p className="text-xs mt-1" style={{ color: "#fcd34d" }}>
-                      Your request has been received. You will receive an SMS on <strong style={{ color: "white" }}>{form.clientPhone}</strong> once the manager confirms.
+                    <div
+                      className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto mb-3"
+                      style={{ background: "rgba(245,158,11,0.2)", border: "2px solid #f59e0b" }}
+                    >
+                      ⏳
+                    </div>
+                    <p
+                      className="text-lg font-semibold text-white"
+                      style={{ fontFamily: "'Playfair Display',serif" }}
+                    >
+                      Awaiting Manager Approval
                     </p>
-                    {/* Pulsing dot */}
+                    <p className="text-xs mt-1" style={{ color: "#fcd34d" }}>
+                      Your request has been received. You will receive an SMS on{" "}
+                      <strong style={{ color: "white" }}>{form.clientPhone}</strong> once the manager
+                      confirms.
+                    </p>
                     <div className="flex items-center justify-center gap-1.5 mt-3">
                       {[0, 150, 300].map((d) => (
-                        <div key={d} style={{
-                          width: 6, height: 6, borderRadius: "50%", background: "#f59e0b",
-                          animation: `pulse 1.2s ${d}ms ease-in-out infinite`,
-                        }}/>
+                        <div
+                          key={d}
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            background: "#f59e0b",
+                            animation: `pulse 1.2s ${d}ms ease-in-out infinite`,
+                          }}
+                        />
                       ))}
                     </div>
                     <style>{`@keyframes pulse { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1.2)} }`}</style>
                   </div>
                 )}
 
-                {/* Reference card */}
-                <div className="rounded-xl p-4 mb-4" style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}>
-                  <p className="text-xs tracking-widest uppercase mb-1 text-center" style={{ color: "#a855f7" }}>Booking Reference</p>
-                  <p className="text-white font-bold text-2xl tracking-widest text-center" style={{ fontFamily: "'Playfair Display',serif" }}>
+                <div
+                  className="rounded-xl p-4 mb-4"
+                  style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}
+                >
+                  <p
+                    className="text-xs tracking-widest uppercase mb-1 text-center"
+                    style={{ color: "#a855f7" }}
+                  >
+                    Booking Reference
+                  </p>
+                  <p
+                    className="text-white font-bold text-2xl tracking-widest text-center"
+                    style={{ fontFamily: "'Playfair Display',serif" }}
+                  >
                     {bookingRef}
                   </p>
                   <p className="text-xs text-center mt-1" style={{ color: "rgba(255,255,255,0.3)" }}>
@@ -919,37 +1075,59 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                   </p>
                 </div>
 
-                {/* Status badge */}
                 <div className="flex justify-center mb-3">
-                  <span className="text-xs px-3 py-1.5 rounded-full font-medium" style={{
-                    background: confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.15)"
-                              : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.15)"
-                              : "rgba(245,158,11,0.15)",
-                    color: confirmedStatus === "Confirmed" ? "#4ade80"
-                         : confirmedStatus === "Cancelled" ? "#f87171"
-                         : "#fcd34d",
-                    border: `1px solid ${confirmedStatus === "Confirmed" ? "rgba(34,197,94,0.3)"
-                           : confirmedStatus === "Cancelled" ? "rgba(239,68,68,0.3)"
-                           : "rgba(245,158,11,0.3)"}`,
-                  }}>
+                  <span
+                    className="text-xs px-3 py-1.5 rounded-full font-medium"
+                    style={{
+                      background:
+                        confirmedStatus === "Confirmed"
+                          ? "rgba(34,197,94,0.15)"
+                          : confirmedStatus === "Cancelled"
+                          ? "rgba(239,68,68,0.15)"
+                          : "rgba(245,158,11,0.15)",
+                      color:
+                        confirmedStatus === "Confirmed"
+                          ? "#4ade80"
+                          : confirmedStatus === "Cancelled"
+                          ? "#f87171"
+                          : "#fcd34d",
+                      border: `1px solid ${
+                        confirmedStatus === "Confirmed"
+                          ? "rgba(34,197,94,0.3)"
+                          : confirmedStatus === "Cancelled"
+                          ? "rgba(239,68,68,0.3)"
+                          : "rgba(245,158,11,0.3)"
+                      }`,
+                    }}
+                  >
                     Status: {confirmedStatus}
                   </span>
                 </div>
 
-                {/* Summary rows */}
                 {[
-                  ["Guest",      form.clientName],
-                  ["Phone",      form.clientPhone],
-                  ["Hall",       selectedHall?.name],
-                  ["Date",       new Date(form.eventDate).toLocaleDateString("en-PK", { day: "numeric", month: "short", year: "numeric" })],
-                  ["Time Slot",  form.timeSlotLabel],
-                  ["Event",      form.eventType],
-                  ["Guests",     form.guests],
-                  ["Payment",    form.paymentMethod],
-                  ["Total",      `PKR ${grandTotal.toLocaleString()}`],
+                  ["Guest", form.clientName],
+                  ["Phone", form.clientPhone],
+                  ["Hall", selectedHall?.name],
+                  [
+                    "Date",
+                    new Date(form.eventDate).toLocaleDateString("en-PK", {
+                      day: "numeric",
+                      month: "short",
+                      year: "numeric",
+                    }),
+                  ],
+                  ["Time Slot", form.timeSlotLabel],
+                  ["Event", form.eventType],
+                  ["Guests", form.guests],
+                  ["Dishes", form.selectedDishes.length > 0 ? `${form.selectedDishes.length} dishes selected` : "Self-catering"],
+                  ["Payment", form.paymentMethod],
+                  ["Total", `PKR ${grandTotal.toLocaleString()}`],
                 ].map(([k, v]) => (
-                  <div key={k} className="flex justify-between py-1.5 text-sm bm-summary-row"
-                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  <div
+                    key={k}
+                    className="flex justify-between py-1.5 text-sm bm-summary-row"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+                  >
                     <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
                     <span className="font-medium text-white bm-summary-val">{v}</span>
                   </div>
@@ -961,10 +1139,18 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
                   </p>
                 )}
                 <div style={{ textAlign: "center", marginTop: "0.75rem" }}>
-                  <a href="/booking-status"
-                    style={{ color: "#a855f7", fontSize: "0.78rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "0.3rem" }}
-                    onMouseEnter={e => e.currentTarget.style.opacity = "0.75"}
-                    onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+                  <a
+                    href="/booking-status"
+                    style={{
+                      color: "#a855f7",
+                      fontSize: "0.78rem",
+                      textDecoration: "none",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.opacity = "0.75")}
+                    onMouseLeave={(e) => (e.currentTarget.style.opacity = "1")}
                   >
                     🔖 Check status anytime at noormahal.pk/booking-status
                   </a>
@@ -973,7 +1159,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
             )}
           </div>
 
-          {/* Footer buttons */}
+          {/* Footer */}
           <div className="p-6 pt-4 flex gap-3 justify-end bm-footer">
             {step > 1 && step < 4 && (
               <button
@@ -1008,7 +1194,7 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
         </div>
       </div>
 
-      {/* Time Slot Sub-modal — rendered outside the main modal so it layers on top */}
+      {/* Time Slot Modal */}
       {showTimeSlots && (
         <TimeSlotModal
           date={form.eventDate}
@@ -1016,6 +1202,18 @@ export default function BookingModal({ hall: preselectedHall, onClose }) {
           bookedSlots={bookedSlots}
           onSelect={handleSlotSelected}
           onClose={() => setShowTimeSlots(false)}
+        />
+      )}
+
+      {/* NEW: Dishes Selection Modal */}
+      {showDishesModal && (
+        <DishesSelectionModal
+          onClose={() => setShowDishesModal(false)}
+          onConfirm={(selectedDishes) => {
+            set("selectedDishes", selectedDishes);
+            setShowDishesModal(false);
+          }}
+          initialSelection={form.selectedDishes}
         />
       )}
     </>
