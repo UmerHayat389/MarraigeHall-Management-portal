@@ -557,13 +557,16 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
       if (form.clientEmail && !/^\S+@\S+\.\S+$/.test(form.clientEmail))
         e.clientEmail = "Invalid email";
       if (!form.eventType) e.eventType = "Event type required";
-      if (!form.guests || form.guests < 1) e.guests = "At least 1 guest";
+
     } else if (step === 2) {
       if (!form.hallId) e.hallId = "Select a hall";
       if (!form.eventDate) e.eventDate = "Select a date";
       else if (new Date(form.eventDate) < new Date().setHours(0, 0, 0, 0))
         e.eventDate = "Cannot book past dates";
       if (!form.timeSlot) e.timeSlot = "Select a time slot";
+      if (!form.guests || form.guests < 1) e.guests = "At least 1 guest required";
+      else if (selectedHall && Number(form.guests) > selectedHall.totalSeats)
+        e.guests = `Exceeds hall capacity of ${selectedHall.totalSeats.toLocaleString()} guests`;
     } else if (step === 3) {
       // NEW: Dishes selection is optional (user can skip or select self-catering)
       if (!form.paymentMethod) e.paymentMethod = "Select payment method";
@@ -745,15 +748,6 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                   />
                 </Field>
 
-                <Field label="Number of Guests *" error={errors.guests}>
-                  <input
-                    className={inputClass(errors.guests)}
-                    type="number"
-                    value={form.guests}
-                    onChange={(e) => set("guests", e.target.value)}
-                    placeholder="e.g. 250"
-                  />
-                </Field>
               </div>
             )}
 
@@ -802,6 +796,22 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     </div>
                   </div>
                 )}
+
+                <Field label="Number of Guests *" error={errors.guests}>
+                  <input
+                    className={inputClass(errors.guests)}
+                    type="number"
+                    value={form.guests}
+                    onChange={(e) => set("guests", e.target.value)}
+                    placeholder={selectedHall ? `Max ${selectedHall.totalSeats.toLocaleString()} guests` : "e.g. 250"}
+                    max={selectedHall ? selectedHall.totalSeats : undefined}
+                  />
+                  {selectedHall && form.guests && !errors.guests && Number(form.guests) <= selectedHall.totalSeats && (
+                    <p style={{ fontSize:"0.7rem", marginTop:4, color:"rgba(167,139,250,0.5)" }}>
+                      ✓ Within capacity · Max <span style={{ color:"#c084fc", fontWeight:600 }}>{selectedHall.totalSeats.toLocaleString()}</span> guests
+                    </p>
+                  )}
+                </Field>
 
                 <Field label="Event Date *" error={errors.eventDate}>
                   <input

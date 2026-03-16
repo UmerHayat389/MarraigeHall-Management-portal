@@ -15,6 +15,11 @@ const dishSchema = new mongoose.Schema({
     type: String,
     trim: true,
     default: ''
+  },
+  image: {
+    type: String,
+    trim: true,
+    default: ''
   }
 }, {
   timestamps: true

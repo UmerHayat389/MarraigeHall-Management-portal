@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Dish = require('../models/Dish');
+const Dish = require('../models/Dish.model');
 
 // Get all dishes
 router.get('/', async (req, res) => {
@@ -28,7 +28,7 @@ router.get('/:id', async (req, res) => {
 // Create new dish
 router.post('/', async (req, res) => {
   try {
-    const { name, category, description } = req.body;
+    const { name, category, description, image } = req.body;
 
     if (!name || !category) {
       return res.status(400).json({ message: 'Name and category are required' });
@@ -37,7 +37,8 @@ router.post('/', async (req, res) => {
     const dish = new Dish({
       name,
       category,
-      description: description || ''
+      description: description || '',
+      image: image || '',
     });
 
     await dish.save();
@@ -50,7 +51,7 @@ router.post('/', async (req, res) => {
 // Update dish
 router.put('/:id', async (req, res) => {
   try {
-    const { name, category, description } = req.body;
+    const { name, category, description, image } = req.body;
 
     const dish = await Dish.findById(req.params.id);
     if (!dish) {
@@ -60,6 +61,7 @@ router.put('/:id', async (req, res) => {
     if (name) dish.name = name;
     if (category) dish.category = category;
     if (description !== undefined) dish.description = description;
+    if (image !== undefined) dish.image = image;
 
     await dish.save();
     res.json({ dish, message: 'Dish updated successfully' });

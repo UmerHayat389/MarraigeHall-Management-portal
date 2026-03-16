@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import api from "../services/api";
 import { btnGhost, btnDanger } from "./adminTheme";
 
 const SLOT_TIMES  = { afternoon:"12:00 PM – 4:00 PM", evening:"5:00 PM – 9:00 PM", latenight:"10:00 PM – 2:00 AM" };
 const SLOT_COLOR  = { afternoon:"#06b6d4", evening:"#f59e0b", latenight:"#a855f7" };
 const SLOT_LABEL  = { afternoon:"Afternoon", evening:"Evening", latenight:"Late Night" };
+
+const CAT_COLOR = {
+  "Starter Menu":     { dot:"#06b6d4", bg:"rgba(6,182,212,0.1)",   border:"rgba(6,182,212,0.28)",   text:"#67e8f9" },
+  "Main Course Menu": { dot:"#f59e0b", bg:"rgba(245,158,11,0.1)",  border:"rgba(245,158,11,0.28)",  text:"#fcd34d" },
+  "Dessert Menu":     { dot:"#ec4899", bg:"rgba(236,72,153,0.1)",  border:"rgba(236,72,153,0.28)",  text:"#f9a8d4" },
+  "Drinks Menu":      { dot:"#10b981", bg:"rgba(16,185,129,0.1)",  border:"rgba(16,185,129,0.28)",  text:"#6ee7b7" },
+};
+const CAT_ICON = {
+  "Starter Menu":"🥗", "Main Course Menu":"🍛", "Dessert Menu":"🍰", "Drinks Menu":"🥤",
+};
 
 const STATUS_CFG = {
   Confirmed: { color:"#10b981", bg:"rgba(16,185,129,0.1)",  border:"rgba(16,185,129,0.28)", icon:"✓", msg:"Booking confirmed. SMS has been sent to the client." },
@@ -28,6 +39,83 @@ function InfoRow({ icon, label, value, highlight, mono }) {
         fontFamily: mono?"'Courier New',monospace":"inherit",
         letterSpacing: mono?"0.04em":"0",
       }}>{String(value??"")||"—"}</span>
+    </div>
+  );
+}
+
+/* ── Selected Dishes Section ── */
+function SelectedDishesSection({ dishIds }) {
+  const [dishes, setDishes]   = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!dishIds?.length) { setLoading(false); return; }
+    api.get("/dishes")
+      .then(r => {
+        const all = r.data.dishes || [];
+        setDishes(all.filter(d => dishIds.includes(d._id)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [dishIds]);
+
+  // Group by category
+  const grouped = {};
+  dishes.forEach(d => {
+    if (!grouped[d.category]) grouped[d.category] = [];
+    grouped[d.category].push(d);
+  });
+
+  return (
+    <div style={{ padding:"0.75rem 1.7rem 0" }}>
+      {/* Section header */}
+      <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", marginBottom:"0.75rem", paddingTop:"0.5rem", borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+        <span style={{ fontSize:"0.85rem", opacity:0.6 }}>🍽️</span>
+        <span style={{ color:"rgba(255,255,255,0.32)", fontSize:"0.78rem", fontWeight:500 }}>Selected Menu</span>
+        {!loading && dishes.length > 0 && (
+          <span style={{ marginLeft:"auto", background:"rgba(147,51,234,0.15)", border:"1px solid rgba(147,51,234,0.3)", borderRadius:999, padding:"1px 8px", color:"#c084fc", fontSize:"0.65rem", fontWeight:700 }}>
+            {dishes.length} dish{dishes.length !== 1 ? "es" : ""}
+          </span>
+        )}
+      </div>
+
+      {loading ? (
+        <p style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.78rem", marginBottom:"0.75rem" }}>Loading dishes…</p>
+      ) : dishes.length === 0 ? (
+        <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <span style={{ fontSize:"0.85rem", opacity:0.4 }}>👨‍🍳</span>
+          <span style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.78rem" }}>Self-catering / no dishes selected</span>
+        </div>
+      ) : (
+        <div style={{ display:"flex", flexDirection:"column", gap:"0.55rem", marginBottom:"0.75rem" }}>
+          {Object.entries(grouped).map(([cat, items]) => {
+            const clr = CAT_COLOR[cat] || CAT_COLOR["Starter Menu"];
+            return (
+              <div key={cat} style={{ background:clr.bg, border:`1px solid ${clr.border}`, borderRadius:12, padding:"0.65rem 0.85rem" }}>
+                {/* Category header */}
+                <div style={{ display:"flex", alignItems:"center", gap:"0.5rem", marginBottom:"0.45rem" }}>
+                  <span style={{ width:7, height:7, borderRadius:"50%", background:clr.dot, flexShrink:0, display:"inline-block" }}/>
+                  <span style={{ fontSize:"0.75rem" }}>{CAT_ICON[cat]}</span>
+                  <span style={{ color:clr.text, fontSize:"0.7rem", fontWeight:700, textTransform:"uppercase", letterSpacing:"0.08em" }}>{cat}</span>
+                  <span style={{ marginLeft:"auto", color:clr.text, fontSize:"0.65rem", opacity:0.7 }}>{items.length}</span>
+                </div>
+                {/* Dish pills */}
+                <div style={{ display:"flex", flexWrap:"wrap", gap:"0.35rem" }}>
+                  {items.map(d => (
+                    <span key={d._id} style={{
+                      background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.1)",
+                      borderRadius:999, padding:"2px 10px",
+                      color:"rgba(255,255,255,0.82)", fontSize:"0.72rem", fontWeight:500,
+                    }}>
+                      {d.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -82,11 +170,9 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
         <div style={{ padding:"1.6rem 1.7rem 0" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.2rem" }}>
             <div style={{ flex:1, minWidth:0 }}>
-              {/* Client name */}
               <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.65rem", fontWeight:700, margin:"0 0 6px", lineHeight:1.1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                 {b.clientName}
               </h3>
-              {/* Tags row */}
               <div style={{ display:"flex", gap:"0.4rem", flexWrap:"wrap", alignItems:"center" }}>
                 {b.bookingRef&&(
                   <span style={{ background:"rgba(147,51,234,0.16)", border:"1px solid rgba(147,51,234,0.35)", borderRadius:999, padding:"2px 10px", color:"rgba(192,132,252,0.9)", fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.07em", fontFamily:"'Courier New',monospace" }}>
@@ -106,7 +192,6 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
               </div>
             </div>
 
-            {/* Close button */}
             <button onClick={onClose}
               style={{ width:34, height:34, borderRadius:10, border:"1px solid rgba(255,255,255,0.09)", background:"rgba(255,255,255,0.05)", color:"rgba(255,255,255,0.45)", fontSize:"1rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginLeft:"0.75rem", transition:"all 0.15s" }}
               onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.12)";e.currentTarget.style.color="white";}}
@@ -122,7 +207,6 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
               <p style={{ color:sc, fontWeight:700, fontSize:"0.95rem", margin:"0 0 3px" }}>{b.status}</p>
               <p style={{ color:"rgba(255,255,255,0.38)", fontSize:"0.75rem", margin:0, lineHeight:1.5 }}>{st.msg}</p>
             </div>
-            {/* Price badge */}
             <div style={{ textAlign:"right", flexShrink:0 }}>
               <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.6rem", margin:"0 0 2px", letterSpacing:"0.06em" }}>TOTAL</p>
               <p style={{ color:"#c084fc", fontWeight:800, fontSize:"1.05rem", margin:0 }}>PKR {b.totalPrice?.toLocaleString()}</p>
@@ -161,6 +245,9 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
             </div>
           )}
         </div>
+
+        {/* ── Selected Dishes ── */}
+        <SelectedDishesSection dishIds={b.selectedDishes || []} />
 
         {/* ── Action buttons ── */}
         <div style={{ padding:"1.25rem 1.7rem 1.7rem", display:"flex", gap:"0.6rem", justifyContent:"flex-end", flexWrap:"wrap" }}>

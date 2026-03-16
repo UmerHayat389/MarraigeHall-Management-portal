@@ -74,23 +74,24 @@ export default function CalendarTab({ toast }) {
     <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
       <style>{`
         .cal-wrap { display:grid; grid-template-columns:1fr 360px; gap:1.5rem; align-items:start; }
-        .cal-7 { display:grid; grid-template-columns:repeat(7,1fr); gap:5px; }
+        .cal-7 { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
         .c-day {
-          aspect-ratio:1; border-radius:12px; border:1px solid rgba(139,92,246,0.1);
+          border-radius:8px; border:1px solid rgba(139,92,246,0.1);
           background:rgba(255,255,255,0.02); cursor:pointer; position:relative;
-          display:flex; flex-direction:column; padding:7px 6px 5px; transition:all 0.16s;
-          min-height:70px;
+          display:flex; flex-direction:column; padding:5px 5px 4px; transition:all 0.15s;
+          min-height:64px;
         }
         .c-day:hover { border-color:rgba(147,51,234,0.45); background:rgba(109,40,217,0.14); transform:translateY(-1px); }
         .c-day.is-today { border-color:rgba(147,51,234,0.65)!important; background:rgba(109,40,217,0.16)!important; }
         .c-day.is-sel { border-color:#9333ea!important; background:linear-gradient(135deg,rgba(109,40,217,0.38),rgba(147,51,234,0.22))!important; box-shadow:0 0 0 2px rgba(147,51,234,0.22); }
         .c-day.is-booked { border-color:rgba(147,51,234,0.3); background:rgba(109,40,217,0.1); }
         .c-day.is-full { border-color:rgba(239,68,68,0.32); background:rgba(239,68,68,0.07); }
-        .c-day.is-past { opacity:0.38; pointer-events:none; }
-        .pip { height:3px; border-radius:2px; width:100%; margin-top:2px; }
-        .bk-chip { font-size:0.58rem; font-weight:700; border-radius:4px; padding:1px 4px; margin-top:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+        .c-day.is-past { opacity:0.32; pointer-events:none; }
+        .slot-pill { font-size:0.5rem; font-weight:700; border-radius:4px; padding:1px 4px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:flex; align-items:center; gap:2px; line-height:1.4; }
+        .slot-dot { width:4px; height:4px; border-radius:50%; flex-shrink:0; display:inline-block; }
         @media(max-width:960px){ .cal-wrap{grid-template-columns:1fr!important;} }
-        @media(max-width:560px){ .c-day{min-height:44px;padding:5px 4px;} .bk-chip{display:none;} .pip{height:2px;} }
+        @media(max-width:700px){ .c-day{min-height:52px;padding:4px 3px;} .slot-pill{font-size:0.45rem;padding:1px 3px;} }
+        @media(max-width:520px){ .c-day{min-height:40px;padding:3px;} .slot-pill{display:none;} }
       `}</style>
 
       {/* ── Page header ── */}
@@ -110,9 +111,9 @@ export default function CalendarTab({ toast }) {
             { v: monthBks.filter(b=>b.status==="Pending").length, l:"Pending", c:"#f59e0b" },
             { v:`${(revenue/1000).toFixed(0)}K`, l:"Revenue", c:"#f59e0b" },
           ].map(({v,l,c})=>(
-            <div key={l} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(139,92,246,0.16)", borderRadius:14, padding:"0.5rem 0.9rem", textAlign:"center", minWidth:64 }}>
-              <p style={{ color:c, fontWeight:700, fontSize:"1.05rem", margin:0, lineHeight:1.2 }}>{v}</p>
-              <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.6rem", margin:0, letterSpacing:"0.04em" }}>{l}</p>
+            <div key={l} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(139,92,246,0.16)", borderRadius:10, padding:"0.4rem 0.7rem", textAlign:"center", minWidth:52 }}>
+              <p style={{ color:c, fontWeight:700, fontSize:"0.95rem", margin:0, lineHeight:1.2 }}>{v}</p>
+              <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.56rem", margin:0, letterSpacing:"0.04em" }}>{l}</p>
             </div>
           ))}
         </div>
@@ -120,10 +121,10 @@ export default function CalendarTab({ toast }) {
 
       <div className="cal-wrap">
         {/* ── Calendar card ── */}
-        <div style={{ background:"linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))", border:"1px solid rgba(139,92,246,0.15)", borderRadius:22, padding:"1.75rem" }}>
+        <div style={{ background:"linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))", border:"1px solid rgba(139,92,246,0.15)", borderRadius:18, padding:"1.25rem" }}>
 
           {/* Month nav */}
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.4rem" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem" }}>
             <button onClick={()=>setCurrent(new Date(year,month-1,1))}
               style={{ width:38, height:38, borderRadius:11, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.04)", color:"rgba(167,139,250,0.7)", cursor:"pointer", fontSize:"1.1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}
               onMouseEnter={e=>{e.currentTarget.style.background="rgba(109,40,217,0.28)";e.currentTarget.style.color="white";}}
@@ -169,32 +170,24 @@ export default function CalendarTab({ toast }) {
               return (
                 <div key={i} className={cls} onClick={()=>selectDay(d)}>
                   {/* Number + count badge */}
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                     <span style={{
-                      fontSize:"0.82rem", lineHeight:1, fontWeight: isToday||isSel||hasAny ? 700 : 400,
-                      color: isFull?"#f87171" : isToday?"#c084fc" : isSel?"white" : hasAny?"rgba(255,255,255,0.95)" : "rgba(255,255,255,0.5)",
+                      fontSize:"0.72rem", lineHeight:1, fontWeight: isToday||isSel||hasAny ? 700 : 400,
+                      color: isFull?"#f87171" : isToday?"#c084fc" : isSel?"white" : hasAny?"rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
                     }}>{d}</span>
                     {acts.length>0 && (
-                      <span style={{ fontSize:"0.52rem", fontWeight:800, lineHeight:"13px", color:isFull?"#f87171":"#c084fc", background:isFull?"rgba(239,68,68,0.18)":"rgba(147,51,234,0.22)", borderRadius:5, padding:"0 3px" }}>
+                      <span style={{ fontSize:"0.45rem", fontWeight:800, lineHeight:1, color:isFull?"#f87171":"#c084fc", background:isFull?"rgba(239,68,68,0.18)":"rgba(147,51,234,0.22)", borderRadius:3, padding:"1px 3px", minWidth:12, textAlign:"center" }}>
                         {acts.length}
                       </span>
                     )}
                   </div>
 
-                  {/* Slot pip bars */}
+                  {/* Slot pills — one per booked slot, always visible */}
                   {hasAny && (
-                    <div style={{ marginTop:"auto", display:"flex", flexDirection:"column", gap:2, width:"100%", paddingTop:4 }}>
-                      {SLOTS.map(s => bookedSet.has(s) ? (
-                        <div key={s} className="pip" style={{ background:SLOT_COLOR[s] }}/>
-                      ):null)}
-                    </div>
-                  )}
-
-                  {/* Slot name chips — show which slots are booked */}
-                  {hasAny && (
-                    <div style={{ display:"flex", flexDirection:"column", gap:1, marginTop:2 }}>
+                    <div style={{ display:"flex", flexDirection:"column", gap:2, marginTop:4 }}>
                       {SLOTS.filter(s=>bookedSet.has(s)).map(s=>(
-                        <div key={s} className="bk-chip" style={{ background:SLOT_COLOR[s]+"22", color:SLOT_COLOR[s] }}>
+                        <div key={s} className="slot-pill" style={{ background:SLOT_COLOR[s]+"1a", color:SLOT_COLOR[s], border:`1px solid ${SLOT_COLOR[s]}44` }}>
+                          <span className="slot-dot" style={{ background:SLOT_COLOR[s] }}/>
                           {SLOT_LABEL[s]}
                         </div>
                       ))}
@@ -232,123 +225,122 @@ export default function CalendarTab({ toast }) {
           ) : (
             <>
               {/* Panel header */}
-              <div style={{ padding:"1.4rem 1.4rem 0" }}>
-                <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontWeight:600, fontSize:"1.2rem", margin:"0 0 3px" }}>
+              <div style={{ padding:"1rem 1.1rem 0" }}>
+                <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontWeight:600, fontSize:"1.05rem", margin:"0 0 5px", lineHeight:1.2 }}>
                   {selectedDateLabel}
                 </p>
-                <div style={{ display:"flex", gap:"0.5rem", marginBottom:"1.1rem", flexWrap:"wrap" }}>
+                <div style={{ display:"flex", gap:"0.4rem", marginBottom:"0.75rem", flexWrap:"wrap" }}>
                   {[
                     { v:dayBookings.filter(b=>b.status!=="Cancelled").length, l:"active",    c:"#c084fc" },
                     { v:dayBookings.filter(b=>b.status==="Confirmed").length,  l:"confirmed", c:"#10b981" },
                     { v:dayBookings.filter(b=>b.status==="Pending").length,    l:"pending",   c:"#f59e0b" },
                   ].map(({v,l,c})=>(
-                    <span key={l} style={{ fontSize:"0.7rem", color:c, background:`${c}14`, border:`1px solid ${c}30`, borderRadius:999, padding:"2px 9px", fontWeight:600 }}>
+                    <span key={l} style={{ fontSize:"0.62rem", color:c, background:`${c}14`, border:`1px solid ${c}30`, borderRadius:999, padding:"1px 7px", fontWeight:600 }}>
                       {v} {l}
                     </span>
                   ))}
                 </div>
 
                 {/* Slot status row */}
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"0.5rem", marginBottom:"1.2rem" }}>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:"0.4rem", marginBottom:"0.85rem" }}>
                   {SLOTS.map(s=>{
                     const bk = dayBookings.find(b=>b.timeSlot===s && b.status!=="Cancelled");
                     return (
                       <div key={s}
                         onClick={()=>bk&&setDetail(bk)}
-                        style={{ borderRadius:12, padding:"10px 6px 9px", textAlign:"center", cursor:bk?"pointer":"default",
-                          background: bk ? SLOT_DARK[s] : "rgba(16,185,129,0.07)",
-                          border:`1px solid ${bk ? SLOT_BORDER[s] : "rgba(16,185,129,0.2)"}`,
+                        style={{ borderRadius:10, padding:"7px 5px 6px", textAlign:"center", cursor:bk?"pointer":"default",
+                          background: bk ? SLOT_DARK[s] : "rgba(16,185,129,0.06)",
+                          border:`1px solid ${bk ? SLOT_BORDER[s] : "rgba(16,185,129,0.18)"}`,
                           transition:"all 0.15s" }}
-                        onMouseEnter={e=>{ if(bk){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 4px 16px ${SLOT_COLOR[s]}22`;}}}
+                        onMouseEnter={e=>{ if(bk){e.currentTarget.style.transform="translateY(-2px)";e.currentTarget.style.boxShadow=`0 4px 12px ${SLOT_COLOR[s]}22`;}}}
                         onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow="none";}}>
-                        {/* Slot colour dot */}
-                        <div style={{ width:6, height:6, borderRadius:"50%", background: bk?SLOT_COLOR[s]:"#34d399", margin:"0 auto 5px" }}/>
-                        <p style={{ color: bk?SLOT_COLOR[s]:"#34d399", fontSize:"0.6rem", fontWeight:800, textTransform:"uppercase", letterSpacing:"0.07em", margin:"0 0 2px" }}>
+                        <div style={{ width:5, height:5, borderRadius:"50%", background: bk?SLOT_COLOR[s]:"#34d399", margin:"0 auto 3px" }}/>
+                        <p style={{ color: bk?SLOT_COLOR[s]:"#34d399", fontSize:"0.52rem", fontWeight:800, textTransform:"uppercase", letterSpacing:"0.06em", margin:"0 0 1px" }}>
                           {SLOT_LABEL[s]}
                         </p>
-                        <p style={{ color: bk?SLOT_COLOR[s]:"#34d399", fontSize:"0.72rem", fontWeight:700, margin:"0 0 2px" }}>
+                        <p style={{ color: bk?SLOT_COLOR[s]:"#34d399", fontSize:"0.65rem", fontWeight:700, margin:"0 0 1px" }}>
                           {bk?"Booked":"Free"}
                         </p>
-                        <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.58rem", margin:0 }}>{SLOT_TIME[s]}</p>
-                        {bk&&<p style={{ color:"rgba(255,255,255,0.45)", fontSize:"0.6rem", margin:"4px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{bk.clientName?.split(" ")[0]}</p>}
+                        <p style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.52rem", margin:0 }}>{SLOT_TIME[s]}</p>
+                        {bk&&<p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.52rem", margin:"3px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{bk.clientName?.split(" ")[0]}</p>}
                       </div>
                     );
                   })}
                 </div>
 
                 {dayBookings.length>0 && (
-                  <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.68rem", margin:"0 0 0.7rem", textTransform:"uppercase", letterSpacing:"0.07em", fontWeight:700 }}>
+                  <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.6rem", margin:"0 0 0.5rem", textTransform:"uppercase", letterSpacing:"0.07em", fontWeight:700 }}>
                     Bookings
                   </p>
                 )}
               </div>
 
               {/* Booking cards */}
-              <div style={{ padding:"0 1.4rem 1.4rem", maxHeight:380, overflowY:"auto" }}>
+              <div style={{ padding:"0 1.1rem 1.1rem", maxHeight:400, overflowY:"auto" }}>
                 {dayBookings.length===0 ? (
                   <div style={{ textAlign:"center", padding:"2rem 0 1rem" }}>
                     <p style={{ fontSize:"1.6rem", marginBottom:6, opacity:0.25 }}>🎉</p>
                     <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.84rem" }}>No bookings on this date</p>
                   </div>
                 ) : (
-                  <div style={{ display:"flex", flexDirection:"column", gap:"0.6rem" }}>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
                     {dayBookings.map(b=>{
                       const sc  = statusColor[b.status]||"#888";
                       const s   = b.timeSlot;
                       const sc2 = s ? SLOT_COLOR[s] : "#9333ea";
                       return (
                         <div key={b._id} onClick={()=>setDetail(b)}
-                          style={{ borderRadius:16, border:"1px solid rgba(139,92,246,0.15)", background:"rgba(255,255,255,0.03)", cursor:"pointer", overflow:"hidden", transition:"all 0.17s" }}
+                          style={{ borderRadius:12, border:"1px solid rgba(139,92,246,0.15)", background:"rgba(255,255,255,0.03)", cursor:"pointer", overflow:"hidden", transition:"all 0.17s" }}
                           onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(147,51,234,0.4)";e.currentTarget.style.background="rgba(109,40,217,0.1)";e.currentTarget.style.transform="translateY(-1px)";}}
                           onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(139,92,246,0.15)";e.currentTarget.style.background="rgba(255,255,255,0.03)";e.currentTarget.style.transform="translateY(0)";}}>
 
                           {/* Colour top bar */}
-                          <div style={{ height:3, background:`linear-gradient(90deg,${sc2},${sc2}88)` }}/>
+                          <div style={{ height:2, background:`linear-gradient(90deg,${sc2},${sc2}88)` }}/>
 
-                          <div style={{ padding:"0.85rem 0.95rem" }}>
+                          <div style={{ padding:"0.55rem 0.75rem" }}>
                             {/* Row 1: name + status */}
-                            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.45rem" }}>
-                              <p style={{ color:"white", fontWeight:700, fontSize:"0.9rem", margin:0 }}>{b.clientName}</p>
-                              <span style={{ fontSize:"0.62rem", fontWeight:700, color:sc, background:`${sc}16`, border:`1px solid ${sc}35`, borderRadius:999, padding:"2px 8px" }}>
+                            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"0.28rem" }}>
+                              <p style={{ color:"white", fontWeight:700, fontSize:"0.82rem", margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", maxWidth:"55%" }}>{b.clientName}</p>
+                              <span style={{ fontSize:"0.58rem", fontWeight:700, color:sc, background:`${sc}16`, border:`1px solid ${sc}35`, borderRadius:999, padding:"1px 7px", flexShrink:0 }}>
                                 {b.status==="Confirmed"?"✓ ":b.status==="Cancelled"?"✕ ":"⏳ "}{b.status}
                               </span>
                             </div>
 
                             {/* Row 2: slot + event type tags */}
-                            <div style={{ display:"flex", gap:"0.4rem", flexWrap:"wrap", marginBottom:"0.45rem" }}>
-                              {s&&<span style={{ fontSize:"0.62rem", color:sc2, background:`${sc2}16`, border:`1px solid ${sc2}35`, borderRadius:6, padding:"2px 7px", fontWeight:600 }}>
+                            <div style={{ display:"flex", gap:"0.3rem", flexWrap:"wrap", marginBottom:"0.28rem" }}>
+                              {s&&<span style={{ fontSize:"0.58rem", color:sc2, background:`${sc2}16`, border:`1px solid ${sc2}35`, borderRadius:5, padding:"1px 6px", fontWeight:600 }}>
                                 {SLOT_LABEL[s]} · {SLOT_TIME[s]}
                               </span>}
-                              {b.eventType&&<span style={{ fontSize:"0.62rem", color:"rgba(255,255,255,0.45)", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:6, padding:"2px 7px" }}>
+                              {b.eventType&&<span style={{ fontSize:"0.58rem", color:"rgba(255,255,255,0.45)", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:5, padding:"1px 6px" }}>
                                 {b.eventType}
                               </span>}
                             </div>
 
                             {/* Row 3: phone + guests + price */}
-                            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: b.hallId?.name?"0.3rem":"0" }}>
-                              <p style={{ color:"rgba(255,255,255,0.32)", fontSize:"0.71rem", margin:0 }}>
+                            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom: b.hallId?.name?"0.18rem":"0" }}>
+                              <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.64rem", margin:0 }}>
                                 📞 {b.clientPhone} · 👥 {b.guests}
                               </p>
-                              <p style={{ color:"#c084fc", fontWeight:700, fontSize:"0.8rem", margin:0 }}>
+                              <p style={{ color:"#c084fc", fontWeight:700, fontSize:"0.72rem", margin:0 }}>
                                 PKR {b.totalPrice?.toLocaleString()}
                               </p>
                             </div>
 
                             {b.hallId?.name&&(
-                              <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.67rem", margin:0 }}>🏛 {b.hallId.name}</p>
+                              <p style={{ color:"rgba(255,255,255,0.2)", fontSize:"0.6rem", margin:"0 0 0" }}>🏛 {b.hallId.name}</p>
                             )}
 
                             {/* Confirm / Cancel quick actions */}
                             {b.status==="Pending"&&(
-                              <div style={{ display:"flex", gap:"0.4rem", marginTop:"0.65rem" }}>
+                              <div style={{ display:"flex", gap:"0.35rem", marginTop:"0.45rem" }}>
                                 <button onClick={e=>{e.stopPropagation();updateStatus(b._id,"Confirmed");}}
-                                  style={{ flex:1, padding:"5px 0", borderRadius:9, border:"1px solid rgba(16,185,129,0.38)", background:"rgba(16,185,129,0.1)", color:"#34d399", fontSize:"0.68rem", fontWeight:700, cursor:"pointer", transition:"all 0.14s" }}
+                                  style={{ flex:1, padding:"4px 0", borderRadius:7, border:"1px solid rgba(16,185,129,0.38)", background:"rgba(16,185,129,0.1)", color:"#34d399", fontSize:"0.62rem", fontWeight:700, cursor:"pointer", transition:"all 0.14s" }}
                                   onMouseEnter={e=>e.currentTarget.style.background="rgba(16,185,129,0.2)"}
                                   onMouseLeave={e=>e.currentTarget.style.background="rgba(16,185,129,0.1)"}>
                                   ✓ Confirm
                                 </button>
                                 <button onClick={e=>{e.stopPropagation();updateStatus(b._id,"Cancelled");}}
-                                  style={{ flex:1, padding:"5px 0", borderRadius:9, border:"1px solid rgba(239,68,68,0.32)", background:"rgba(239,68,68,0.08)", color:"#f87171", fontSize:"0.68rem", fontWeight:700, cursor:"pointer", transition:"all 0.14s" }}
+                                  style={{ flex:1, padding:"4px 0", borderRadius:7, border:"1px solid rgba(239,68,68,0.32)", background:"rgba(239,68,68,0.08)", color:"#f87171", fontSize:"0.62rem", fontWeight:700, cursor:"pointer", transition:"all 0.14s" }}
                                   onMouseEnter={e=>e.currentTarget.style.background="rgba(239,68,68,0.18)"}
                                   onMouseLeave={e=>e.currentTarget.style.background="rgba(239,68,68,0.08)"}>
                                   ✕ Cancel

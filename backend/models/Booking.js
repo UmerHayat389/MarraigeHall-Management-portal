@@ -33,6 +33,13 @@ const bookingSchema = new mongoose.Schema(
       enum: ["Pending", "Confirmed", "Cancelled"],
       default: "Pending",
     },
+
+    // Selected dish IDs from the menu (empty = self-catering)
+    selectedDishes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Dish",
+      default: [],
+    }],
   },
   { timestamps: true }
 );
