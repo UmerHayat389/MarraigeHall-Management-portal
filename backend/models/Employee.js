@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcryptjs");
+const bcrypt   = require("bcryptjs");
 
 const employeeSchema = new mongoose.Schema(
   {
@@ -41,17 +41,22 @@ const employeeSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+
+    // ── FIX: image field was missing — MongoDB was silently discarding it ──────
+    // Stores either a URL string (https://...) or a base64 data URI (data:image/...)
+    image: {
+      type: String,
+      default: "",
+      trim: true,
+    },
   },
   { timestamps: true }
 );
 
-employeeSchema.pre("save", function (next) {
-  if (!this.isModified("password") || !this.password) return next();
-  bcrypt.hash(this.password, 10, (err, hash) => {
-    if (err) return next(err);
-    this.password = hash;
-    next();
-  });
+// ── FIX: use async/await — old callback style crashes Mongoose 6+ ─────────────
+employeeSchema.pre("save", async function () {
+  if (!this.isModified("password") || !this.password) return;
+  this.password = await bcrypt.hash(this.password, 10);
 });
 
 module.exports = mongoose.model("Employee", employeeSchema);
