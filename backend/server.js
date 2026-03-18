@@ -25,14 +25,13 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // ── Routes ────────────────────────────────────────────────────────────────────
-app.use("/api/auth",      require("./routes/authRoutes"));
-app.use("/api/halls",     require("./routes/hallRoutes"));
-app.use("/api/bookings",  require("./routes/bookingRoutes"));
-app.use("/api/employees", require("./routes/employeeRoutes"));
-app.use("/api/dishes",    require("./routes/dishes.routes"));
-
-// ── TEMPORARY: One-time dish fix route — REMOVE after fixing all bookings ─────
-app.use("/api/fix",       require("./routes/fixDishesRoute"));
+app.use("/api/auth",        require("./routes/authRoutes"));
+app.use("/api/halls",       require("./routes/hallRoutes"));
+app.use("/api/bookings",    require("./routes/bookingRoutes"));
+app.use("/api/employees",   require("./routes/employeeRoutes"));
+app.use("/api/dishes",      require("./routes/dishes.routes"));
+app.use("/api/revenue",     require("./routes/revenueRoutes"));
+app.use("/api/assignments", require("./routes/assignmentRoutes")); // NEW: Staff assignments
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get("/api/health", (req, res) => {
@@ -69,7 +68,7 @@ const connectDB = async () => {
 };
 
 mongoose.connection.on("disconnected", () => console.warn("⚠ MongoDB disconnected. Attempting reconnect..."));
-mongoose.connection.on("reconnected", () => console.log("✅ MongoDB reconnected"));
+mongoose.connection.on("reconnected",  () => console.log("✅ MongoDB reconnected"));
 
 // ── Start server ──────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;

@@ -10,15 +10,19 @@ import HallsTab      from "./HallsTab";
 import BookingsTab   from "./BookingsTab";
 import CalendarTab   from "./CalendarTab";
 import DishesTab     from "./DishesTab";
-import EmployeesTab  from "./EmployeesTab"; // NEW: Employees Tab
+import EmployeesTab  from "./EmployeesTab";
+import RevenueTab    from "./RevenueTab";
+import StaffAssignmentTab from "./StaffAssignmentTab"; // NEW: Staff Assignment Tab
 
 const TABS = [
-  { id: "dashboard", label: "Dashboard", icon: "📊" },
-  { id: "halls",     label: "Halls",     icon: "🏛️" },
-  { id: "bookings",  label: "Bookings",  icon: "📋" },
-  { id: "dishes",    label: "Dishes",    icon: "🍽️" },
-  { id: "employees", label: "Employees", icon: "👥" }, // NEW: Employees Tab
-  { id: "calendar",  label: "Calendar",  icon: "📅" },
+  { id: "dashboard",   label: "Dashboard",   icon: "📊" },
+  { id: "halls",       label: "Halls",       icon: "🏛️" },
+  { id: "bookings",    label: "Bookings",    icon: "📋" },
+  { id: "dishes",      label: "Dishes",      icon: "🍽️" },
+  { id: "employees",   label: "Employees",   icon: "👥" },
+  { id: "assignments", label: "Staff Assignment", icon: "📌" }, // Staff Assignment Tab
+  { id: "revenue",     label: "Revenue",     icon: "💰" },
+  { id: "calendar",    label: "Calendar",    icon: "📅" },
 ];
 
 export default function AdminPanel() {
@@ -196,7 +200,13 @@ export default function AdminPanel() {
             <DishesTab toast={showToast} />
           )}
           {activeTab === "employees" && (
-            <EmployeesTab toast={showToast} />  // NEW: Employees Tab
+            <EmployeesTab toast={showToast} />
+          )}
+          {activeTab === "assignments" && (
+            <StaffAssignmentTab toast={showToast} />  // NEW: Staff Assignment Tab
+          )}
+          {activeTab === "revenue" && (
+            <RevenueTab toast={showToast} />  // NEW: Revenue Tab
           )}
           {activeTab === "calendar" && (
             <CalendarTab toast={showToast} />

@@ -7,14 +7,12 @@ const bookingSchema = new mongoose.Schema(
     clientEmail:     { type: String, default: "" },
     userId:          { type: mongoose.Schema.Types.ObjectId, ref: "User", default: null },
 
-    // Human-readable reference e.g. NM-UMER-A3X
     bookingRef:      { type: String, default: "" },
 
     hallId:          { type: mongoose.Schema.Types.ObjectId, ref: "Hall", required: true },
     eventType:       { type: String, default: "Walima" },
     eventDate:       { type: Date, required: true },
 
-    // NEW: which time slot is booked — afternoon / evening / latenight
     timeSlot: {
       type: String,
       enum: ["afternoon", "evening", "latenight"],
@@ -34,15 +32,24 @@ const bookingSchema = new mongoose.Schema(
       default: "Pending",
     },
 
-    // Selected dish IDs from the menu (empty = self-catering)
     selectedDishes: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Dish",
       default: [],
     }],
 
-    // "our-menu" | "self-catering" | "" (empty = old booking, not specified)
     cateringOption: { type: String, default: "" },
+
+    // ── Staff assignment ──────────────────────────────────────────────────────
+    // Each booking can have multiple staff assigned across roles
+    assignedStaff: [
+      {
+        employeeId: { type: mongoose.Schema.Types.ObjectId, ref: "Employee", required: true },
+        role:       { type: String, required: true }, // role snapshot at time of assignment
+        assignedAt: { type: Date, default: Date.now },
+        note:       { type: String, default: "" },    // optional per-assignment note
+      },
+    ],
   },
   { timestamps: true }
 );

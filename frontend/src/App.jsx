@@ -15,7 +15,9 @@ export default function App() {
         <Route path="/admin/halls"      element={<AdminPanel />} />
         <Route path="/admin/bookings"   element={<AdminPanel />} />
         <Route path="/admin/dishes"     element={<AdminPanel />} />
-        <Route path="/admin/employees"  element={<AdminPanel />} /> {/* FIXED: was missing, caused redirect to landing page */}
+        <Route path="/admin/employees"   element={<AdminPanel />} />
+        <Route path="/admin/assignments" element={<AdminPanel />} /> {/* NEW: Staff Assignments */}
+        <Route path="/admin/revenue"     element={<AdminPanel />} />
         <Route path="/admin/calendar"   element={<AdminPanel />} />
         <Route path="*"                 element={<Navigate to="/" replace />} />
       </Routes>
