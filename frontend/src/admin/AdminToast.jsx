@@ -7,7 +7,7 @@ export default function AdminToast({ msg, type, onDone }) {
     <div style={{
       position:"fixed", bottom:"1.5rem", right:"1.5rem", zIndex:9999,
       padding:"0.85rem 1.35rem", borderRadius:"14px", fontSize:"0.86rem",
-      fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:500,
+      fontFamily:"'Inter',sans-serif", fontWeight:500,
       background: isSuccess ? "rgba(10,185,129,0.1)" : "rgba(239,68,68,0.1)",
       border:`1px solid ${isSuccess?"rgba(16,185,129,0.38)":"rgba(239,68,68,0.38)"}`,
       color: isSuccess ? "#34d399" : "#f87171",

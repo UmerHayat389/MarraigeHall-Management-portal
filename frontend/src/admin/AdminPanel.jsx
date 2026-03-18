@@ -83,14 +83,14 @@ export default function AdminPanel() {
           onClick={() => setSidebarOpen(o => !o)}
           style={{
             background: "none", border: "none",
-            color: "rgba(255,255,255,0.7)", cursor: "pointer",
+            color: "#cbd5e1", cursor: "pointer",
             fontSize: "1.5rem", padding: "0.2rem", lineHeight: 1,
           }}
         >
           ☰
         </button>
-        <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: "1.2rem", margin: 0 }}>
-          <span style={{ color: "#a855f7" }}>Noor</span>
+        <p style={{ fontFamily: "'Sora',sans-serif", fontSize: "1.2rem", margin: 0 }}>
+          <span style={{ color: "#818cf8" }}>Noor</span>
           <span style={{ color: "white" }}> Mahal</span>
         </p>
         <button
@@ -115,14 +115,14 @@ export default function AdminPanel() {
           {/* Logo */}
           <div style={{ padding: "0 0.5rem 2rem" }}>
             <p style={{
-              fontFamily: "'Cormorant Garamond',serif",
+              fontFamily: "'Sora',sans-serif",
               fontSize: "1.4rem", margin: "0 0 3px", lineHeight: 1,
             }}>
-              <span style={{ color: "#a855f7" }}>Noor</span>
+              <span style={{ color: "#818cf8" }}>Noor</span>
               <span style={{ color: "white" }}> Mahal</span>
             </p>
             <p style={{
-              color: "rgba(255,255,255,0.22)", fontSize: "0.6rem",
+              color: "#cbd5e1", fontSize: "0.6rem",
               letterSpacing: "0.2em", textTransform: "uppercase", margin: 0,
             }}>
               Admin Panel
@@ -144,7 +144,7 @@ export default function AdminPanel() {
                 {t.id === "bookings" && stats.pending > 0 && (
                   <span style={{
                     marginLeft: "auto",
-                    background: "linear-gradient(135deg,#6d28d9,#9333ea)",
+                    background: "#6366f1",
                     color: "white", fontSize: "0.6rem",
                     padding: "2px 8px", borderRadius: "999px", fontWeight: 700,
                   }}>
@@ -156,21 +156,21 @@ export default function AdminPanel() {
           </nav>
 
           {/* Signed-in user + logout */}
-          <div style={{ borderTop: "1px solid rgba(139,92,246,0.12)", paddingTop: "1rem" }}>
+          <div style={{ borderTop: "1px solid rgba(99,102,241,0.12)", paddingTop: "1rem" }}>
             <div style={{
               padding: "0.6rem 0.9rem", borderRadius: "12px",
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(139,92,246,0.1)",
+              background: "#1e2433",
+              border: "1px solid #2d3548",
               marginBottom: "0.75rem",
             }}>
               <p style={{
-                color: "rgba(255,255,255,0.22)", fontSize: "0.6rem",
+                color: "#cbd5e1", fontSize: "0.6rem",
                 textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 3px",
               }}>
                 Signed in as
               </p>
               <p style={{
-                color: "rgba(255,255,255,0.65)", fontSize: "0.78rem",
+                color: "rgba(255,255,255,0.85)", fontSize: "0.78rem",
                 margin: 0, wordBreak: "break-all",
               }}>
                 {user.email}

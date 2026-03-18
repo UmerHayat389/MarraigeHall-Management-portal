@@ -6,9 +6,9 @@ import BookingDetailModal from "./BookingDetailModal";
 const SLOTS      = ["afternoon","evening","latenight"];
 const SLOT_LABEL = { afternoon:"Afternoon", evening:"Evening", latenight:"Late Night" };
 const SLOT_TIME  = { afternoon:"12–4 PM",   evening:"5–9 PM",  latenight:"10 PM–2 AM" };
-const SLOT_COLOR = { afternoon:"#06b6d4",   evening:"#f59e0b", latenight:"#a855f7" };
-const SLOT_DARK  = { afternoon:"rgba(6,182,212,0.18)", evening:"rgba(245,158,11,0.18)", latenight:"rgba(168,85,247,0.18)" };
-const SLOT_BORDER= { afternoon:"rgba(6,182,212,0.4)",  evening:"rgba(245,158,11,0.4)",  latenight:"rgba(168,85,247,0.4)" };
+const SLOT_COLOR = { afternoon:"#06b6d4",   evening:"#f59e0b", latenight:"#818cf8" };
+const SLOT_DARK  = { afternoon:"rgba(6,182,212,0.18)", evening:"rgba(245,158,11,0.18)", latenight:"rgba(99,102,241,0.2)" };
+const SLOT_BORDER= { afternoon:"rgba(6,182,212,0.4)",  evening:"rgba(245,158,11,0.4)",  latenight:"rgba(99,102,241,0.4)" };
 
 const MONTH_NAMES = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DAY_NAMES   = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
@@ -71,20 +71,20 @@ export default function CalendarTab({ toast }) {
     : "";
 
   return (
-    <div style={{ fontFamily:"'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ fontFamily:"'Inter',sans-serif" }}>
       <style>{`
         .cal-wrap { display:grid; grid-template-columns:1fr 360px; gap:1.5rem; align-items:start; }
         .cal-7 { display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
         .c-day {
-          border-radius:8px; border:1px solid rgba(139,92,246,0.1);
-          background:rgba(255,255,255,0.02); cursor:pointer; position:relative;
+          border-radius:8px; border:1px solid #2d3548;
+          background:#1e2433; cursor:pointer; position:relative;
           display:flex; flex-direction:column; padding:5px 5px 4px; transition:all 0.15s;
           min-height:64px;
         }
-        .c-day:hover { border-color:rgba(147,51,234,0.45); background:rgba(109,40,217,0.14); transform:translateY(-1px); }
-        .c-day.is-today { border-color:rgba(147,51,234,0.65)!important; background:rgba(109,40,217,0.16)!important; }
-        .c-day.is-sel { border-color:#9333ea!important; background:linear-gradient(135deg,rgba(109,40,217,0.38),rgba(147,51,234,0.22))!important; box-shadow:0 0 0 2px rgba(147,51,234,0.22); }
-        .c-day.is-booked { border-color:rgba(147,51,234,0.3); background:rgba(109,40,217,0.1); }
+        .c-day:hover { border-color:rgba(99,102,241,0.45); background:rgba(79,70,229,0.14); transform:translateY(-1px); }
+        .c-day.is-today { border-color:rgba(99,102,241,0.65)!important; background:rgba(79,70,229,0.16)!important; }
+        .c-day.is-sel { border-color:#6366f1!important; background:linear-gradient(135deg,rgba(79,70,229,0.38),rgba(99,102,241,0.22))!important; box-shadow:0 0 0 2px rgba(99,102,241,0.22); }
+        .c-day.is-booked { border-color:rgba(99,102,241,0.3); background:rgba(79,70,229,0.1); }
         .c-day.is-full { border-color:rgba(239,68,68,0.32); background:rgba(239,68,68,0.07); }
         .c-day.is-past { opacity:0.32; pointer-events:none; }
         .slot-pill { font-size:0.5rem; font-weight:700; border-radius:4px; padding:1px 4px; margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; display:flex; align-items:center; gap:2px; line-height:1.4; }
@@ -97,8 +97,8 @@ export default function CalendarTab({ toast }) {
       {/* ── Page header ── */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.75rem", flexWrap:"wrap", gap:"1rem" }}>
         <div>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.8rem", fontWeight:600, margin:"0 0 4px" }}>
-            Booking <em style={{ color:"#9333ea", fontStyle:"italic" }}>Calendar</em>
+          <h2 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.8rem", fontWeight:600, margin:"0 0 4px" }}>
+            Booking <em style={{ color:"#6366f1", fontStyle:"italic" }}>Calendar</em>
           </h2>
           <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.8rem", margin:0 }}>Click any date to see booking details</p>
         </div>
@@ -106,12 +106,12 @@ export default function CalendarTab({ toast }) {
         {/* Month stat pills */}
         <div style={{ display:"flex", gap:"0.55rem" }}>
           {[
-            { v: monthBks.length,      l:"Bookings",  c:"#c084fc" },
+            { v: monthBks.length,      l:"Bookings",  c:"#a5b4fc" },
             { v: confirmed.length,     l:"Confirmed", c:"#10b981" },
             { v: monthBks.filter(b=>b.status==="Pending").length, l:"Pending", c:"#f59e0b" },
             { v:`${(revenue/1000).toFixed(0)}K`, l:"Revenue", c:"#f59e0b" },
           ].map(({v,l,c})=>(
-            <div key={l} style={{ background:"rgba(255,255,255,0.04)", border:"1px solid rgba(139,92,246,0.16)", borderRadius:10, padding:"0.4rem 0.7rem", textAlign:"center", minWidth:52 }}>
+            <div key={l} style={{ background:"#252d3d", border:"1px solid rgba(99,102,241,0.16)", borderRadius:10, padding:"0.4rem 0.7rem", textAlign:"center", minWidth:52 }}>
               <p style={{ color:c, fontWeight:700, fontSize:"0.95rem", margin:0, lineHeight:1.2 }}>{v}</p>
               <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.56rem", margin:0, letterSpacing:"0.04em" }}>{l}</p>
             </div>
@@ -121,28 +121,28 @@ export default function CalendarTab({ toast }) {
 
       <div className="cal-wrap">
         {/* ── Calendar card ── */}
-        <div style={{ background:"linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))", border:"1px solid rgba(139,92,246,0.15)", borderRadius:18, padding:"1.25rem" }}>
+        <div style={{ background:"linear-gradient(145deg,#252d3d,#1e2433)", border:"1px solid rgba(99,102,241,0.15)", borderRadius:18, padding:"1.25rem" }}>
 
           {/* Month nav */}
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1rem" }}>
             <button onClick={()=>setCurrent(new Date(year,month-1,1))}
-              style={{ width:38, height:38, borderRadius:11, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.04)", color:"rgba(167,139,250,0.7)", cursor:"pointer", fontSize:"1.1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(109,40,217,0.28)";e.currentTarget.style.color="white";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="rgba(167,139,250,0.7)";}}>‹</button>
+              style={{ width:38, height:38, borderRadius:11, border:"1px solid rgba(99,102,241,0.22)", background:"#252d3d", color:"#94a3b8", cursor:"pointer", fontSize:"1.1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(79,70,229,0.28)";e.currentTarget.style.color="white";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#252d3d";e.currentTarget.style.color="#94a3b8";}}>‹</button>
             <div style={{ textAlign:"center" }}>
-              <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.45rem", fontWeight:600, margin:0, lineHeight:1 }}>{MONTH_NAMES[month]}</p>
+              <p style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.45rem", fontWeight:600, margin:0, lineHeight:1 }}>{MONTH_NAMES[month]}</p>
               <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.7rem", margin:"3px 0 0" }}>{year}</p>
             </div>
             <button onClick={()=>setCurrent(new Date(year,month+1,1))}
-              style={{ width:38, height:38, borderRadius:11, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.04)", color:"rgba(167,139,250,0.7)", cursor:"pointer", fontSize:"1.1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}
-              onMouseEnter={e=>{e.currentTarget.style.background="rgba(109,40,217,0.28)";e.currentTarget.style.color="white";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.04)";e.currentTarget.style.color="rgba(167,139,250,0.7)";}}>›</button>
+              style={{ width:38, height:38, borderRadius:11, border:"1px solid rgba(99,102,241,0.22)", background:"#252d3d", color:"#94a3b8", cursor:"pointer", fontSize:"1.1rem", display:"flex", alignItems:"center", justifyContent:"center", transition:"all 0.15s" }}
+              onMouseEnter={e=>{e.currentTarget.style.background="rgba(79,70,229,0.28)";e.currentTarget.style.color="white";}}
+              onMouseLeave={e=>{e.currentTarget.style.background="#252d3d";e.currentTarget.style.color="#94a3b8";}}>›</button>
           </div>
 
           {/* Day headers */}
           <div className="cal-7" style={{ marginBottom:6 }}>
             {DAY_NAMES.map(d=>(
-              <div key={d} style={{ textAlign:"center", color:"rgba(255,255,255,0.22)", fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.1em", padding:"4px 0", textTransform:"uppercase" }}>{d}</div>
+              <div key={d} style={{ textAlign:"center", color:"#94a3b8", fontSize:"0.62rem", fontWeight:700, letterSpacing:"0.1em", padding:"4px 0", textTransform:"uppercase" }}>{d}</div>
             ))}
           </div>
 
@@ -173,10 +173,10 @@ export default function CalendarTab({ toast }) {
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
                     <span style={{
                       fontSize:"0.72rem", lineHeight:1, fontWeight: isToday||isSel||hasAny ? 700 : 400,
-                      color: isFull?"#f87171" : isToday?"#c084fc" : isSel?"white" : hasAny?"rgba(255,255,255,0.9)" : "rgba(255,255,255,0.4)",
+                      color: isFull?"#f87171" : isToday?"#a5b4fc" : isSel?"white" : hasAny?"rgba(255,255,255,0.9)" : "#94a3b8",
                     }}>{d}</span>
                     {acts.length>0 && (
-                      <span style={{ fontSize:"0.45rem", fontWeight:800, lineHeight:1, color:isFull?"#f87171":"#c084fc", background:isFull?"rgba(239,68,68,0.18)":"rgba(147,51,234,0.22)", borderRadius:3, padding:"1px 3px", minWidth:12, textAlign:"center" }}>
+                      <span style={{ fontSize:"0.45rem", fontWeight:800, lineHeight:1, color:isFull?"#f87171":"#a5b4fc", background:isFull?"rgba(239,68,68,0.18)":"rgba(99,102,241,0.22)", borderRadius:3, padding:"1px 3px", minWidth:12, textAlign:"center" }}>
                         {acts.length}
                       </span>
                     )}
@@ -199,12 +199,12 @@ export default function CalendarTab({ toast }) {
           </div>
 
           {/* Legend */}
-          <div style={{ display:"flex", flexWrap:"wrap", gap:"1rem", marginTop:"1.4rem", paddingTop:"1.1rem", borderTop:"1px solid rgba(255,255,255,0.06)" }}>
+          <div style={{ display:"flex", flexWrap:"wrap", gap:"1rem", marginTop:"1.4rem", paddingTop:"1.1rem", borderTop:"1px solid #1e2433" }}>
             {[
               {c:"#06b6d4", l:"Afternoon"},
               {c:"#f59e0b", l:"Evening"},
-              {c:"#a855f7", l:"Late Night"},
-              {c:"rgba(109,40,217,0.6)", l:"Has booking"},
+              {c:"#818cf8", l:"Late Night"},
+              {c:"rgba(79,70,229,0.6)", l:"Has booking"},
               {c:"rgba(239,68,68,0.7)",  l:"Fully booked"},
             ].map(({c,l})=>(
               <div key={l} style={{ display:"flex", alignItems:"center", gap:5 }}>
@@ -216,22 +216,22 @@ export default function CalendarTab({ toast }) {
         </div>
 
         {/* ── Right panel ── */}
-        <div style={{ background:"linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))", border:"1px solid rgba(139,92,246,0.15)", borderRadius:22, overflow:"hidden", minHeight:400 }}>
+        <div style={{ background:"linear-gradient(145deg,#252d3d,#1e2433)", border:"1px solid rgba(99,102,241,0.15)", borderRadius:22, overflow:"hidden", minHeight:400 }}>
           {!selected ? (
             <div style={{ display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", height:400, gap:"0.75rem" }}>
-              <div style={{ width:56, height:56, borderRadius:16, background:"rgba(139,92,246,0.1)", border:"1px solid rgba(139,92,246,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem" }}>📅</div>
+              <div style={{ width:56, height:56, borderRadius:16, background:"rgba(99,102,241,0.1)", border:"1px solid rgba(99,102,241,0.2)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem" }}>📅</div>
               <p style={{ color:"rgba(255,255,255,0.28)", fontSize:"0.88rem", margin:0 }}>Select a date to view details</p>
             </div>
           ) : (
             <>
               {/* Panel header */}
               <div style={{ padding:"1rem 1.1rem 0" }}>
-                <p style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontWeight:600, fontSize:"1.05rem", margin:"0 0 5px", lineHeight:1.2 }}>
+                <p style={{ fontFamily:"'Sora',sans-serif", color:"white", fontWeight:600, fontSize:"1.05rem", margin:"0 0 5px", lineHeight:1.2 }}>
                   {selectedDateLabel}
                 </p>
                 <div style={{ display:"flex", gap:"0.4rem", marginBottom:"0.75rem", flexWrap:"wrap" }}>
                   {[
-                    { v:dayBookings.filter(b=>b.status!=="Cancelled").length, l:"active",    c:"#c084fc" },
+                    { v:dayBookings.filter(b=>b.status!=="Cancelled").length, l:"active",    c:"#a5b4fc" },
                     { v:dayBookings.filter(b=>b.status==="Confirmed").length,  l:"confirmed", c:"#10b981" },
                     { v:dayBookings.filter(b=>b.status==="Pending").length,    l:"pending",   c:"#f59e0b" },
                   ].map(({v,l,c})=>(
@@ -261,15 +261,15 @@ export default function CalendarTab({ toast }) {
                         <p style={{ color: bk?SLOT_COLOR[s]:"#34d399", fontSize:"0.65rem", fontWeight:700, margin:"0 0 1px" }}>
                           {bk?"Booked":"Free"}
                         </p>
-                        <p style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.52rem", margin:0 }}>{SLOT_TIME[s]}</p>
-                        {bk&&<p style={{ color:"rgba(255,255,255,0.4)", fontSize:"0.52rem", margin:"3px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{bk.clientName?.split(" ")[0]}</p>}
+                        <p style={{ color:"#94a3b8", fontSize:"0.52rem", margin:0 }}>{SLOT_TIME[s]}</p>
+                        {bk&&<p style={{ color:"#94a3b8", fontSize:"0.52rem", margin:"3px 0 0", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{bk.clientName?.split(" ")[0]}</p>}
                       </div>
                     );
                   })}
                 </div>
 
                 {dayBookings.length>0 && (
-                  <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.6rem", margin:"0 0 0.5rem", textTransform:"uppercase", letterSpacing:"0.07em", fontWeight:700 }}>
+                  <p style={{ color:"#94a3b8", fontSize:"0.6rem", margin:"0 0 0.5rem", textTransform:"uppercase", letterSpacing:"0.07em", fontWeight:700 }}>
                     Bookings
                   </p>
                 )}
@@ -280,19 +280,19 @@ export default function CalendarTab({ toast }) {
                 {dayBookings.length===0 ? (
                   <div style={{ textAlign:"center", padding:"2rem 0 1rem" }}>
                     <p style={{ fontSize:"1.6rem", marginBottom:6, opacity:0.25 }}>🎉</p>
-                    <p style={{ color:"rgba(255,255,255,0.22)", fontSize:"0.84rem" }}>No bookings on this date</p>
+                    <p style={{ color:"#94a3b8", fontSize:"0.84rem" }}>No bookings on this date</p>
                   </div>
                 ) : (
                   <div style={{ display:"flex", flexDirection:"column", gap:"0.4rem" }}>
                     {dayBookings.map(b=>{
                       const sc  = statusColor[getDisplayStatus(b)]||"#888";
                       const s   = b.timeSlot;
-                      const sc2 = s ? SLOT_COLOR[s] : "#9333ea";
+                      const sc2 = s ? SLOT_COLOR[s] : "#6366f1";
                       return (
                         <div key={b._id} onClick={()=>setDetail(b)}
-                          style={{ borderRadius:12, border:"1px solid rgba(139,92,246,0.15)", background:"rgba(255,255,255,0.03)", cursor:"pointer", overflow:"hidden", transition:"all 0.17s" }}
-                          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(147,51,234,0.4)";e.currentTarget.style.background="rgba(109,40,217,0.1)";e.currentTarget.style.transform="translateY(-1px)";}}
-                          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(139,92,246,0.15)";e.currentTarget.style.background="rgba(255,255,255,0.03)";e.currentTarget.style.transform="translateY(0)";}}>
+                          style={{ borderRadius:12, border:"1px solid rgba(99,102,241,0.15)", background:"#1e2433", cursor:"pointer", overflow:"hidden", transition:"all 0.17s" }}
+                          onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(99,102,241,0.4)";e.currentTarget.style.background="rgba(79,70,229,0.1)";e.currentTarget.style.transform="translateY(-1px)";}}
+                          onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(99,102,241,0.15)";e.currentTarget.style.background="#1e2433";e.currentTarget.style.transform="translateY(0)";}}>
 
                           {/* Colour top bar */}
                           <div style={{ height:2, background:`linear-gradient(90deg,${sc2},${sc2}88)` }}/>
@@ -311,7 +311,7 @@ export default function CalendarTab({ toast }) {
                               {s&&<span style={{ fontSize:"0.58rem", color:sc2, background:`${sc2}16`, border:`1px solid ${sc2}35`, borderRadius:5, padding:"1px 6px", fontWeight:600 }}>
                                 {SLOT_LABEL[s]} · {SLOT_TIME[s]}
                               </span>}
-                              {b.eventType&&<span style={{ fontSize:"0.58rem", color:"rgba(255,255,255,0.45)", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.09)", borderRadius:5, padding:"1px 6px" }}>
+                              {b.eventType&&<span style={{ fontSize:"0.58rem", color:"#94a3b8", background:"#252d3d", border:"1px solid rgba(255,255,255,0.09)", borderRadius:5, padding:"1px 6px" }}>
                                 {b.eventType}
                               </span>}
                             </div>
@@ -321,13 +321,13 @@ export default function CalendarTab({ toast }) {
                               <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.64rem", margin:0 }}>
                                 📞 {b.clientPhone} · 👥 {b.guests}
                               </p>
-                              <p style={{ color:"#c084fc", fontWeight:700, fontSize:"0.72rem", margin:0 }}>
+                              <p style={{ color:"#a5b4fc", fontWeight:700, fontSize:"0.72rem", margin:0 }}>
                                 PKR {b.totalPrice?.toLocaleString()}
                               </p>
                             </div>
 
                             {b.hallId?.name&&(
-                              <p style={{ color:"rgba(255,255,255,0.2)", fontSize:"0.6rem", margin:"0 0 0" }}>🏛 {b.hallId.name}</p>
+                              <p style={{ color:"#94a3b8", fontSize:"0.6rem", margin:"0 0 0" }}>🏛 {b.hallId.name}</p>
                             )}
 
                             {/* Confirm / Cancel quick actions */}

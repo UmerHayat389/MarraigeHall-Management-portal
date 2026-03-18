@@ -4,7 +4,7 @@ import { btnPrimary, btnGhost, statusColor, statusBg, statusBorder, getDisplaySt
 
 // ── Role meta ─────────────────────────────────────────────────────────────────
 const ROLE_META = {
-  manager:   { icon: "👔", color: "#a855f7", bg: "rgba(168,85,247,0.12)",  border: "rgba(168,85,247,0.25)" },
+  manager:   { icon: "👔", color: "#818cf8", bg: "rgba(15,118,110,0.12)",  border: "rgba(99,102,241,0.25)" },
   waiter:    { icon: "🍽️", color: "#06b6d4", bg: "rgba(6,182,212,0.12)",   border: "rgba(6,182,212,0.25)"  },
   chef:      { icon: "👨‍🍳", color: "#f59e0b", bg: "rgba(245,158,11,0.12)",  border: "rgba(245,158,11,0.25)" },
   security:  { icon: "🛡️", color: "#10b981", bg: "rgba(16,185,129,0.12)",  border: "rgba(16,185,129,0.25)" },
@@ -52,16 +52,16 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
       <div className="sa-modal">
 
         {/* Header */}
-        <div style={{ padding: "1.1rem 1.25rem 0.9rem", borderBottom: "1px solid rgba(139,92,246,0.12)", background: "linear-gradient(135deg,rgba(109,40,217,0.08),transparent)" }}>
+        <div style={{ padding: "1.1rem 1.25rem 0.9rem", borderBottom: "1px solid rgba(99,102,241,0.12)", background: "linear-gradient(135deg,#252d3d,transparent)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
             <div style={{ minWidth: 0 }}>
-              <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 4px" }}>Assign Staff to Booking</p>
-              <h3 style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "1.2rem", fontWeight: 600, margin: "0 0 2px" }}>{booking.clientName}</h3>
+              <p style={{ color: "#94a3b8", fontSize: "0.6rem", letterSpacing: "0.12em", textTransform: "uppercase", margin: "0 0 4px" }}>Assign Staff to Booking</p>
+              <h3 style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "1.2rem", fontWeight: 600, margin: "0 0 2px" }}>{booking.clientName}</h3>
               <p style={{ color: "rgba(255,255,255,0.32)", fontSize: "0.73rem", margin: 0 }}>
                 {booking.hallId?.name || "—"} · {fmtDate(booking.eventDate)} · {SLOT[booking.timeSlot] || booking.timeSlot}
               </p>
             </div>
-            <button onClick={onClose} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: "8px", color: "rgba(255,255,255,0.45)", fontSize: "0.85rem", cursor: "pointer", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: "0.75rem" }}>✕</button>
+            <button onClick={onClose} style={{ background: "#252d3d", border: "1px solid #252d3d", borderRadius: "8px", color: "#cbd5e1", fontSize: "0.85rem", cursor: "pointer", width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: "0.75rem" }}>✕</button>
           </div>
           {/* Catering note - simple one-liner */}
           <p style={{ margin: "0.6rem 0 0", fontSize: "0.7rem", color: booking.cateringOption === "self-catering" ? "rgba(103,232,249,0.6)" : "rgba(252,211,77,0.6)" }}>
@@ -72,7 +72,7 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
         {/* Search */}
         <div style={{ padding: "0.85rem 1.25rem 0.5rem" }}>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "rgba(167,139,250,0.35)", fontSize: "0.78rem", pointerEvents: "none" }}>🔍</span>
+            <span style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "rgba(99,102,241,0.35)", fontSize: "0.78rem", pointerEvents: "none" }}>🔍</span>
             <input className="a-input" placeholder="Search staff name…" style={{ paddingLeft: "2rem", fontSize: "0.8rem", width: "100%" }} value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           {/* Role tabs */}
@@ -80,10 +80,10 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
             {["all", ...needed].map(r => (
               <button key={r} onClick={() => setRoleTab(r)} style={{
                 padding: "0.22rem 0.65rem", borderRadius: "999px", fontSize: "0.67rem",
-                fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: "pointer",
-                border: `1px solid ${roleTab === r ? "rgba(147,51,234,0.55)" : "rgba(139,92,246,0.15)"}`,
-                background: roleTab === r ? "rgba(109,40,217,0.35)" : "transparent",
-                color: roleTab === r ? "white" : "rgba(196,139,252,0.45)",
+                fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: "pointer",
+                border: `1px solid ${roleTab === r ? "rgba(99,102,241,0.55)" : "rgba(99,102,241,0.15)"}`,
+                background: roleTab === r ? "rgba(79,70,229,0.35)" : "transparent",
+                color: roleTab === r ? "white" : "#94a3b8",
                 textTransform: "capitalize", transition: "all 0.12s",
               }}>{r === "all" ? "All roles" : r}</button>
             ))}
@@ -94,7 +94,7 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
         <div style={{ flex: 1, overflowY: "auto", padding: "0 1.25rem 0.5rem" }}>
           {err && <p style={{ color: "#f87171", fontSize: "0.74rem", margin: "0 0 0.5rem", padding: "0.4rem 0.7rem", background: "rgba(239,68,68,0.07)", borderRadius: "8px", border: "1px solid rgba(239,68,68,0.18)" }}>✕ {err}</p>}
           {visible.length === 0
-            ? <p style={{ color: "rgba(255,255,255,0.22)", textAlign: "center", padding: "1.5rem 0", fontSize: "0.82rem" }}>No staff match</p>
+            ? <p style={{ color: "#cbd5e1", textAlign: "center", padding: "1.5rem 0", fontSize: "0.82rem" }}>No staff match</p>
             : visible.map(emp => {
               const m          = RM(emp.role);
               const isAssigned = assigned.includes(emp._id?.toString());
@@ -102,8 +102,8 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
                 <div key={emp._id} style={{
                   display: "flex", alignItems: "center", gap: "0.6rem",
                   padding: "0.5rem 0.6rem", borderRadius: "10px", marginBottom: "0.28rem",
-                  background: isAssigned ? "rgba(16,185,129,0.05)" : "rgba(255,255,255,0.025)",
-                  border: `1px solid ${isAssigned ? "rgba(16,185,129,0.15)" : "rgba(139,92,246,0.08)"}`,
+                  background: isAssigned ? "rgba(16,185,129,0.05)" : "#1e2433",
+                  border: `1px solid ${isAssigned ? "rgba(16,185,129,0.15)" : "#252d3d"}`,
                 }}>
                   <div style={{ width: 32, height: 32, borderRadius: "50%", flexShrink: 0, background: m.bg, border: `1px solid ${m.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.82rem", overflow: "hidden" }}>
                     {emp.image ? <img src={emp.image} alt={emp.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : m.icon}
@@ -125,7 +125,7 @@ function AssignModal({ booking, employees, onClose, onAssigned }) {
           }
         </div>
 
-        <div style={{ padding: "0.7rem 1.25rem", borderTop: "1px solid rgba(139,92,246,0.1)" }}>
+        <div style={{ padding: "0.7rem 1.25rem", borderTop: "1px solid rgba(99,102,241,0.1)" }}>
           <button style={{ ...btnGhost, width: "100%", textAlign: "center", padding: "0.5rem" }} onClick={onClose}>Done</button>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function StaffAssignmentTab({ toast }) {
   const unassigned = bookings.filter(b => (b.assignedStaff || []).length === 0).length;
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ fontFamily: "'Inter',sans-serif" }}>
 
       <style>{`
         .sa-ov {
@@ -196,7 +196,7 @@ export default function StaffAssignmentTab({ toast }) {
         .sa-modal {
           width:100%; max-width:460px;
           background:linear-gradient(160deg,#110a2e,#0c0720);
-          border:1px solid rgba(139,92,246,.22); border-radius:18px;
+          border:1px solid rgba(99,102,241,.22); border-radius:18px;
           max-height:88vh; overflow:hidden; display:flex; flex-direction:column;
           box-shadow:0 32px 80px rgba(0,0,0,.85);
           animation:saUp .2s cubic-bezier(.22,1,.36,1);
@@ -204,15 +204,15 @@ export default function StaffAssignmentTab({ toast }) {
         @keyframes saUp { from{opacity:0;transform:translateY(14px) scale(.97)} to{opacity:1;transform:none} }
         .sa-modal > div:nth-child(4) { overflow-y:auto; }
         .sa-modal > div:nth-child(4)::-webkit-scrollbar { width:3px; }
-        .sa-modal > div:nth-child(4)::-webkit-scrollbar-thumb { background:rgba(147,51,234,.3); border-radius:2px; }
+        .sa-modal > div:nth-child(4)::-webkit-scrollbar-thumb { background:rgba(99,102,241,.3); border-radius:2px; }
 
         .sa-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:.85rem; }
         .sa-card {
-          background:linear-gradient(135deg,rgba(255,255,255,.04),rgba(255,255,255,.015));
-          border:1px solid rgba(139,92,246,.12); border-radius:16px;
+          background:linear-gradient(135deg,#1e2433,rgba(255,255,255,.015));
+          border:1px solid rgba(99,102,241,.35); border-radius:16px;
           overflow:hidden; transition:border-color .2s, box-shadow .2s;
         }
-        .sa-card:hover { border-color:rgba(147,51,234,.28); box-shadow:0 8px 28px rgba(0,0,0,.28); }
+        .sa-card:hover { border-color:rgba(99,102,241,.28); box-shadow:0 8px 28px rgba(0,0,0,.28); }
 
         .sa-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:.75rem; margin-bottom:1.25rem; }
 
@@ -224,8 +224,8 @@ export default function StaffAssignmentTab({ toast }) {
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 4px" }}>
-          Staff <em style={{ color: "#a855f7", fontStyle: "italic" }}>Assignments</em>
+        <h2 style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 4px" }}>
+          Staff <em style={{ color: "#818cf8", fontStyle: "italic" }}>Assignments</em>
         </h2>
         <p style={{ color: "rgba(255,255,255,0.32)", fontSize: "0.82rem", margin: 0 }}>
           Assign managers, chefs &amp; staff to upcoming bookings
@@ -235,14 +235,14 @@ export default function StaffAssignmentTab({ toast }) {
       {/* ── Stats ──────────────────────────────────────────────────────── */}
       <div className="sa-stats">
         {[
-          { label: "Total Bookings", value: bookings.length,                                                color: "#9333ea" },
+          { label: "Total Bookings", value: bookings.length,                                                color: "#6366f1" },
           { label: "Unassigned",     value: unassigned,                                                     color: "#f59e0b" },
           { label: "Staffed",        value: bookings.filter(b => (b.assignedStaff||[]).length > 0).length, color: "#10b981" },
           { label: "Active Staff",   value: employees.length,                                               color: "#06b6d4" },
         ].map(s => (
-          <div key={s.label} style={{ background: "linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02))", border: `1px solid ${s.color}28`, borderRadius: "14px", padding: ".85rem 1rem" }}>
+          <div key={s.label} style={{ background: "linear-gradient(135deg,#1e2433,#1e2433)", border: `1px solid ${s.color}28`, borderRadius: "14px", padding: ".85rem 1rem" }}>
             <p style={{ color: "rgba(255,255,255,.35)", fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", margin: "0 0 4px", fontWeight: 600 }}>{s.label}</p>
-            <p style={{ color: s.color, fontSize: "1.5rem", fontWeight: 700, fontFamily: "'Cormorant Garamond',serif", margin: 0, lineHeight: 1 }}>{s.value}</p>
+            <p style={{ color: s.color, fontSize: "1.5rem", fontWeight: 700, fontFamily: "'Sora',sans-serif", margin: 0, lineHeight: 1 }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -253,15 +253,15 @@ export default function StaffAssignmentTab({ toast }) {
           {[["all","All"], ["unassigned","Unassigned"], ["assigned","Assigned"]].map(([id, label]) => (
             <button key={id} onClick={() => setFilter(id)} style={{
               padding: ".32rem .82rem", borderRadius: "999px", fontSize: ".74rem",
-              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: "pointer",
-              border: `1px solid ${filter === id ? "rgba(147,51,234,.55)" : "rgba(139,92,246,.15)"}`,
-              background: filter === id ? "linear-gradient(135deg,rgba(109,40,217,.38),rgba(147,51,234,.22))" : "transparent",
-              color: filter === id ? "white" : "rgba(196,139,252,.5)", transition: "all .15s",
+              fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: "pointer",
+              border: `1px solid ${filter === id ? "rgba(99,102,241,.55)" : "rgba(99,102,241,.15)"}`,
+              background: filter === id ? "linear-gradient(135deg,rgba(99,102,241,.38),rgba(99,102,241,.22))" : "transparent",
+              color: filter === id ? "white" : "#94a3b8", transition: "all .15s",
             }}>{label}</button>
           ))}
         </div>
         <div style={{ position: "relative", flex: 1, minWidth: 160 }}>
-          <span style={{ position: "absolute", left: ".8rem", top: "50%", transform: "translateY(-50%)", color: "rgba(167,139,250,.35)", fontSize: ".78rem", pointerEvents: "none" }}>🔍</span>
+          <span style={{ position: "absolute", left: ".8rem", top: "50%", transform: "translateY(-50%)", color: "rgba(99,102,241,.35)", fontSize: ".78rem", pointerEvents: "none" }}>🔍</span>
           <input className="a-input" placeholder="Search name or ref…" style={{ paddingLeft: "2.1rem", fontSize: ".78rem", width: "100%" }} value={search} onChange={e => setSearch(e.target.value)} />
         </div>
       </div>
@@ -276,7 +276,7 @@ export default function StaffAssignmentTab({ toast }) {
 
       {/* ── Empty ───────────────────────────────────────────────────────── */}
       {!loading && filtered.length === 0 && (
-        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(139,92,246,.1)", borderRadius: "16px" }}>
+        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(99,102,241,.1)", borderRadius: "16px" }}>
           <p style={{ fontSize: "1.8rem", marginBottom: ".5rem" }}>📋</p>
           <p style={{ color: "rgba(255,255,255,.28)", fontSize: ".88rem" }}>
             {search || filter !== "all" ? "No bookings match" : "No active bookings"}
@@ -312,7 +312,7 @@ export default function StaffAssignmentTab({ toast }) {
                       <span style={{ background: sbg, color: sc, border: `1px solid ${sbd}`, borderRadius: "999px", padding: "1px 7px", fontSize: ".57rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", flexShrink: 0 }}>{ds}</span>
                     </div>
                     {booking.bookingRef && (
-                      <span style={{ color: "rgba(196,139,252,.5)", fontSize: ".6rem", fontWeight: 600, flexShrink: 0 }}>{booking.bookingRef}</span>
+                      <span style={{ color: "#94a3b8", fontSize: ".6rem", fontWeight: 600, flexShrink: 0 }}>{booking.bookingRef}</span>
                     )}
                   </div>
 
@@ -336,7 +336,7 @@ export default function StaffAssignmentTab({ toast }) {
                       {complete ? "✓ Complete" : missing.length > 0 ? `${missing.length} missing` : "Not started"}
                     </span>
                   </div>
-                  <div style={{ height: 4, borderRadius: 2, background: "rgba(255,255,255,.05)", overflow: "hidden" }}>
+                  <div style={{ height: 4, borderRadius: 2, background: "#1e2433", overflow: "hidden" }}>
                     <div style={{
                       height: "100%", borderRadius: 2, transition: "width .5s ease",
                       width: `${pct}%`,
@@ -346,7 +346,7 @@ export default function StaffAssignmentTab({ toast }) {
                 </div>
 
                 {/* ── Assigned staff ── */}
-                <div style={{ borderTop: "1px solid rgba(139,92,246,.08)", padding: ".6rem 1rem" }}>
+                <div style={{ borderTop: "1px solid rgba(99,102,241,.08)", padding: ".6rem 1rem" }}>
                   {staff.length === 0 ? (
                     <p style={{ color: "rgba(255,255,255,.22)", fontSize: ".73rem", margin: 0 }}>No staff assigned yet</p>
                   ) : (
@@ -357,7 +357,7 @@ export default function StaffAssignmentTab({ toast }) {
                       const m     = RM(emp.role);
                       const isRem = removing === `${booking._id}-${empId}`;
                       return (
-                        <div key={empId} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".32rem 0", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
+                        <div key={empId} style={{ display: "flex", alignItems: "center", gap: ".5rem", padding: ".32rem 0", borderBottom: "1px solid #1e2433" }}>
                           {/* Avatar */}
                           <div style={{ width: 26, height: 26, borderRadius: "50%", flexShrink: 0, background: m.bg, border: `1px solid ${m.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: ".72rem", overflow: "hidden" }}>
                             {emp.image ? <img src={emp.image} alt={emp.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : m.icon}
@@ -390,12 +390,12 @@ export default function StaffAssignmentTab({ toast }) {
                     style={{
                       width: "100%", padding: ".46rem", borderRadius: "10px",
                       fontSize: ".78rem", fontWeight: 600, cursor: "pointer",
-                      fontFamily: "'Plus Jakarta Sans',sans-serif",
-                      border: staff.length > 0 ? "1px solid rgba(139,92,246,.25)" : "none",
-                      background: staff.length === 0 ? "linear-gradient(135deg,#6d28d9,#9333ea)" : "rgba(139,92,246,.1)",
+                      fontFamily: "'Inter',sans-serif",
+                      border: staff.length > 0 ? "1px solid rgba(99,102,241,.25)" : "none",
+                      background: staff.length === 0 ? "linear-gradient(135deg,#4f46e5,#7c3aed)" : "rgba(99,102,241,.1)",
                       color: "white", transition: "transform .15s, box-shadow .15s",
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 5px 18px rgba(109,40,217,.3)"; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 5px 18px rgba(79,70,229,.3)"; }}
                     onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}
                   >
                     {staff.length === 0 ? "+ Assign Staff" : "Manage Staff"}

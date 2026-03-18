@@ -38,9 +38,9 @@ function DishCategorySelect({ value, onChange, error }) {
       <style>{DROPDOWN_ANIM}</style>
       <button type="button" onClick={() => setOpen(o => !o)} style={{
         width:"100%", padding:"0.7rem 1rem", borderRadius:11,
-        background:"rgba(255,255,255,0.05)", color:"white", fontSize:"0.875rem",
-        outline:"none", fontFamily:"'Plus Jakarta Sans',sans-serif",
-        border:`1px solid ${error?"rgba(239,68,68,0.5)":open?"rgba(147,51,234,0.55)":"rgba(139,92,246,0.2)"}`,
+        background:"#252d3d", color:"white", fontSize:"0.875rem",
+        outline:"none", fontFamily:"'Inter',sans-serif",
+        border:`1px solid ${error?"rgba(239,68,68,0.5)":open?"rgba(99,102,241,0.55)":"rgba(99,102,241,0.2)"}`,
         cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"space-between", transition:"border-color 0.2s",
       }}>
         <span style={{ display:"flex", alignItems:"center", gap:10 }}>
@@ -52,13 +52,13 @@ function DishCategorySelect({ value, onChange, error }) {
             </>
           ) : <span style={{ color:"rgba(255,255,255,0.3)" }}>Select category</span>}
         </span>
-        <span style={{ color:"rgba(167,139,250,0.6)", fontSize:"0.65rem", display:"inline-block", transition:"transform 0.2s", transform:open?"rotate(180deg)":"rotate(0deg)" }}>▼</span>
+        <span style={{ color:"rgba(99,102,241,0.6)", fontSize:"0.65rem", display:"inline-block", transition:"transform 0.2s", transform:open?"rotate(180deg)":"rotate(0deg)" }}>▼</span>
       </button>
       {open && (
         <div style={{
           position:"absolute", top:"calc(100% + 6px)", left:0, right:0, zIndex:9999,
-          background:"linear-gradient(160deg,#1a1035,#120d2a)",
-          border:"1px solid rgba(147,51,234,0.28)", borderRadius:14,
+          background:"linear-gradient(160deg,#252d3d,#252d3d)",
+          border:"1px solid rgba(99,102,241,0.28)", borderRadius:14,
           overflow:"hidden", boxShadow:"0 20px 50px rgba(0,0,0,0.6)",
           animation:"dropIn 0.18s ease forwards",
         }}>
@@ -71,16 +71,16 @@ function DishCategorySelect({ value, onChange, error }) {
                 display:"flex", alignItems:"center", gap:12,
                 background:isActive ? clr.bg : "transparent",
                 borderLeft:`3px solid ${isActive ? clr.dot : "transparent"}`,
-                borderTop:i===0?"none":"1px solid rgba(255,255,255,0.04)",
+                borderTop:i===0?"none":"1px solid #252d3d",
                 borderRight:"none", borderBottom:"none",
                 cursor:"pointer", textAlign:"left", transition:"background 0.15s",
-                fontFamily:"'Plus Jakarta Sans',sans-serif",
+                fontFamily:"'Inter',sans-serif",
               }}
-              onMouseEnter={e => { if(!isActive) e.currentTarget.style.background="rgba(109,40,217,0.18)"; }}
+              onMouseEnter={e => { if(!isActive) e.currentTarget.style.background="rgba(99,102,241,0.15)"; }}
               onMouseLeave={e => { if(!isActive) e.currentTarget.style.background="transparent"; }}>
                 <span style={{ width:8, height:8, borderRadius:"50%", background:clr.dot, flexShrink:0 }}/>
                 <span style={{ fontSize:"1rem", width:22, textAlign:"center" }}>{CATEGORY_ICONS[cat]}</span>
-                <span style={{ fontSize:"0.875rem", color:isActive?clr.text:"rgba(255,255,255,0.75)", fontWeight:isActive?600:400 }}>{cat}</span>
+                <span style={{ fontSize:"0.875rem", color:isActive?clr.text:"#cbd5e1", fontWeight:isActive?600:400 }}>{cat}</span>
                 {isActive && <span style={{ marginLeft:"auto", color:clr.dot, fontSize:"0.8rem" }}>✓</span>}
               </button>
             );
@@ -120,10 +120,10 @@ function DishModal({ dish, onClose, onSave }) {
       <div className="modal-box" style={{ maxWidth:500 }}>
         <div style={{ padding:"1.75rem" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem" }}>
-            <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.5rem", fontWeight:600, margin:0 }}>
+            <h3 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.5rem", fontWeight:600, margin:0 }}>
               {dish?._id ? "Edit Dish" : "Add New Dish"}
             </h3>
-            <button onClick={onClose} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:"10px", color:"rgba(255,255,255,0.5)", fontSize:"1rem", cursor:"pointer", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+            <button onClick={onClose} style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:"10px", color:"#cbd5e1", fontSize:"1rem", cursor:"pointer", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
           </div>
 
           <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
@@ -151,9 +151,9 @@ function DishModal({ dish, onClose, onSave }) {
                 placeholder="https://example.com/dish.jpg"
               />
               {form.image && !imgErr && (
-                <div style={{ marginTop:8, borderRadius:10, overflow:"hidden", border:"1px solid rgba(139,92,246,0.2)", height:120, position:"relative" }}>
+                <div style={{ marginTop:8, borderRadius:10, overflow:"hidden", border:"1px solid rgba(99,102,241,0.2)", height:120, position:"relative" }}>
                   <img src={form.image} alt="Preview" onError={()=>setImgErr(true)} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  <div style={{ position:"absolute", top:6, right:6, background:"rgba(0,0,0,0.6)", borderRadius:6, padding:"2px 8px", color:"rgba(255,255,255,0.6)", fontSize:"0.65rem" }}>preview</div>
+                  <div style={{ position:"absolute", top:6, right:6, background:"rgba(0,0,0,0.6)", borderRadius:6, padding:"2px 8px", color:"#94a3b8", fontSize:"0.65rem" }}>preview</div>
                 </div>
               )}
               {form.image && imgErr && (
@@ -186,9 +186,9 @@ function DishModal({ dish, onClose, onSave }) {
 function DishCard({ dish, clr, onEdit, onDelete }) {
   return (
     <div
-      style={{ borderRadius:"16px", overflow:"hidden", border:"1px solid rgba(139,92,246,0.15)", background:"linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015))", transition:"all 0.2s", cursor:"pointer" }}
-      onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(109,40,217,0.18)"; e.currentTarget.style.borderColor="rgba(147,51,234,0.35)"; }}
-      onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; e.currentTarget.style.borderColor="rgba(139,92,246,0.15)"; }}
+      style={{ borderRadius:"16px", overflow:"hidden", border:"1px solid rgba(99,102,241,0.15)", background:"#1e2433", transition:"all 0.2s", cursor:"pointer" }}
+      onMouseEnter={e=>{ e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 12px 32px rgba(99,102,241,0.15)"; e.currentTarget.style.borderColor="rgba(99,102,241,0.35)"; }}
+      onMouseLeave={e=>{ e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="none"; e.currentTarget.style.borderColor="rgba(99,102,241,0.15)"; }}
     >
       {dish.image ? (
         <div style={{ height:140, overflow:"hidden", position:"relative" }}>
@@ -198,7 +198,7 @@ function DishCard({ dish, clr, onEdit, onDelete }) {
             onError={e=>{
               // swap to placeholder on broken URL
               const wrap = e.currentTarget.parentElement;
-              wrap.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,${clr.bg},rgba(255,255,255,0.02))"><span style="font-size:2.5rem;opacity:0.7">${CATEGORY_ICONS[dish.category]||"🍽️"}</span><span style="font-size:0.65rem;color:${clr.text};opacity:0.6;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">${dish.category}</span></div>`;
+              wrap.innerHTML = `<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,${clr.bg},#1e2433)"><span style="font-size:2.5rem;opacity:0.7">${CATEGORY_ICONS[dish.category]||"🍽️"}</span><span style="font-size:0.65rem;color:${clr.text};opacity:0.6;font-weight:600;letter-spacing:0.08em;text-transform:uppercase">${dish.category}</span></div>`;
             }}
             style={{ width:"100%", height:"100%", objectFit:"cover" }}
           />
@@ -218,12 +218,12 @@ function DishCard({ dish, clr, onEdit, onDelete }) {
             {dish.category}
           </span>
           {/* "Add image" hint */}
-          <span style={{ fontSize:"0.55rem", color:"rgba(255,255,255,0.2)", position:"absolute", bottom:6, right:8 }}>no image</span>
+          <span style={{ fontSize:"0.55rem", color:"#94a3b8", position:"absolute", bottom:6, right:8 }}>no image</span>
         </div>
       )}
 
       <div style={{ padding:"1.15rem" }}>
-        <h4 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.1rem", fontWeight:600, margin:"0 0 0.25rem", overflow:"hidden", textOverflow:"ellipsis" }}>
+        <h4 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.1rem", fontWeight:600, margin:"0 0 0.25rem", overflow:"hidden", textOverflow:"ellipsis" }}>
           {dish.name}
         </h4>
         <div style={{ display:"flex", alignItems:"center", gap:"0.4rem", marginBottom:"0.5rem" }}>
@@ -234,7 +234,7 @@ function DishCard({ dish, clr, onEdit, onDelete }) {
         </div>
 
         {dish.description && (
-          <p style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.78rem", margin:"0 0 1rem", lineHeight:1.5, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
+          <p style={{ color:"#cbd5e1", fontSize:"0.78rem", margin:"0 0 1rem", lineHeight:1.5, display:"-webkit-box", WebkitLineClamp:2, WebkitBoxOrient:"vertical", overflow:"hidden" }}>
             {dish.description}
           </p>
         )}
@@ -263,26 +263,26 @@ function Pagination({ page, total, onChange }) {
       </p>
       <div style={{ display:"flex", alignItems:"center", gap:"0.35rem" }}>
         <button onClick={()=>onChange(Math.max(1,page-1))} disabled={page===1}
-          style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color:page===1?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:"0.78rem", cursor:page===1?"not-allowed":"pointer", fontWeight:600 }}
-          onMouseEnter={e=>{ if(page>1){e.currentTarget.style.background="rgba(109,40,217,0.2)";e.currentTarget.style.color="white";}}}
-          onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.03)";e.currentTarget.style.color=page===1?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)";}}>
+          style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(99,102,241,0.22)", background:"#1e2433", color:page===1?"#94a3b8":"#94a3b8", fontSize:"0.78rem", cursor:page===1?"not-allowed":"pointer", fontWeight:600 }}
+          onMouseEnter={e=>{ if(page>1){e.currentTarget.style.background="rgba(79,70,229,0.2)";e.currentTarget.style.color="white";}}}
+          onMouseLeave={e=>{e.currentTarget.style.background="#1e2433";e.currentTarget.style.color=page===1?"#94a3b8":"#94a3b8";}}>
           ← Prev
         </button>
         {pages.map((n,idx)=>n==="..."?(
-          <span key={`d${idx}`} style={{ color:"rgba(255,255,255,0.2)", fontSize:"0.78rem", padding:"0 2px" }}>…</span>
+          <span key={`d${idx}`} style={{ color:"#94a3b8", fontSize:"0.78rem", padding:"0 2px" }}>…</span>
         ):(
           <button key={n} onClick={()=>onChange(n)} style={{
             width:34, height:34, borderRadius:9,
-            border:`1px solid ${page===n?"rgba(147,51,234,0.6)":"rgba(139,92,246,0.2)"}`,
-            background:page===n?"linear-gradient(135deg,rgba(109,40,217,0.5),rgba(147,51,234,0.3))":"rgba(255,255,255,0.03)",
-            color:page===n?"white":"rgba(192,132,252,0.6)", fontSize:"0.8rem", fontWeight:page===n?700:500, cursor:"pointer",
-            boxShadow:page===n?"0 0 0 2px rgba(147,51,234,0.2)":"none",
+            border:`1px solid ${page===n?"rgba(99,102,241,0.6)":"rgba(99,102,241,0.2)"}`,
+            background:page===n?"linear-gradient(135deg,rgba(79,70,229,0.5),rgba(99,102,241,0.3))":"#1e2433",
+            color:page===n?"white":"#94a3b8", fontSize:"0.8rem", fontWeight:page===n?700:500, cursor:"pointer",
+            boxShadow:page===n?"0 0 0 2px rgba(99,102,241,0.2)":"none",
           }}>{n}</button>
         ))}
         <button onClick={()=>onChange(Math.min(Math.ceil(total/PER_PAGE),page+1))} disabled={page===Math.ceil(total/PER_PAGE)}
-          style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color:page===Math.ceil(total/PER_PAGE)?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:"0.78rem", cursor:page===Math.ceil(total/PER_PAGE)?"not-allowed":"pointer", fontWeight:600 }}
-          onMouseEnter={e=>{ if(page<Math.ceil(total/PER_PAGE)){e.currentTarget.style.background="rgba(109,40,217,0.2)";e.currentTarget.style.color="white";}}}
-          onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.03)";e.currentTarget.style.color=page===Math.ceil(total/PER_PAGE)?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)";}}>
+          style={{ padding:"0.38rem 0.75rem", borderRadius:9, border:"1px solid rgba(99,102,241,0.22)", background:"#1e2433", color:page===Math.ceil(total/PER_PAGE)?"#94a3b8":"#94a3b8", fontSize:"0.78rem", cursor:page===Math.ceil(total/PER_PAGE)?"not-allowed":"pointer", fontWeight:600 }}
+          onMouseEnter={e=>{ if(page<Math.ceil(total/PER_PAGE)){e.currentTarget.style.background="rgba(79,70,229,0.2)";e.currentTarget.style.color="white";}}}
+          onMouseLeave={e=>{e.currentTarget.style.background="#1e2433";e.currentTarget.style.color=page===Math.ceil(total/PER_PAGE)?"#94a3b8":"#94a3b8";}}>
           Next →
         </button>
       </div>
@@ -330,15 +330,15 @@ export default function DishesTab({ toast }) {
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem", flexWrap:"wrap", gap:"0.75rem" }}>
         <div>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
-            Manage <em style={{ color:"#9333ea", fontStyle:"italic" }}>Dishes</em>
+          <h2 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
+            Manage <em style={{ color:"#6366f1", fontStyle:"italic" }}>Dishes</em>
           </h2>
           <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.8rem", margin:0 }}>
             {filtered.length!==dishes.length?`${filtered.length} of ${dishes.length} dishes`:`${dishes.length} total dish${dishes.length!==1?"es":""}`}
           </p>
         </div>
         <button style={btnPrimary} onClick={()=>setModal("new")}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(109,40,217,0.4)";}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(79,70,229,0.4)";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
           + Add Dish
         </button>
@@ -349,15 +349,15 @@ export default function DishesTab({ toast }) {
         {["All",...CATEGORIES].map(cat=>(
           <button key={cat} onClick={()=>setFilter(cat)} style={{
             padding:"0.38rem 0.9rem", borderRadius:"999px", fontSize:"0.75rem",
-            fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600,
-            border:`1px solid ${filter===cat?"rgba(147,51,234,0.55)":"rgba(139,92,246,0.18)"}`,
-            background:filter===cat?"linear-gradient(135deg,rgba(109,40,217,0.4),rgba(147,51,234,0.25))":"transparent",
-            color:filter===cat?"white":"rgba(196,139,252,0.55)",
+            fontFamily:"'Inter',sans-serif", fontWeight:600,
+            border:`1px solid ${filter===cat?"rgba(99,102,241,0.55)":"rgba(99,102,241,0.2)"}`,
+            background:filter===cat?"linear-gradient(135deg,rgba(79,70,229,0.4),rgba(99,102,241,0.25))":"transparent",
+            color:filter===cat?"white":"#94a3b8",
             cursor:"pointer", transition:"all 0.15s", display:"flex", alignItems:"center", gap:"0.35rem",
           }}>
             {cat!=="All"&&<span>{CATEGORY_ICONS[cat]}</span>}
             {cat}
-            <span style={{ background:filter===cat?"rgba(255,255,255,0.2)":"rgba(139,92,246,0.2)", borderRadius:"999px", padding:"0 5px", fontSize:"0.65rem", fontWeight:700 }}>
+            <span style={{ background:filter===cat?"#94a3b8":"rgba(99,102,241,0.2)", borderRadius:"999px", padding:"0 5px", fontSize:"0.65rem", fontWeight:700 }}>
               {counts[cat]}
             </span>
           </button>
@@ -365,13 +365,13 @@ export default function DishesTab({ toast }) {
       </div>
 
       {loading ? (
-        <div style={{ textAlign:"center", padding:"4rem", color:"rgba(255,255,255,0.25)" }}>
+        <div style={{ textAlign:"center", padding:"4rem", color:"#94a3b8" }}>
           <div style={{ fontSize:"2rem", marginBottom:"0.75rem", opacity:0.4 }}>🍽️</div>Loading dishes…
         </div>
       ) : filtered.length===0 ? (
-        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(139,92,246,0.12)", borderRadius:"18px" }}>
+        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(99,102,241,0.12)", borderRadius:"18px" }}>
           <p style={{ fontSize:"2.5rem", marginBottom:"0.75rem" }}>🍽️</p>
-          <p style={{ color:"rgba(255,255,255,0.4)", marginBottom:"1.25rem" }}>
+          <p style={{ color:"#94a3b8", marginBottom:"1.25rem" }}>
             {filter==="All"?"No dishes yet. Add your first dish.":`No dishes in ${filter}`}
           </p>
           <button style={btnPrimary} onClick={()=>setModal("new")}>+ Add First Dish</button>
@@ -388,8 +388,8 @@ export default function DishesTab({ toast }) {
                   <div key={category} style={{ gridColumn:"1/-1" }}>
                     <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", marginBottom:"1rem" }}>
                       <span style={{ fontSize:"1.5rem" }}>{CATEGORY_ICONS[category]}</span>
-                      <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.3rem", fontWeight:600, margin:0 }}>{category}</h3>
-                      <div style={{ flex:1, height:"1px", background:"rgba(167,139,250,0.12)" }}/>
+                      <h3 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.3rem", fontWeight:600, margin:0 }}>{category}</h3>
+                      <div style={{ flex:1, height:"1px", background:"rgba(99,102,241,0.12)" }}/>
                       <span style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.75rem" }}>{catDishes.length} dish{catDishes.length!==1?"es":""}</span>
                     </div>
                     <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(260px,1fr))", gap:"0.85rem" }}>

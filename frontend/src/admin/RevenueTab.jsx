@@ -24,7 +24,7 @@ function BarChart({ data, color = "#10b981", valueKey = "revenue", labelKey = "l
             }} />
           </div>
           <span style={{
-            color: "rgba(255,255,255,0.3)", fontSize: "0.52rem", textAlign: "center",
+            color: "#94a3b8", fontSize: "0.52rem", textAlign: "center",
             lineHeight: 1.1, overflow: "hidden", textOverflow: "ellipsis",
             whiteSpace: "nowrap", width: "100%", maxWidth: 32,
           }}>
@@ -40,14 +40,14 @@ function BarChart({ data, color = "#10b981", valueKey = "revenue", labelKey = "l
 function StatPill({ label, value, sub, color }) {
   return (
     <div style={{
-      background: "linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
+      background: "#1e2433",
       border: `1px solid ${color}44`, borderRadius: "14px", padding: "1rem 1.1rem",
     }}>
-      <p style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.63rem", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 5px", fontWeight: 600 }}>{label}</p>
-      <p style={{ color: "white", fontSize: "1.3rem", fontWeight: 700, fontFamily: "'Cormorant Garamond',serif", margin: 0, lineHeight: 1.1 }}>
+      <p style={{ color: "#cbd5e1", fontSize: "0.63rem", letterSpacing: "0.1em", textTransform: "uppercase", margin: "0 0 5px", fontWeight: 600 }}>{label}</p>
+      <p style={{ color: "white", fontSize: "1.3rem", fontWeight: 700, fontFamily: "'Sora',sans-serif", margin: 0, lineHeight: 1.1 }}>
         <span style={{ color }}>{value}</span>
       </p>
-      {sub && <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.65rem", margin: "4px 0 0" }}>{sub}</p>}
+      {sub && <p style={{ color: "#94a3b8", fontSize: "0.65rem", margin: "4px 0 0" }}>{sub}</p>}
     </div>
   );
 }
@@ -62,20 +62,20 @@ function YearSelect({ value, onChange }) {
         onChange={e => onChange(e.target.value)}
         style={{
           appearance: "none", WebkitAppearance: "none",
-          background: "rgba(255,255,255,0.06)",
-          border: "1px solid rgba(139,92,246,0.35)",
+          background: "#1e2433",
+          border: "1px solid rgba(99,102,241,0.35)",
           borderRadius: "10px", color: "white",
           fontSize: "0.84rem", fontWeight: 600,
-          fontFamily: "'Plus Jakarta Sans',sans-serif",
+          fontFamily: "'Inter',sans-serif",
           padding: "0.5rem 2.2rem 0.5rem 0.85rem",
           cursor: "pointer", outline: "none", colorScheme: "dark",
         }}
-        onFocus={e => { e.target.style.borderColor = "rgba(147,51,234,0.7)"; e.target.style.background = "rgba(255,255,255,0.09)"; }}
-        onBlur={e =>  { e.target.style.borderColor = "rgba(139,92,246,0.35)"; e.target.style.background = "rgba(255,255,255,0.06)"; }}
+        onFocus={e => { e.target.style.borderColor = "rgba(99,102,241,0.7)"; e.target.style.background = "rgba(255,255,255,0.09)"; }}
+        onBlur={e =>  { e.target.style.borderColor = "rgba(99,102,241,0.35)"; e.target.style.background = "#1e2433"; }}
       >
         {years.map(y => <option key={y} value={String(y)} style={{ background: "#0f0a28", color: "white" }}>{y}</option>)}
       </select>
-      <span style={{ position: "absolute", right: "0.6rem", pointerEvents: "none", color: "rgba(196,139,252,0.7)", fontSize: "0.6rem" }}>▼</span>
+      <span style={{ position: "absolute", right: "0.6rem", pointerEvents: "none", color: "#94a3b8", fontSize: "0.6rem" }}>▼</span>
     </div>
   );
 }
@@ -95,20 +95,20 @@ const d30ago = new Date(today); d30ago.setDate(today.getDate() - 29);
 
 const dateInputStyle = {
   width: "100%", padding: "0.5rem 0.65rem", borderRadius: "10px",
-  fontSize: "0.82rem", background: "rgba(255,255,255,0.06)",
-  border: "1px solid rgba(139,92,246,0.35)", color: "white",
-  outline: "none", fontFamily: "'Plus Jakarta Sans',sans-serif", colorScheme: "dark",
+  fontSize: "0.82rem", background: "#1e2433",
+  border: "1px solid rgba(99,102,241,0.35)", color: "white",
+  outline: "none", fontFamily: "'Inter',sans-serif", colorScheme: "dark",
 };
 const fieldLabel = {
-  color: "rgba(196,139,252,0.7)", fontSize: "0.65rem", fontWeight: 700,
+  color: "#94a3b8", fontSize: "0.65rem", fontWeight: 700,
   letterSpacing: "0.1em", textTransform: "uppercase", display: "block", marginBottom: "0.25rem",
 };
 const pillBtn = (active) => ({
   padding: "0.38rem 0.85rem", borderRadius: "999px", fontSize: "0.75rem",
-  fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: "pointer",
-  border: `1px solid ${active ? "rgba(147,51,234,0.7)" : "rgba(139,92,246,0.25)"}`,
-  background: active ? "linear-gradient(135deg,rgba(109,40,217,0.5),rgba(147,51,234,0.3))" : "rgba(255,255,255,0.03)",
-  color: active ? "white" : "rgba(196,139,252,0.6)",
+  fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: "pointer",
+  border: `1px solid ${active ? "rgba(99,102,241,0.7)" : "rgba(99,102,241,0.25)"}`,
+  background: active ? "linear-gradient(135deg,rgba(79,70,229,0.5),rgba(99,102,241,0.3))" : "#1e2433",
+  color: active ? "white" : "#94a3b8",
   transition: "all 0.15s", whiteSpace: "nowrap",
 });
 
@@ -186,7 +186,7 @@ export default function RevenueTab({ toast }) {
   const groupByLabel = groupBy === "createdAt" ? "booking date" : "event date";
 
   return (
-    <div style={{ fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ fontFamily: "'Inter',sans-serif" }}>
 
       {/* ── CSS ────────────────────────────────────────────────────────── */}
       <style>{`
@@ -196,7 +196,7 @@ export default function RevenueTab({ toast }) {
         .rev-trow   { display:grid; }
         .rev-trow.daily   { grid-template-columns:1.3fr 1fr .6fr 1.2fr; }
         .rev-trow.monthly { grid-template-columns:1.3fr 1fr .6fr .6fr 1.2fr; }
-        .rev-date-inp:focus { border-color:rgba(147,51,234,.7)!important; background:rgba(255,255,255,.09)!important; }
+        .rev-date-inp:focus { border-color:rgba(99,102,241,.7)!important; background:rgba(255,255,255,.09)!important; }
         @media(max-width:620px){
           .rev-pills { grid-template-columns:repeat(2,1fr); }
           .rev-rpt   { grid-template-columns:repeat(2,1fr); }
@@ -217,7 +217,7 @@ export default function RevenueTab({ toast }) {
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
       <div style={{ marginBottom: "1.5rem" }}>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 4px" }}>
+        <h2 style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 4px" }}>
           Revenue <em style={{ color: "#10b981", fontStyle: "italic" }}>Analytics</em>
         </h2>
         <p style={{ color: "rgba(255,255,255,0.38)", fontSize: "0.82rem", margin: 0 }}>
@@ -230,15 +230,15 @@ export default function RevenueTab({ toast }) {
         <div className="rev-pills">
           <StatPill label="Today"      value={fmtK(summary.today?.revenue)}    sub={`${summary.today?.bookings   || 0} booking(s)`} color="#10b981" />
           <StatPill label="This Week"  value={fmtK(summary.week?.revenue)}     sub={`${summary.week?.bookings    || 0} booking(s)`} color="#06b6d4" />
-          <StatPill label="This Month" value={fmtK(summary.month?.revenue)}    sub={`${summary.month?.bookings   || 0} booking(s)`} color="#a855f7" />
+          <StatPill label="This Month" value={fmtK(summary.month?.revenue)}    sub={`${summary.month?.bookings   || 0} booking(s)`} color="#818cf8" />
           <StatPill label="All Time"   value={fmtK(summary.allTime?.revenue)}  sub={`${summary.allTime?.bookings || 0} total`}      color="#f59e0b" />
         </div>
       )}
 
       {/* ── Controls card ────────────────────────────────────────────────── */}
       <div style={{
-        background: "linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
-        border: "1px solid rgba(139,92,246,0.2)", borderRadius: "16px",
+        background: "#1e2433",
+        border: "1px solid rgba(99,102,241,0.2)", borderRadius: "16px",
         padding: "1.1rem 1.2rem", marginBottom: "1.25rem",
       }}>
         <div className="rev-ctrl">
@@ -281,23 +281,23 @@ export default function RevenueTab({ toast }) {
                     onChange={e => setMonth(e.target.value)}
                     style={{
                       appearance: "none", WebkitAppearance: "none",
-                      background: "rgba(255,255,255,0.06)",
-                      border: "1px solid rgba(139,92,246,0.35)",
+                      background: "#1e2433",
+                      border: "1px solid rgba(99,102,241,0.35)",
                       borderRadius: "10px", color: "white",
                       fontSize: "0.84rem", fontWeight: 600,
-                      fontFamily: "'Plus Jakarta Sans',sans-serif",
+                      fontFamily: "'Inter',sans-serif",
                       padding: "0.5rem 2.2rem 0.5rem 0.85rem",
                       cursor: "pointer", outline: "none", colorScheme: "dark",
                     }}
-                    onFocus={e => { e.target.style.borderColor = "rgba(147,51,234,0.7)"; e.target.style.background = "rgba(255,255,255,0.09)"; }}
-                    onBlur={e =>  { e.target.style.borderColor = "rgba(139,92,246,0.35)"; e.target.style.background = "rgba(255,255,255,0.06)"; }}
+                    onFocus={e => { e.target.style.borderColor = "rgba(99,102,241,0.7)"; e.target.style.background = "rgba(255,255,255,0.09)"; }}
+                    onBlur={e =>  { e.target.style.borderColor = "rgba(99,102,241,0.35)"; e.target.style.background = "#1e2433"; }}
                   >
                     <option value="all"  style={{ background: "#0f0a28", color: "white" }}>All months</option>
                     {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => (
                       <option key={i+1} value={String(i+1)} style={{ background: "#0f0a28", color: "white" }}>{m}</option>
                     ))}
                   </select>
-                  <span style={{ position: "absolute", right: "0.6rem", pointerEvents: "none", color: "rgba(196,139,252,0.7)", fontSize: "0.6rem" }}>▼</span>
+                  <span style={{ position: "absolute", right: "0.6rem", pointerEvents: "none", color: "#94a3b8", fontSize: "0.6rem" }}>▼</span>
                 </div>
               </div>
             </div>
@@ -317,7 +317,7 @@ export default function RevenueTab({ toast }) {
             <button
               style={{ ...btnPrimary, width: "100%", opacity: loading ? 0.6 : 1, padding: "0.52rem 1.4rem" }}
               onClick={fetchReport} disabled={loading}
-              onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(109,40,217,0.45)"; }}}
+              onMouseEnter={e => { if (!loading) { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 8px 24px rgba(79,70,229,0.45)"; }}}
               onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = ""; }}
             >
               {loading ? "Loading…" : "Generate"}
@@ -326,16 +326,16 @@ export default function RevenueTab({ toast }) {
         </div>
 
         {/* Info hint */}
-        <p style={{ color: "rgba(255,255,255,0.25)", fontSize: "0.7rem", margin: "0.75rem 0 0" }}>
-          <span style={{ color: "rgba(196,139,252,0.5)" }}>ℹ</span>
-          {" "}<strong style={{ color: "rgba(255,255,255,0.4)" }}>Booking date</strong> = when the booking was made ·{" "}
-          <strong style={{ color: "rgba(255,255,255,0.4)" }}>Event date</strong> = when the event takes place
+        <p style={{ color: "#94a3b8", fontSize: "0.7rem", margin: "0.75rem 0 0" }}>
+          <span style={{ color: "#94a3b8" }}>ℹ</span>
+          {" "}<strong style={{ color: "#94a3b8" }}>Booking date</strong> = when the booking was made ·{" "}
+          <strong style={{ color: "#94a3b8" }}>Event date</strong> = when the event takes place
         </p>
       </div>
 
       {/* ── Loading ─────────────────────────────────────────────────────── */}
       {loading && (
-        <div style={{ textAlign: "center", padding: "4rem", color: "rgba(255,255,255,0.3)" }}>
+        <div style={{ textAlign: "center", padding: "4rem", color: "#94a3b8" }}>
           <div style={{ fontSize: "2rem", marginBottom: "0.75rem", opacity: 0.5 }}>💰</div>
           Calculating revenue…
         </div>
@@ -351,20 +351,20 @@ export default function RevenueTab({ toast }) {
             {mode === "monthly"
               ? month !== "all"
                 ? <StatPill label="Best Day"    value={fmtK(report.summary?.bestDay?.revenue)} sub={report.summary?.bestDay?.date || "—"} color="#f59e0b" />
-                : <StatPill label="Avg / Month" value={fmtK(report.summary?.avgMonthly)} sub="monthly average" color="#a855f7" />
+                : <StatPill label="Avg / Month" value={fmtK(report.summary?.avgMonthly)} sub="monthly average" color="#818cf8" />
               : <StatPill label="Best Day"    value={fmtK(report.summary?.bestDay?.revenue)} sub={report.summary?.bestDay?.date || "—"} color="#f59e0b" />
             }
           </div>
 
           {/* Revenue chart */}
           <div style={{
-            background: "linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
-            border: "1px solid rgba(139,92,246,0.18)", borderRadius: "18px",
+            background: "#1e2433",
+            border: "1px solid rgba(99,102,241,0.2)", borderRadius: "18px",
             padding: "1.2rem", marginBottom: "1rem",
           }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "0.6rem", flexWrap: "wrap", gap: "0.5rem" }}>
               <div>
-                <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.8rem", fontWeight: 600, margin: 0 }}>
+                <p style={{ color: "#cbd5e1", fontSize: "0.8rem", fontWeight: 600, margin: 0 }}>
                   Revenue — {mode === "daily"
                     ? `${fromDate} → ${toDate}`
                     : month !== "all"
@@ -387,11 +387,11 @@ export default function RevenueTab({ toast }) {
             {!hasRevenue
               ? (
                 <div style={{ padding: "1.5rem 0" }}>
-                  <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.84rem", margin: "0 0 0.5rem" }}>
+                  <p style={{ color: "#94a3b8", fontSize: "0.84rem", margin: "0 0 0.5rem" }}>
                     No confirmed revenue in this period
                   </p>
                   {groupBy === "eventDate" && (
-                    <p style={{ color: "rgba(196,139,252,0.5)", fontSize: "0.75rem", margin: 0 }}>
+                    <p style={{ color: "#94a3b8", fontSize: "0.75rem", margin: 0 }}>
                       💡 Try switching <strong>Group by</strong> to <strong>Booking date</strong> — your bookings may have been made in this period but with a future event date.
                     </p>
                   )}
@@ -403,40 +403,40 @@ export default function RevenueTab({ toast }) {
 
           {/* Bookings chart */}
           <div style={{
-            background: "linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
-            border: "1px solid rgba(139,92,246,0.18)", borderRadius: "18px",
+            background: "#1e2433",
+            border: "1px solid rgba(99,102,241,0.2)", borderRadius: "18px",
             padding: "1.2rem", marginBottom: "1.25rem",
           }}>
-            <p style={{ color: "rgba(255,255,255,0.75)", fontSize: "0.8rem", fontWeight: 600, margin: "0 0 0.5rem" }}>
+            <p style={{ color: "#cbd5e1", fontSize: "0.8rem", fontWeight: 600, margin: "0 0 0.5rem" }}>
               Bookings Count — same period
             </p>
             {!hasBookings
-              ? <p style={{ color: "rgba(255,255,255,0.28)", fontSize: "0.84rem", padding: "1.5rem 0" }}>No bookings in this period</p>
-              : <BarChart data={chartData} color="#9333ea" valueKey="bookings" labelKey="label" />
+              ? <p style={{ color: "#94a3b8", fontSize: "0.84rem", padding: "1.5rem 0" }}>No bookings in this period</p>
+              : <BarChart data={chartData} color="#6366f1" valueKey="bookings" labelKey="label" />
             }
           </div>
 
           {/* Detail table */}
           {tableRows.length > 0 && (
             <div style={{
-              background: "linear-gradient(135deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02))",
-              border: "1px solid rgba(139,92,246,0.18)", borderRadius: "18px", overflow: "hidden",
+              background: "#1e2433",
+              border: "1px solid rgba(99,102,241,0.2)", borderRadius: "18px", overflow: "hidden",
             }}>
               {/* Header */}
               <div className={`rev-trow ${mode === "daily" || month !== "all" ? "daily" : "monthly"}`} style={{
                 padding: "0.72rem 1.1rem",
-                borderBottom: "1px solid rgba(139,92,246,0.15)",
-                background: "rgba(139,92,246,0.1)",
+                borderBottom: "1px solid rgba(99,102,241,0.15)",
+                background: "rgba(99,102,241,0.1)",
               }}>
-                <span style={{ color: "rgba(196,139,252,0.7)", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
+                <span style={{ color: "#94a3b8", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>
                   {mode === "daily" || month !== "all" ? "Date" : "Month"}
                 </span>
-                <span style={{ color: "rgba(196,139,252,0.7)", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Revenue (PKR)</span>
-                <span style={{ color: "rgba(196,139,252,0.7)", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Bookings</span>
+                <span style={{ color: "#94a3b8", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Revenue (PKR)</span>
+                <span style={{ color: "#94a3b8", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Bookings</span>
                 {mode === "monthly" && (
-                  <span className="rev-nm" style={{ color: "rgba(196,139,252,0.7)", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Guests</span>
+                  <span className="rev-nm" style={{ color: "#94a3b8", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Guests</span>
                 )}
-                <span className="rev-nm" style={{ color: "rgba(196,139,252,0.7)", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Share</span>
+                <span className="rev-nm" style={{ color: "#94a3b8", fontSize: "0.63rem", fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" }}>Share</span>
               </div>
 
               {/* Rows */}
@@ -444,8 +444,8 @@ export default function RevenueTab({ toast }) {
                 const pct = totalRevenue ? (((r.revenue || 0) / totalRevenue) * 100).toFixed(1) : "0.0";
                 return (
                   <div key={idx} className={`rev-trow ${mode === "daily" || month !== "all" ? "daily" : "monthly"}`}
-                    style={{ padding: "0.68rem 1.1rem", borderBottom: idx < tableRows.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", transition: "background 0.15s" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "rgba(109,40,217,0.08)"}
+                    style={{ padding: "0.68rem 1.1rem", borderBottom: idx < tableRows.length - 1 ? "1px solid #252d3d" : "none", transition: "background 0.15s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#252d3d"}
                     onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                   >
                     <span style={{ color: "rgba(255,255,255,0.85)", fontSize: "0.82rem", fontWeight: 500 }}>
@@ -457,15 +457,15 @@ export default function RevenueTab({ toast }) {
                     <span style={{ color: "#34d399", fontWeight: 700, fontSize: "0.82rem" }}>
                       {(r.revenue || 0).toLocaleString()}
                     </span>
-                    <span style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.82rem" }}>{r.bookings || 0}</span>
+                    <span style={{ color: "#cbd5e1", fontSize: "0.82rem" }}>{r.bookings || 0}</span>
                     {mode === "monthly" && (
-                      <span className="rev-nm" style={{ color: "rgba(255,255,255,0.55)", fontSize: "0.82rem" }}>{(r.guests || 0).toLocaleString()}</span>
+                      <span className="rev-nm" style={{ color: "#cbd5e1", fontSize: "0.82rem" }}>{(r.guests || 0).toLocaleString()}</span>
                     )}
                     <div className="rev-nm" style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
-                      <div style={{ flex: 1, height: 5, borderRadius: 3, background: "rgba(255,255,255,0.08)", overflow: "hidden" }}>
+                      <div style={{ flex: 1, height: 5, borderRadius: 3, background: "#252d3d", overflow: "hidden" }}>
                         <div style={{ height: "100%", borderRadius: 3, background: "linear-gradient(90deg,#10b981,#34d399)", width: `${pct}%` }} />
                       </div>
-                      <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.68rem", minWidth: "2.2rem" }}>{pct}%</span>
+                      <span style={{ color: "#cbd5e1", fontSize: "0.68rem", minWidth: "2.2rem" }}>{pct}%</span>
                     </div>
                   </div>
                 );
@@ -477,9 +477,9 @@ export default function RevenueTab({ toast }) {
 
       {/* ── Empty state ──────────────────────────────────────────────────── */}
       {!loading && !report && (
-        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(139,92,246,0.15)", borderRadius: "18px", background: "rgba(255,255,255,0.02)" }}>
+        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(99,102,241,0.15)", borderRadius: "18px", background: "#1e2433" }}>
           <p style={{ fontSize: "2.2rem", marginBottom: "0.75rem" }}>💰</p>
-          <p style={{ color: "rgba(255,255,255,0.45)", marginBottom: "1.25rem", fontSize: "0.9rem" }}>
+          <p style={{ color: "#cbd5e1", marginBottom: "1.25rem", fontSize: "0.9rem" }}>
             Select a range and click Generate to see revenue data
           </p>
           <button style={btnPrimary} onClick={fetchReport}>Generate Report</button>

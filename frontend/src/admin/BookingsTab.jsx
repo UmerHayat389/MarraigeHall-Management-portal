@@ -38,7 +38,7 @@ const CSS = `
   .ab-box {
     width:100%;max-width:560px;
     background:linear-gradient(160deg,#110a2e 0%,#0c0720 100%);
-    border:1px solid rgba(139,92,246,.22);border-radius:18px;
+    border:1px solid rgba(99,102,241,.22);border-radius:18px;
     display:flex;flex-direction:column;
     max-height:calc(100vh - 1.5rem);
     box-shadow:0 32px 80px rgba(0,0,0,.8);
@@ -47,35 +47,35 @@ const CSS = `
   }
   .ab-head {
     padding:1.2rem 1.4rem 1rem;flex-shrink:0;
-    background:linear-gradient(135deg,rgba(124,58,237,.14),rgba(147,51,234,.06));
-    border-bottom:1px solid rgba(139,92,246,.14);
+    background:linear-gradient(135deg,rgba(79,70,229,.14),rgba(99,102,241,.06));
+    border-bottom:1px solid rgba(99,102,241,.14);
   }
   .ab-body {
     flex:1;overflow-y:auto;padding:1.15rem 1.4rem;
   }
   .ab-body::-webkit-scrollbar{width:3px}
-  .ab-body::-webkit-scrollbar-thumb{background:rgba(147,51,234,.3);border-radius:2px}
+  .ab-body::-webkit-scrollbar-thumb{background:rgba(99,102,241,.3);border-radius:2px}
   .ab-foot {
     flex-shrink:0;padding:.9rem 1.4rem;
-    border-top:1px solid rgba(139,92,246,.12);
+    border-top:1px solid rgba(99,102,241,.12);
     display:flex;justify-content:flex-end;gap:.6rem;
   }
 
   .ab-lbl {
     display:block;font-size:.61rem;font-weight:700;
     letter-spacing:.12em;text-transform:uppercase;
-    color:rgba(196,139,252,.52);margin-bottom:.25rem;
+    color:#94a3b8;margin-bottom:.25rem;
   }
   .ab-inp {
     width:100%;padding:.6rem .85rem;border-radius:9px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(139,92,246,.18);
+    background:#1e2433;
+    border:1px solid rgba(99,102,241,.35);
     color:white;font-size:.84rem;outline:none;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     transition:border-color .15s,background .15s;
     box-sizing:border-box;
   }
-  .ab-inp:focus { border-color:rgba(147,51,234,.55);background:rgba(255,255,255,.07); }
+  .ab-inp:focus { border-color:rgba(99,102,241,.55);background:#1e2433; }
   .ab-inp.err   { border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04); }
   .ab-inp::placeholder{color:rgba(255,255,255,.18);}
   .ab-inp[type=date]{color-scheme:dark;}
@@ -90,17 +90,17 @@ const CSS = `
   .ab-dd { position:relative; }
   .ab-dd-btn {
     width:100%;padding:.6rem .85rem;border-radius:9px;
-    background:rgba(255,255,255,.05);border:1px solid rgba(139,92,246,.18);
+    background:#1e2433;border:1px solid rgba(99,102,241,.35);
     color:white;cursor:pointer;outline:none;
-    font-family:'Plus Jakarta Sans',sans-serif;font-size:.84rem;
+    font-family:'Inter',sans-serif;font-size:.84rem;
     display:flex;align-items:center;justify-content:space-between;
     transition:all .15s;box-sizing:border-box;
   }
-  .ab-dd-btn.open,.ab-dd-btn:focus{border-color:rgba(147,51,234,.55);background:rgba(255,255,255,.07);}
+  .ab-dd-btn.open,.ab-dd-btn:focus{border-color:rgba(99,102,241,.55);background:#1e2433;}
   .ab-dd-btn.err{border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04);}
   .ab-dd-menu {
     position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:9999;
-    background:#100929;border:1px solid rgba(139,92,246,.22);
+    background:#1e2433;border:1px solid rgba(99,102,241,.22);
     border-radius:10px;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.7);
   }
   .ab-dd-opt {
@@ -108,10 +108,10 @@ const CSS = `
     border-left:3px solid transparent;
     display:flex;align-items:center;gap:.6rem;
     cursor:pointer;transition:background .1s;
-    font-family:'Plus Jakarta Sans',sans-serif;font-size:.83rem;
+    font-family:'Inter',sans-serif;font-size:.83rem;
   }
-  .ab-dd-opt:hover{background:rgba(255,255,255,.04);}
-  .ab-dd-opt.sel{background:rgba(124,58,237,.25);border-left-color:#9333ea;}
+  .ab-dd-opt:hover{background:#1e2433;}
+  .ab-dd-opt.sel{background:rgba(79,70,229,.25);border-left-color:#6366f1;}
 
   .ab-step-bar { display:flex;align-items:center;gap:0;margin-bottom:0; }
   .ab-step-dot {
@@ -122,62 +122,62 @@ const CSS = `
   .ab-slot-btn {
     width:100%;padding:.75rem 1rem;border-radius:10px;
     display:flex;align-items:center;justify-content:space-between;
-    cursor:pointer;border:1px solid rgba(167,139,250,.18);
-    background:rgba(255,255,255,.03);transition:all .15s;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    cursor:pointer;border:1px solid rgba(99,102,241,.35);
+    background:#1e2433;transition:all .15s;
+    font-family:'Inter',sans-serif;
   }
-  .ab-slot-btn:hover:not(:disabled){border-color:rgba(147,51,234,.45);background:rgba(109,40,217,.1);}
-  .ab-slot-btn.sel{border-color:#9333ea;background:linear-gradient(135deg,rgba(109,40,217,.3),rgba(147,51,234,.15));}
+  .ab-slot-btn:hover:not(:disabled){border-color:rgba(99,102,241,.45);background:rgba(79,70,229,.1);}
+  .ab-slot-btn.sel{border-color:#6366f1;background:linear-gradient(135deg,rgba(79,70,229,.3),rgba(99,102,241,.15));}
   .ab-slot-btn:disabled{opacity:.45;cursor:not-allowed;}
 
   .ab-catering-btn {
     flex:1;padding:.9rem 1rem;border-radius:10px;cursor:pointer;text-align:left;
-    border:1px solid rgba(167,139,250,.18);background:rgba(255,255,255,.03);
-    transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;
+    border:1px solid rgba(99,102,241,.35);background:#1e2433;
+    transition:all .15s;font-family:'Inter',sans-serif;
   }
-  .ab-catering-btn.sel{border-color:#9333ea;background:rgba(109,40,217,.2);}
-  .ab-catering-btn:hover:not(.sel){border-color:rgba(147,51,234,.35);background:rgba(109,40,217,.08);}
+  .ab-catering-btn.sel{border-color:#6366f1;background:rgba(79,70,229,.2);}
+  .ab-catering-btn:hover:not(.sel){border-color:rgba(99,102,241,.35);background:rgba(79,70,229,.08);}
 
   .ab-dish-tab {
     flex:1;padding:.45rem .5rem;border-radius:8px;cursor:pointer;
     display:flex;flex-direction:column;align-items:center;gap:2px;
-    border:1px solid rgba(167,139,250,.12);background:rgba(255,255,255,.03);
-    transition:all .14s;font-family:'Plus Jakarta Sans',sans-serif;
+    border:1px solid rgba(99,102,241,.35);background:#1e2433;
+    transition:all .14s;font-family:'Inter',sans-serif;
   }
-  .ab-dish-tab.sel{border-color:rgba(147,51,234,.55);background:rgba(109,40,217,.3);}
+  .ab-dish-tab.sel{border-color:rgba(99,102,241,.55);background:rgba(79,70,229,.3);}
 
   .ab-dish-item {
     display:flex;align-items:center;gap:.55rem;padding:.45rem .6rem;
-    border-radius:7px;cursor:pointer;border:1px solid rgba(167,139,250,.12);
+    border-radius:7px;cursor:pointer;border:1px solid rgba(99,102,241,.35);
     background:rgba(255,255,255,.025);transition:all .12s;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
   }
-  .ab-dish-item.sel{border-color:#9333ea;background:rgba(109,40,217,.18);}
-  .ab-dish-item:hover:not(.sel):not(.blocked){border-color:rgba(147,51,234,.3);background:rgba(109,40,217,.08);}
+  .ab-dish-item.sel{border-color:#6366f1;background:rgba(79,70,229,.18);}
+  .ab-dish-item:hover:not(.sel):not(.blocked){border-color:rgba(99,102,241,.3);background:rgba(79,70,229,.08);}
   .ab-dish-item.blocked{opacity:.4;cursor:not-allowed;}
 
   .ab-sumrow {
     display:flex;justify-content:space-between;align-items:center;
-    padding:.4rem 0;border-bottom:1px solid rgba(255,255,255,.05);
+    padding:.4rem 0;border-bottom:1px solid #1e2433;
     font-size:.82rem;
   }
 
   .ab-btn-back {
     padding:.58rem 1.1rem;border-radius:9px;cursor:pointer;
-    border:1px solid rgba(139,92,246,.2);background:transparent;
-    color:rgba(196,139,252,.55);font-size:.83rem;font-weight:500;
-    font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+    border:1px solid rgba(99,102,241,.4);background:transparent;
+    color:#94a3b8;font-size:.83rem;font-weight:500;
+    font-family:'Inter',sans-serif;transition:all .15s;
   }
-  .ab-btn-back:hover{border-color:rgba(139,92,246,.4);color:rgba(196,139,252,.85);}
+  .ab-btn-back:hover{border-color:rgba(99,102,241,.4);color:rgba(165,180,252,.85);}
   .ab-btn-next {
     padding:.58rem 1.4rem;border-radius:9px;border:none;cursor:pointer;
-    background:linear-gradient(135deg,#6d28d9,#9333ea);
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
     color:white;font-size:.83rem;font-weight:700;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     min-width:120px;display:flex;align-items:center;justify-content:center;gap:.4rem;
-    box-shadow:0 4px 16px rgba(109,40,217,.38);transition:all .15s;
+    box-shadow:0 4px 16px rgba(99,102,241,.38);transition:all .15s;
   }
-  .ab-btn-next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 22px rgba(109,40,217,.52);}
+  .ab-btn-next:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 22px rgba(79,70,229,.52);}
   .ab-btn-next:disabled{opacity:.5;cursor:not-allowed;transform:none;}
 
   @media(max-width:520px){
@@ -218,7 +218,7 @@ function Dropdown({ value, onChange, options, placeholder, icons = {}, error }) 
           {ico && <span style={{ fontSize:"1rem" }}>{ico}</span>}
           {lbl || placeholder}
         </span>
-        <span style={{ color:"rgba(167,139,250,.45)", fontSize:".58rem", transform: open ? "rotate(180deg)" : "rotate(0)", transition:"transform .18s", display:"inline-block" }}>▼</span>
+        <span style={{ color:"rgba(99,102,241,.45)", fontSize:".58rem", transform: open ? "rotate(180deg)" : "rotate(0)", transition:"transform .18s", display:"inline-block" }}>▼</span>
       </button>
       {open && (
         <div className="ab-dd-menu">
@@ -232,7 +232,7 @@ function Dropdown({ value, onChange, options, placeholder, icons = {}, error }) 
                 onClick={() => { onChange(val); setOpen(false); }}>
                 {ic && <span style={{ fontSize:".95rem", width:18, textAlign:"center" }}>{ic}</span>}
                 <span style={{ color: active ? "white" : "rgba(255,255,255,.65)", fontWeight: active ? 700 : 400 }}>{txt}</span>
-                {active && <span style={{ marginLeft:"auto", color:"#9333ea", fontSize:".72rem" }}>✓</span>}
+                {active && <span style={{ marginLeft:"auto", color:"#6366f1", fontSize:".72rem" }}>✓</span>}
               </button>
             );
           })}
@@ -355,7 +355,7 @@ function AddBookingModal({ onClose, onSaved }) {
           <div className="ab-head">
             <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:".75rem" }}>
               <div>
-                <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.3rem", fontWeight:600, margin:"0 0 2px" }}>
+                <h3 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.3rem", fontWeight:600, margin:"0 0 2px" }}>
                   {step === 5 ? "Booking Created ✓" : "Add New Booking"}
                 </h3>
                 <p style={{ color:"rgba(255,255,255,.28)", fontSize:".72rem", margin:0 }}>
@@ -363,7 +363,7 @@ function AddBookingModal({ onClose, onSaved }) {
                 </p>
               </div>
               {step !== 5 && (
-                <button onClick={onClose} style={{ width:28, height:28, borderRadius:"7px", border:"1px solid rgba(255,255,255,.1)", background:"rgba(255,255,255,.06)", color:"rgba(255,255,255,.42)", cursor:"pointer", fontSize:".85rem", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+                <button onClick={onClose} style={{ width:28, height:28, borderRadius:"7px", border:"1px solid rgba(255,255,255,.1)", background:"#1e2433", color:"rgba(255,255,255,.42)", cursor:"pointer", fontSize:".85rem", display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
               )}
             </div>
 
@@ -372,11 +372,11 @@ function AddBookingModal({ onClose, onSaved }) {
               {[1,2,3,4,5].map((s,i) => (
                 <React.Fragment key={s}>
                   <div className="ab-step-dot" style={{
-                    background: s < step ? "#10b981" : s === step ? "linear-gradient(135deg,#7c3aed,#9333ea)" : "rgba(167,139,250,.2)",
+                    background: s < step ? "#10b981" : s === step ? "linear-gradient(135deg,#4f46e5,#6366f1)" : "rgba(99,102,241,.2)",
                     width: s === step ? 24 : 8,
                     borderRadius: s === step ? "999px" : "50%",
                   }} />
-                  {i < 4 && <div className="ab-step-line" style={{ background: s < step ? "#10b981" : "rgba(167,139,250,.15)" }} />}
+                  {i < 4 && <div className="ab-step-line" style={{ background: s < step ? "#10b981" : "rgba(99,102,241,.15)" }} />}
                 </React.Fragment>
               ))}
             </div>
@@ -431,7 +431,7 @@ function AddBookingModal({ onClose, onSaved }) {
                 </div>
 
                 {selectedHall && (
-                  <div style={{ padding:".75rem 1rem", borderRadius:"10px", background:"rgba(147,51,234,.08)", border:"1px solid rgba(147,51,234,.2)" }}>
+                  <div style={{ padding:".75rem 1rem", borderRadius:"10px", background:"rgba(99,102,241,.08)", border:"1px solid rgba(99,102,241,.2)" }}>
                     <p style={{ color:"white", fontWeight:600, fontSize:".86rem", margin:"0 0 3px" }}>{selectedHall.name}</p>
                     <p style={{ color:"rgba(255,255,255,.38)", fontSize:".75rem", margin:0 }}>
                       📍 {selectedHall.location} · PKR {selectedHall.pricePerHead?.toLocaleString()}/guest · {selectedHall.totalSeats?.toLocaleString()} capacity
@@ -478,8 +478,8 @@ function AddBookingModal({ onClose, onSaved }) {
                           {booked
                             ? <span style={{ padding:"2px 8px", borderRadius:"999px", fontSize:".62rem", fontWeight:700, background:"rgba(239,68,68,.12)", color:"#f87171", border:"1px solid rgba(239,68,68,.25)" }}>Booked</span>
                             : active
-                            ? <span style={{ color:"#9333ea", fontSize:"1rem" }}>✓</span>
-                            : <span style={{ width:18, height:18, borderRadius:"50%", border:"1px solid rgba(167,139,250,.25)", display:"inline-block" }} />
+                            ? <span style={{ color:"#6366f1", fontSize:"1rem" }}>✓</span>
+                            : <span style={{ width:18, height:18, borderRadius:"50%", border:"1px solid rgba(99,102,241,.25)", display:"inline-block" }} />
                           }
                         </button>
                       );
@@ -517,7 +517,7 @@ function AddBookingModal({ onClose, onSaved }) {
                 </div>
 
                 {form.cateringOption === "our-menu" && (
-                  <div style={{ border:"1px solid rgba(147,51,234,.2)", borderRadius:"12px", overflow:"hidden", background:"rgba(147,51,234,.06)" }}>
+                  <div style={{ border:"1px solid rgba(99,102,241,.2)", borderRadius:"12px", overflow:"hidden", background:"rgba(99,102,241,.06)" }}>
                     {/* Category tabs */}
                     <div style={{ display:"flex", gap:".35rem", padding:".75rem .85rem .5rem" }}>
                       {DISH_CATS.map(c => {
@@ -529,7 +529,7 @@ function AddBookingModal({ onClose, onSaved }) {
                             onClick={() => setDishTab(c.key)}>
                             <span style={{ fontSize:"1rem" }}>{c.icon}</span>
                             <span style={{ fontSize:".65rem", fontWeight:600, color: isActive?"white":"rgba(255,255,255,.5)" }}>{c.short}</span>
-                            {catSel > 0 && <span style={{ fontSize:".58rem", padding:"0 4px", borderRadius:3, background:"#7c3aed", color:"white", fontWeight:700 }}>{catSel}</span>}
+                            {catSel > 0 && <span style={{ fontSize:".58rem", padding:"0 4px", borderRadius:3, background:"#4f46e5", color:"white", fontWeight:700 }}>{catSel}</span>}
                           </button>
                         );
                       })}
@@ -548,7 +548,7 @@ function AddBookingModal({ onClose, onSaved }) {
                             <button key={d._id} type="button"
                               className={`ab-dish-item${checked?" sel":""}${blocked?" blocked":""}`}
                               onClick={() => !blocked && toggleDish(d._id, d.category)}>
-                              <div style={{ width:30, height:30, borderRadius:6, overflow:"hidden", background:"rgba(124,58,237,.15)", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                              <div style={{ width:30, height:30, borderRadius:6, overflow:"hidden", background:"rgba(79,70,229,.15)", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
                                 {d.image
                                   ? <img src={d.image} alt={d.name} style={{ width:"100%", height:"100%", objectFit:"cover" }} />
                                   : <span style={{ fontSize:".9rem", opacity:.45 }}>{DISH_CATS.find(c=>c.key===d.category)?.icon||"🍽️"}</span>
@@ -557,20 +557,20 @@ function AddBookingModal({ onClose, onSaved }) {
                               <span style={{ flex:1, fontSize:".82rem", fontWeight:checked?600:400, color: checked?"white":"rgba(255,255,255,.72)", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                                 {d.name}
                               </span>
-                              {checked && <div style={{ width:16, height:16, borderRadius:"50%", background:"#7c3aed", display:"flex", alignItems:"center", justifyContent:"center", fontSize:".6rem", color:"white", fontWeight:700, flexShrink:0 }}>✓</div>}
+                              {checked && <div style={{ width:16, height:16, borderRadius:"50%", background:"#4f46e5", display:"flex", alignItems:"center", justifyContent:"center", fontSize:".6rem", color:"white", fontWeight:700, flexShrink:0 }}>✓</div>}
                             </button>
                           );
                         })
                       }
                     </div>
-                    <div style={{ padding:".5rem .85rem .75rem", borderTop:"1px solid rgba(139,92,246,.12)", fontSize:".72rem", color:"rgba(255,255,255,.28)" }}>
+                    <div style={{ padding:".5rem .85rem .75rem", borderTop:"1px solid rgba(99,102,241,.12)", fontSize:".72rem", color:"rgba(255,255,255,.28)" }}>
                       {form.selectedDishes.length} dish{form.selectedDishes.length!==1?"es":""} selected · Max {MAX_PER_CAT} per category
                     </div>
                   </div>
                 )}
 
                 {form.cateringOption === "self-catering" && (
-                  <div style={{ padding:"1.25rem", borderRadius:"10px", textAlign:"center", background:"rgba(147,51,234,.06)", border:"1px solid rgba(147,51,234,.18)" }}>
+                  <div style={{ padding:"1.25rem", borderRadius:"10px", textAlign:"center", background:"rgba(99,102,241,.06)", border:"1px solid rgba(99,102,241,.18)" }}>
                     <div style={{ fontSize:"2rem", marginBottom:".5rem" }}>👨‍🍳</div>
                     <p style={{ color:"white", fontWeight:600, fontSize:".86rem", margin:"0 0 4px" }}>Self-Catering Selected</p>
                     <p style={{ color:"rgba(255,255,255,.35)", fontSize:".75rem", margin:0 }}>Client will arrange their own catering</p>
@@ -583,8 +583,8 @@ function AddBookingModal({ onClose, onSaved }) {
             {step === 4 && (
               <div className="ab-g3">
                 {/* Summary card */}
-                <div style={{ padding:".95rem 1.1rem", borderRadius:"12px", background:"linear-gradient(135deg,rgba(147,51,234,.12),rgba(109,40,217,.06))", border:"1px solid rgba(147,51,234,.22)" }}>
-                  <p style={{ color:"#a855f7", fontSize:".62rem", fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", margin:"0 0 .6rem" }}>Booking Summary</p>
+                <div style={{ padding:".95rem 1.1rem", borderRadius:"12px", background:"linear-gradient(135deg,rgba(99,102,241,.12),rgba(79,70,229,.06))", border:"1px solid rgba(99,102,241,.22)" }}>
+                  <p style={{ color:"#818cf8", fontSize:".62rem", fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", margin:"0 0 .6rem" }}>Booking Summary</p>
                   {[
                     ["Client",    form.clientName],
                     ["Hall",      selectedHall?.name],
@@ -599,8 +599,8 @@ function AddBookingModal({ onClose, onSaved }) {
                       <span style={{ color:"rgba(255,255,255,.85)", fontWeight:500 }}>{v}</span>
                     </div>
                   ))}
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:".6rem", paddingTop:".6rem", borderTop:"1px solid rgba(167,139,250,.18)" }}>
-                    <span style={{ color:"#a855f7", fontWeight:700, fontSize:".88rem" }}>Grand Total</span>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:".6rem", paddingTop:".6rem", borderTop:"1px solid rgba(99,102,241,.18)" }}>
+                    <span style={{ color:"#818cf8", fontWeight:700, fontSize:".88rem" }}>Grand Total</span>
                     <span style={{ color:"white", fontWeight:700, fontSize:"1.05rem" }}>PKR {grandTotal.toLocaleString()}</span>
                   </div>
                 </div>
@@ -635,11 +635,11 @@ function AddBookingModal({ onClose, onSaved }) {
             {step === 5 && (
               <div style={{ textAlign:"center", padding:"1rem 0" }}>
                 <div style={{ width:64, height:64, borderRadius:"50%", background:"rgba(16,185,129,.15)", border:"2px solid #10b981", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"1.6rem", margin:"0 auto .9rem" }}>✓</div>
-                <h4 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.2rem", fontWeight:600, margin:"0 0 .3rem" }}>Booking Confirmed!</h4>
+                <h4 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.2rem", fontWeight:600, margin:"0 0 .3rem" }}>Booking Confirmed!</h4>
                 <p style={{ color:"#4ade80", fontSize:".78rem", margin:"0 0 1.1rem" }}>Auto-confirmed since this was created by admin.</p>
-                <div style={{ padding:".75rem 1.1rem", borderRadius:"10px", background:"rgba(147,51,234,.1)", border:"1px solid rgba(147,51,234,.25)", marginBottom:".9rem" }}>
+                <div style={{ padding:".75rem 1.1rem", borderRadius:"10px", background:"rgba(99,102,241,.1)", border:"1px solid rgba(99,102,241,.25)", marginBottom:".9rem" }}>
                   <p style={{ color:"rgba(255,255,255,.38)", fontSize:".62rem", letterSpacing:".1em", textTransform:"uppercase", margin:"0 0 4px" }}>Booking Reference</p>
-                  <p style={{ color:"white", fontWeight:700, fontSize:"1.3rem", letterSpacing:".12em", fontFamily:"'Cormorant Garamond',serif", margin:0 }}>{bookingRef}</p>
+                  <p style={{ color:"white", fontWeight:700, fontSize:"1.3rem", letterSpacing:".12em", fontFamily:"'Sora',sans-serif", margin:0 }}>{bookingRef}</p>
                 </div>
                 <p style={{ color:"rgba(255,255,255,.25)", fontSize:".74rem" }}>The booking list has been updated automatically.</p>
               </div>
@@ -729,8 +729,8 @@ export default function BookingsTab({ toast }) {
       {/* Header */}
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.5rem", flexWrap:"wrap", gap:".75rem" }}>
         <div>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
-            All <em style={{ color:"#9333ea", fontStyle:"italic" }}>Bookings</em>
+          <h2 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
+            All <em style={{ color:"#6366f1", fontStyle:"italic" }}>Bookings</em>
           </h2>
           <p style={{ color:"rgba(255,255,255,0.3)", fontSize:".8rem", margin:0 }}>
             {filtered.length!==bookings.length?`${filtered.length} of ${bookings.length} bookings`:`${bookings.length} total bookings`}
@@ -738,12 +738,12 @@ export default function BookingsTab({ toast }) {
         </div>
         <div style={{ display:"flex", gap:".6rem", alignItems:"center", flexWrap:"wrap" }}>
           <div style={{ position:"relative" }}>
-            <span style={{ position:"absolute", left:".8rem", top:"50%", transform:"translateY(-50%)", color:"rgba(167,139,250,0.4)", fontSize:".85rem" }}>🔍</span>
+            <span style={{ position:"absolute", left:".8rem", top:"50%", transform:"translateY(-50%)", color:"rgba(99,102,241,0.4)", fontSize:".85rem" }}>🔍</span>
             <input className="a-input" value={search} onChange={e=>setSearch(e.target.value)}
               placeholder="Search name, ref, phone…" style={{ paddingLeft:"2.2rem", width:220, fontSize:".82rem" }} />
           </div>
           <button style={btnPrimary} onClick={()=>setShowAdd(true)}
-            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(109,40,217,0.4)";}}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(79,70,229,0.4)";}}
             onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
             + Add Booking
           </button>
@@ -755,15 +755,15 @@ export default function BookingsTab({ toast }) {
         {["All","Pending","Confirmed","Cancelled","Completed"].map(s=>(
           <button key={s} onClick={()=>setFilter(s)} style={{
             padding:".38rem .9rem", borderRadius:"999px", fontSize:".75rem",
-            fontFamily:"'Plus Jakarta Sans',sans-serif", fontWeight:600,
-            border:`1px solid ${filter===s?"rgba(147,51,234,0.55)":"rgba(139,92,246,0.18)"}`,
-            background:filter===s?"linear-gradient(135deg,rgba(109,40,217,0.4),rgba(147,51,234,0.25))":"transparent",
-            color:filter===s?"white":"rgba(196,139,252,0.55)",
+            fontFamily:"'Inter',sans-serif", fontWeight:600,
+            border:`1px solid ${filter===s?"rgba(99,102,241,0.55)":"rgba(99,102,241,0.2)"}`,
+            background:filter===s?"linear-gradient(135deg,rgba(79,70,229,0.4),rgba(99,102,241,0.25))":"transparent",
+            color:filter===s?"white":"#94a3b8",
             cursor:"pointer", transition:"all 0.15s",
             display:"flex", alignItems:"center", gap:".35rem",
           }}>
             {s}
-            <span style={{ background:filter===s?"rgba(255,255,255,0.2)":"rgba(139,92,246,0.2)", borderRadius:"999px", padding:"0 5px", fontSize:".65rem", fontWeight:700 }}>
+            <span style={{ background:filter===s?"#94a3b8":"rgba(99,102,241,0.2)", borderRadius:"999px", padding:"0 5px", fontSize:".65rem", fontWeight:700 }}>
               {counts[s]??""}
             </span>
           </button>
@@ -772,11 +772,11 @@ export default function BookingsTab({ toast }) {
 
       {/* List */}
       {loading ? (
-        <div style={{ textAlign:"center", padding:"4rem", color:"rgba(255,255,255,0.25)" }}>
+        <div style={{ textAlign:"center", padding:"4rem", color:"#94a3b8" }}>
           <div style={{ fontSize:"2rem", marginBottom:".75rem", opacity:.4 }}>📋</div>Loading bookings…
         </div>
       ) : filtered.length===0 ? (
-        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(139,92,246,0.12)", borderRadius:"18px" }}>
+        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(99,102,241,0.12)", borderRadius:"18px" }}>
           <p style={{ fontSize:"2rem", marginBottom:".6rem" }}>🔍</p>
           <p style={{ color:"rgba(255,255,255,0.28)", fontSize:".9rem" }}>No bookings match your filter</p>
         </div>
@@ -788,30 +788,30 @@ export default function BookingsTab({ toast }) {
             const slot=b.timeSlot?b.timeSlot.charAt(0).toUpperCase()+b.timeSlot.slice(1):"—";
             return (
               <div key={b._id} onClick={()=>setSelected(b)}
-                style={{ display:"flex", alignItems:"stretch", borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(139,92,246,0.13)", background:"rgba(255,255,255,0.025)", transition:"all 0.16s" }}
-                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(147,51,234,0.38)";e.currentTarget.style.background="rgba(109,40,217,0.07)";}}
-                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(139,92,246,0.13)";e.currentTarget.style.background="rgba(255,255,255,0.025)";}}>
+                style={{ display:"flex", alignItems:"stretch", borderRadius:12, overflow:"hidden", cursor:"pointer", border:"1px solid rgba(99,102,241,0.13)", background:"#1e2433", transition:"all 0.16s" }}
+                onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(99,102,241,0.38)";e.currentTarget.style.background="rgba(79,70,229,0.07)";}}
+                onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(99,102,241,0.13)";e.currentTarget.style.background="#1e2433";}}>
                 <div style={{ width:3, flexShrink:0, background:sc }} />
                 <div style={{ flex:1, padding:"12px 16px", minWidth:0, display:"flex", alignItems:"center", justifyContent:"space-between", gap:12 }}>
                   <div style={{ minWidth:0 }}>
                     <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:5 }}>
                       <span style={{ color:"white", fontWeight:600, fontSize:".88rem" }}>{b.clientName}</span>
                       <span style={{ fontSize:".6rem", fontWeight:700, padding:"2px 7px", borderRadius:99, textTransform:"uppercase", letterSpacing:".07em", background:sbg, color:sc, border:`1px solid ${sbd}`, flexShrink:0 }}>{ds}</span>
-                      {b.bookingRef&&<span style={{ fontSize:".63rem", fontWeight:600, padding:"2px 7px", borderRadius:99, background:"rgba(139,92,246,0.1)", color:"rgba(196,139,252,0.65)", border:"1px solid rgba(139,92,246,0.18)", flexShrink:0 }}>{b.bookingRef}</span>}
+                      {b.bookingRef&&<span style={{ fontSize:".63rem", fontWeight:600, padding:"2px 7px", borderRadius:99, background:"rgba(99,102,241,0.1)", color:"#94a3b8", border:"1px solid rgba(99,102,241,0.2)", flexShrink:0 }}>{b.bookingRef}</span>}
                     </div>
                     <div style={{ display:"flex", alignItems:"center", gap:6, flexWrap:"wrap" }}>
-                      <span style={{ fontSize:".75rem", color:"rgba(255,255,255,0.5)" }}>{b.hallId?.name||"—"}</span>
+                      <span style={{ fontSize:".75rem", color:"#cbd5e1" }}>{b.hallId?.name||"—"}</span>
                       <span style={{ color:"rgba(255,255,255,0.18)", fontSize:".65rem" }}>·</span>
-                      <span style={{ fontSize:".75rem", color:"rgba(255,255,255,0.5)" }}>{dateStr}</span>
+                      <span style={{ fontSize:".75rem", color:"#cbd5e1" }}>{dateStr}</span>
                       <span style={{ color:"rgba(255,255,255,0.18)", fontSize:".65rem" }}>·</span>
-                      <span style={{ fontSize:".75rem", color:"rgba(255,255,255,0.5)" }}>{slot}</span>
+                      <span style={{ fontSize:".75rem", color:"#cbd5e1" }}>{slot}</span>
                       <span style={{ color:"rgba(255,255,255,0.18)", fontSize:".65rem" }}>·</span>
-                      <span style={{ fontSize:".75rem", color:"rgba(255,255,255,0.4)" }}>{b.guests} guests</span>
+                      <span style={{ fontSize:".75rem", color:"#94a3b8" }}>{b.guests} guests</span>
                     </div>
                   </div>
-                  <span style={{ color:"#c084fc", fontWeight:700, fontSize:".9rem", flexShrink:0 }}>PKR {b.totalPrice?.toLocaleString()}</span>
+                  <span style={{ color:"#a5b4fc", fontWeight:700, fontSize:".9rem", flexShrink:0 }}>PKR {b.totalPrice?.toLocaleString()}</span>
                 </div>
-                <div style={{ display:"flex", alignItems:"center", gap:6, padding:"0 14px", borderLeft:"1px solid rgba(139,92,246,0.1)", flexShrink:0 }} onClick={e=>e.stopPropagation()}>
+                <div style={{ display:"flex", alignItems:"center", gap:6, padding:"0 14px", borderLeft:"1px solid rgba(99,102,241,0.1)", flexShrink:0 }} onClick={e=>e.stopPropagation()}>
                   {ds==="Pending"&&<button onClick={()=>updateStatus(b._id,"Confirmed")} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 13px", borderRadius:8, fontSize:".75rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(16,185,129,0.4)", background:"rgba(16,185,129,0.12)", color:"#4ade80", whiteSpace:"nowrap" }} onMouseEnter={e=>{e.currentTarget.style.background="rgba(16,185,129,0.25)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(16,185,129,0.12)";}}>✓ Confirm</button>}
                   {ds!=="Cancelled"&&ds!=="Completed"&&<button onClick={()=>updateStatus(b._id,"Cancelled")} style={{ display:"flex", alignItems:"center", gap:5, padding:"6px 13px", borderRadius:8, fontSize:".75rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(239,68,68,0.35)", background:"rgba(239,68,68,0.1)", color:"#f87171", whiteSpace:"nowrap" }} onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.22)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.1)";}}>✕ Cancel</button>}
                   <button onClick={()=>deleteBooking(b._id)} style={{ display:"flex", alignItems:"center", justifyContent:"center", width:32, height:32, borderRadius:8, cursor:"pointer", border:"1px solid rgba(239,68,68,0.25)", background:"rgba(239,68,68,0.07)", color:"#f87171", fontSize:".85rem" }} onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.2)";}} onMouseLeave={e=>{e.currentTarget.style.background="rgba(239,68,68,0.07)";}}>🗑</button>
@@ -827,9 +827,9 @@ export default function BookingsTab({ toast }) {
         <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginTop:"1.25rem", flexWrap:"wrap", gap:".5rem" }}>
           <p style={{ color:"rgba(255,255,255,0.28)", fontSize:".78rem", margin:0 }}>Showing {(page-1)*PER_PAGE+1}–{Math.min(page*PER_PAGE,filtered.length)} of {filtered.length}</p>
           <div style={{ display:"flex", alignItems:"center", gap:".35rem" }}>
-            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} style={{ padding:".38rem .75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color:page===1?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:".78rem", cursor:page===1?"not-allowed":"pointer", fontWeight:600 }}>← Prev</button>
-            {Array.from({length:totalPages},(_,i)=>i+1).filter(n=>n===1||n===totalPages||Math.abs(n-page)<=1).reduce((acc,n,idx,arr)=>{if(idx>0&&n-arr[idx-1]>1)acc.push("...");acc.push(n);return acc;},[]).map((n,idx)=>n==="..."?<span key={`d${idx}`} style={{ color:"rgba(255,255,255,0.2)", fontSize:".78rem", padding:"0 2px" }}>…</span>:<button key={n} onClick={()=>setPage(n)} style={{ width:34, height:34, borderRadius:9, border:`1px solid ${page===n?"rgba(147,51,234,0.6)":"rgba(139,92,246,0.2)"}`, background:page===n?"linear-gradient(135deg,rgba(109,40,217,0.5),rgba(147,51,234,0.3))":"rgba(255,255,255,0.03)", color:page===n?"white":"rgba(192,132,252,0.6)", fontSize:".8rem", fontWeight:page===n?700:500, cursor:"pointer" }}>{n}</button>)}
-            <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages} style={{ padding:".38rem .75rem", borderRadius:9, border:"1px solid rgba(139,92,246,0.22)", background:"rgba(255,255,255,0.03)", color:page===totalPages?"rgba(255,255,255,0.2)":"rgba(192,132,252,0.7)", fontSize:".78rem", cursor:page===totalPages?"not-allowed":"pointer", fontWeight:600 }}>Next →</button>
+            <button onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1} style={{ padding:".38rem .75rem", borderRadius:9, border:"1px solid rgba(99,102,241,0.22)", background:"#1e2433", color:page===1?"#94a3b8":"#94a3b8", fontSize:".78rem", cursor:page===1?"not-allowed":"pointer", fontWeight:600 }}>← Prev</button>
+            {Array.from({length:totalPages},(_,i)=>i+1).filter(n=>n===1||n===totalPages||Math.abs(n-page)<=1).reduce((acc,n,idx,arr)=>{if(idx>0&&n-arr[idx-1]>1)acc.push("...");acc.push(n);return acc;},[]).map((n,idx)=>n==="..."?<span key={`d${idx}`} style={{ color:"#94a3b8", fontSize:".78rem", padding:"0 2px" }}>…</span>:<button key={n} onClick={()=>setPage(n)} style={{ width:34, height:34, borderRadius:9, border:`1px solid ${page===n?"rgba(99,102,241,0.6)":"rgba(99,102,241,0.2)"}`, background:page===n?"linear-gradient(135deg,rgba(79,70,229,0.5),rgba(99,102,241,0.3))":"#1e2433", color:page===n?"white":"#94a3b8", fontSize:".8rem", fontWeight:page===n?700:500, cursor:"pointer" }}>{n}</button>)}
+            <button onClick={()=>setPage(p=>Math.min(totalPages,p+1))} disabled={page===totalPages} style={{ padding:".38rem .75rem", borderRadius:9, border:"1px solid rgba(99,102,241,0.22)", background:"#1e2433", color:page===totalPages?"#94a3b8":"#94a3b8", fontSize:".78rem", cursor:page===totalPages?"not-allowed":"pointer", fontWeight:600 }}>Next →</button>
           </div>
         </div>
       )}

@@ -16,7 +16,7 @@ const inputClass = (err) =>
   `w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-all ${
     err
       ? "border border-red-500/60 bg-red-500/5"
-      : "border border-purple-500/20 bg-white/5 focus:border-purple-400"
+      : "border border-yellow-600/20 bg-white/5 focus:border-yellow-500"
   }`;
 
 function Field({ label, error, children }) {
@@ -24,7 +24,7 @@ function Field({ label, error, children }) {
     <div>
       <label
         className="block text-xs font-medium mb-1.5 tracking-wider uppercase"
-        style={{ color: "rgba(192,132,252,0.7)" }}
+        style={{ color: "rgba(245,158,11,0.7)" }}
       >
         {label}
       </label>
@@ -59,7 +59,7 @@ function CustomSelect({ value, onChange, options, placeholder = "Select...", err
         onClick={() => setOpen((o) => !o)}
         className="w-full px-3 py-2.5 rounded-lg text-sm text-white outline-none transition-all flex items-center justify-between"
         style={{
-          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : open ? "rgba(167,139,250,0.5)" : "rgba(167,139,250,0.2)"}`,
+          border: `1px solid ${error ? "rgba(239,68,68,0.5)" : open ? "rgba(245,158,11,0.5)" : "rgba(245,158,11,0.2)"}`,
           background: error ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)",
         }}
       >
@@ -67,15 +67,15 @@ function CustomSelect({ value, onChange, options, placeholder = "Select...", err
           {icon && <span style={{ fontSize: "1rem" }}>{icon}</span>}
           {label || placeholder}
         </span>
-        <span style={{ color: "rgba(167,139,250,0.6)", fontSize: "0.7rem", transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+        <span style={{ color: "rgba(245,158,11,0.6)", fontSize: "0.7rem", transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
       </button>
 
       {/* Dropdown panel */}
       {open && (
         <div style={{
           position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 999,
-          background: "linear-gradient(145deg,#1e1240,#160e35)",
-          border: "1px solid rgba(167,139,250,0.25)", borderRadius: "12px",
+          background: "linear-gradient(145deg,#122418,#0d1c17)",
+          border: "1px solid rgba(245,158,11,0.25)", borderRadius: "12px",
           overflow: "hidden", boxShadow: "0 16px 40px rgba(0,0,0,0.5)",
         }}>
           {options.map((opt) => {
@@ -90,16 +90,16 @@ function CustomSelect({ value, onChange, options, placeholder = "Select...", err
                 onClick={() => { onChange(val); setOpen(false); }}
                 className="w-full px-3 py-2.5 text-sm text-left flex items-center gap-3 transition-all"
                 style={{
-                  background: isActive ? "rgba(124,58,237,0.3)" : "transparent",
+                  background: isActive ? "rgba(245,158,11,0.3)" : "transparent",
                   color: isActive ? "white" : "rgba(255,255,255,0.7)",
-                  borderLeft: isActive ? "2px solid #a855f7" : "2px solid transparent",
+                  borderLeft: isActive ? "2px solid #fbbf24" : "2px solid transparent",
                 }}
-                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(124,58,237,0.15)"; }}
+                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(245,158,11,0.15)"; }}
                 onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
               >
                 {ico && <span style={{ fontSize: "1rem", width: "20px", textAlign: "center" }}>{ico}</span>}
                 <span>{lbl}</span>
-                {isActive && <span style={{ marginLeft: "auto", color: "#a855f7", fontSize: "0.75rem" }}>✓</span>}
+                {isActive && <span style={{ marginLeft: "auto", color: "#fbbf24", fontSize: "0.75rem" }}>✓</span>}
               </button>
             );
           })}
@@ -116,14 +116,14 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-      style={{ background: "rgba(7,5,15,0.45)", backdropFilter: "blur(4px)" }}
+      style={{ background: "rgba(4,10,8,0.45)", backdropFilter: "blur(4px)" }}
       onClick={undefined}
     >
       <div
         className="w-full max-w-sm rounded-2xl overflow-hidden"
         style={{
-          background: "linear-gradient(145deg,#1a1035,#120d2a)",
-          border: "1px solid rgba(167,139,250,0.22)",
+          background: "linear-gradient(145deg,#14141f,#14141f)",
+          border: "1px solid rgba(245,158,11,0.22)",
         }}
       >
         {/* Header */}
@@ -136,23 +136,23 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
               >
                 Available Time Slots
               </h3>
-              <p className="text-xs mt-0.5" style={{ color: "rgba(192,132,252,0.6)" }}>
+              <p className="text-xs mt-0.5" style={{ color: "rgba(245,158,11,0.6)" }}>
                 {hallName} · {date}
               </p>
             </div>
             <button
               onClick={onClose}
               className="text-lg leading-none transition-colors"
-              style={{ color: "rgba(167,139,250,0.45)" }}
+              style={{ color: "rgba(245,158,11,0.45)" }}
               onMouseEnter={(e) => (e.target.style.color = "white")}
-              onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.45)")}
+              onMouseLeave={(e) => (e.target.style.color = "rgba(245,158,11,0.45)")}
             >
               ✕
             </button>
           </div>
           <div
             className="h-px mt-3"
-            style={{ background: "rgba(167,139,250,0.12)" }}
+            style={{ background: "rgba(245,158,11,0.12)" }}
           />
           {/* Live availability indicator */}
           <div className="flex items-center gap-1.5 mt-2">
@@ -184,13 +184,13 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
                     booked
                       ? "rgba(239,68,68,0.3)"
                       : active
-                      ? "rgba(147,51,234,0.65)"
-                      : "rgba(167,139,250,0.18)"
+                      ? "rgba(245,158,11,0.65)"
+                      : "rgba(245,158,11,0.18)"
                   }`,
                   background: booked
                     ? "rgba(239,68,68,0.08)"
                     : active
-                    ? "linear-gradient(135deg,rgba(124,58,237,0.35),rgba(147,51,234,0.2))"
+                    ? "linear-gradient(135deg,rgba(245,158,11,0.35),rgba(245,158,11,0.2))"
                     : "rgba(255,255,255,0.03)",
                   cursor: booked ? "not-allowed" : "pointer",
                   opacity: booked ? 0.5 : 1,
@@ -208,7 +208,7 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
                       Booked
                     </span>
                   )}
-                  {active && !booked && <span style={{ color: "#a855f7" }}>✓</span>}
+                  {active && !booked && <span style={{ color: "#fbbf24" }}>✓</span>}
                 </div>
                 <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
                   {slot.startTime} – {slot.endTime}
@@ -223,8 +223,8 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg text-sm transition-all"
-            style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
+            style={{ border: "1px solid rgba(245,158,11,0.2)", color: "#fcd34d" }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(245,158,11,0.1)")}
             onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
           >
             Cancel
@@ -234,7 +234,7 @@ function TimeSlotModal({ date, hallName, bookedSlots = [], loading = false, onSe
             disabled={!selected}
             className="px-5 py-2 rounded-lg text-sm font-semibold text-white"
             style={{
-              background: selected ? "linear-gradient(135deg,#7c3aed,#a855f7)" : "rgba(124,58,237,0.3)",
+              background: selected ? "linear-gradient(135deg,#d97706,#fbbf24)" : "rgba(245,158,11,0.3)",
               opacity: selected ? 1 : 0.6,
               cursor: selected ? "pointer" : "not-allowed",
             }}
@@ -293,17 +293,17 @@ function InlineDishSelector({ selected, onChange }) {
   return (
     <div
       className="rounded-xl overflow-hidden"
-      style={{ border: "1px solid rgba(147,51,234,0.2)", background: "rgba(147,51,234,0.08)" }}
+      style={{ border: "1px solid rgba(245,158,11,0.2)", background: "rgba(245,158,11,0.08)" }}
     >
       {/* Header */}
       <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", padding:"12px 16px 8px" }}>
         <div style={{ display:"flex", alignItems:"center", gap:6 }}>
           <span style={{ fontSize:15 }}>🍽️</span>
           <span style={{ fontSize:13, fontWeight:600, color:"white" }}>Menu Selection</span>
-          <span style={{ fontSize:11, color:"rgba(255,255,255,0.35)" }}>(max {MAX_PER_CATEGORY}/category)</span>
+          <span style={{ fontSize:11, color:"rgba(255,255,255,0.65)" }}>(max {MAX_PER_CATEGORY}/category)</span>
         </div>
         {selected.length > 0 && (
-          <span style={{ fontSize:11, padding:"2px 8px", borderRadius:99, background:"rgba(147,51,234,0.25)", color:"#c084fc" }}>
+          <span style={{ fontSize:11, padding:"2px 8px", borderRadius:99, background:"rgba(245,158,11,0.25)", color:"#fcd34d" }}>
             {selected.length} selected
           </span>
         )}
@@ -322,8 +322,8 @@ function InlineDishSelector({ selected, onChange }) {
               type="button"
               onClick={() => { setActiveTab(cat.key); setCatError(""); }}
               style={{
-                background: isActive ? "rgba(124,58,237,0.4)" : "rgba(255,255,255,0.04)",
-                border: `1px solid ${isActive ? "rgba(147,51,234,0.6)" : atLimit ? "rgba(239,68,68,0.35)" : "rgba(167,139,250,0.12)"}`,
+                background: isActive ? "rgba(245,158,11,0.4)" : "rgba(255,255,255,0.04)",
+                border: `1px solid ${isActive ? "rgba(245,158,11,0.6)" : atLimit ? "rgba(239,68,68,0.35)" : "rgba(245,158,11,0.12)"}`,
                 borderRadius: 8,
                 padding: "6px 2px",
                 color: isActive ? "white" : "rgba(255,255,255,0.45)",
@@ -336,7 +336,7 @@ function InlineDishSelector({ selected, onChange }) {
               {catSelected > 0 && (
                 <span style={{
                   fontSize: 9, lineHeight:"1.4", padding:"0 3px", borderRadius:3,
-                  background: atLimit ? "#ef4444" : "#7c3aed", color:"white"
+                  background: atLimit ? "#ef4444" : "#e8a020", color:"white"
                 }}>
                   {catSelected}/{MAX_PER_CATEGORY}
                 </span>
@@ -358,7 +358,7 @@ function InlineDishSelector({ selected, onChange }) {
         {loadingDishes ? (
           <p style={{ fontSize:11, textAlign:"center", padding:"12px 0", color:"rgba(255,255,255,0.3)" }}>Loading menu...</p>
         ) : tabDishes.length === 0 ? (
-          <p style={{ fontSize:11, textAlign:"center", padding:"12px 0", color:"rgba(255,255,255,0.25)" }}>No items in this category yet</p>
+          <p style={{ fontSize:11, textAlign:"center", padding:"12px 0", color:"rgba(255,255,255,0.55)" }}>No items in this category yet</p>
         ) : (
           <div style={{ display:"grid", gridTemplateColumns:"repeat(2,1fr)", gap:4 }}>
             {tabDishes.map(dish => {
@@ -372,8 +372,8 @@ function InlineDishSelector({ selected, onChange }) {
                   type="button"
                   onClick={() => !blocked && toggle(dish._id, dish.category)}
                   style={{
-                    border: `1px solid ${checked ? "#9333ea" : blocked ? "rgba(239,68,68,0.2)" : "rgba(167,139,250,0.14)"}`,
-                    background: checked ? "rgba(124,58,237,0.18)" : blocked ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.03)",
+                    border: `1px solid ${checked ? "#f59e0b" : blocked ? "rgba(239,68,68,0.2)" : "rgba(245,158,11,0.14)"}`,
+                    background: checked ? "rgba(245,158,11,0.18)" : blocked ? "rgba(239,68,68,0.04)" : "rgba(255,255,255,0.03)",
                     borderRadius:6, padding:"4px 8px 4px 4px",
                     textAlign:"left", cursor: blocked ? "not-allowed" : "pointer",
                     opacity: blocked ? 0.5 : 1, transition:"all 0.15s",
@@ -383,7 +383,7 @@ function InlineDishSelector({ selected, onChange }) {
                   {/* 28×28 thumbnail */}
                   <div style={{
                     width:28, height:28, borderRadius:4, overflow:"hidden",
-                    background:"rgba(124,58,237,0.15)", flexShrink:0,
+                    background:"rgba(245,158,11,0.15)", flexShrink:0,
                   }}>
                     {dish.image ? (
                       <img src={dish.image} alt={dish.name} style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
@@ -399,7 +399,7 @@ function InlineDishSelector({ selected, onChange }) {
                   </p>
                   {/* Check */}
                   {checked && (
-                    <div style={{ width:14, height:14, borderRadius:"50%", flexShrink:0, background:"#7c3aed", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"white", fontWeight:700 }}>✓</div>
+                    <div style={{ width:14, height:14, borderRadius:"50%", flexShrink:0, background:"#e8a020", display:"flex", alignItems:"center", justifyContent:"center", fontSize:8, color:"white", fontWeight:700 }}>✓</div>
                   )}
                 </button>
               );
@@ -581,13 +581,13 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
     <>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "rgba(7,5,15,0.45)", backdropFilter: "blur(4px)" }}
+        style={{ background: "rgba(4,10,8,0.45)", backdropFilter: "blur(4px)" }}
         onClick={undefined}
       >
         <style>
           {`
             .bm-scroll::-webkit-scrollbar { width: 3px; }
-            .bm-scroll::-webkit-scrollbar-thumb { background: rgba(147,51,234,0.4); border-radius: 2px; }
+            .bm-scroll::-webkit-scrollbar-thumb { background: rgba(245,158,11,0.4); border-radius: 2px; }
             @media (max-width: 480px) {
               .bm-modal { border-radius: 16px !important; margin: 0 8px; }
               .bm-header { padding: 16px 16px 14px !important; }
@@ -604,8 +604,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
         <div
           className="w-full max-w-2xl max-h-[90vh] rounded-2xl overflow-hidden bm-scroll bm-modal"
           style={{
-            background: "linear-gradient(145deg,#1b1142,#12093a)",
-            border: "1px solid rgba(167,139,250,0.25)",
+            background: "linear-gradient(145deg,#14141f,#14141f)",
+            border: "1px solid rgba(245,158,11,0.25)",
             overflowY: "auto",
           }}
         >
@@ -613,8 +613,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
           <div
             className="p-6 pb-5 bm-header"
             style={{
-              background: "linear-gradient(135deg,rgba(124,58,237,0.15),rgba(147,51,234,0.08))",
-              borderBottom: "1px solid rgba(167,139,250,0.15)",
+              background: "linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.08))",
+              borderBottom: "1px solid rgba(245,158,11,0.15)",
             }}
           >
             <div className="flex justify-between items-start mb-4">
@@ -625,7 +625,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 >
                   Reserve Your Event
                 </h2>
-                <p className="text-xs mt-1.5 uppercase tracking-widest" style={{ color: "#a855f7" }}>
+                <p className="text-xs mt-1.5 uppercase tracking-widest" style={{ color: "#fbbf24" }}>
                   Step {step} of 4
                 </p>
               </div>
@@ -633,9 +633,9 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 <button
                   onClick={onClose}
                   className="text-xl leading-none transition-colors"
-                  style={{ color: "rgba(167,139,250,0.5)" }}
+                  style={{ color: "rgba(245,158,11,0.5)" }}
                   onMouseEnter={(e) => (e.target.style.color = "white")}
-                  onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.5)")}
+                  onMouseLeave={(e) => (e.target.style.color = "rgba(245,158,11,0.5)")}
                 >
                   ✕
                 </button>
@@ -656,14 +656,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                         s < step
                           ? "#10b981"
                           : s === step
-                          ? "linear-gradient(90deg,#7c3aed,#a855f7)"
-                          : "rgba(167,139,250,0.2)",
+                          ? "linear-gradient(90deg,#d97706,#fbbf24)"
+                          : "rgba(245,158,11,0.2)",
                     }}
                   />
                   {s < 5 && (
                     <div
                       className="flex-1 h-px"
-                      style={{ background: s < step ? "#10b981" : "rgba(167,139,250,0.15)" }}
+                      style={{ background: s < step ? "#10b981" : "rgba(245,158,11,0.15)" }}
                     />
                   )}
                 </React.Fragment>
@@ -744,8 +744,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                   <div
                     className="p-4 rounded-xl"
                     style={{
-                      background: "rgba(147,51,234,0.08)",
-                      border: "1px solid rgba(147,51,234,0.2)",
+                      background: "rgba(245,158,11,0.08)",
+                      border: "1px solid rgba(245,158,11,0.2)",
                     }}
                   >
                     <div className="flex gap-3">
@@ -763,7 +763,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                         <p className="text-xs mb-1" style={{ color: "rgba(255,255,255,0.4)" }}>
                           📍 {selectedHall.location || "Karachi"}
                         </p>
-                        <p className="text-xs font-semibold" style={{ color: "#c084fc" }}>
+                        <p className="text-xs font-semibold" style={{ color: "#fcd34d" }}>
                           PKR {selectedHall.pricePerHead?.toLocaleString()}/guest · {selectedHall.totalSeats} capacity
                         </p>
                       </div>
@@ -780,8 +780,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     placeholder={selectedHall ? `Max ${selectedHall.totalSeats.toLocaleString()} guests` : "e.g. 250"}
                   />
                   {selectedHall && form.guests && !errors.guests && Number(form.guests) <= selectedHall.totalSeats && (
-                    <p style={{ fontSize:"0.7rem", marginTop:4, color:"rgba(167,139,250,0.5)" }}>
-                      ✓ Within capacity · Max <span style={{ color:"#c084fc", fontWeight:600 }}>{selectedHall.totalSeats.toLocaleString()}</span> guests
+                    <p style={{ fontSize:"0.7rem", marginTop:4, color:"rgba(245,158,11,0.5)" }}>
+                      ✓ Within capacity · Max <span style={{ color:"#fcd34d", fontWeight:600 }}>{selectedHall.totalSeats.toLocaleString()}</span> guests
                     </p>
                   )}
                 </Field>
@@ -805,7 +805,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     }}
                     className="w-full px-3 py-2.5 rounded-lg text-sm text-left transition-all"
                     style={{
-                      border: `1px solid ${errors.timeSlot ? "rgba(239,68,68,0.5)" : "rgba(167,139,250,0.2)"}`,
+                      border: `1px solid ${errors.timeSlot ? "rgba(239,68,68,0.5)" : "rgba(245,158,11,0.2)"}`,
                       background: errors.timeSlot ? "rgba(239,68,68,0.05)" : "rgba(255,255,255,0.05)",
                       color: form.timeSlotLabel ? "white" : "rgba(255,255,255,0.3)",
                     }}
@@ -821,7 +821,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
               <div className="space-y-4">
                 {/* Catering choice cards */}
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "rgba(192,132,252,0.7)" }}>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "rgba(245,158,11,0.7)" }}>
                     Catering Preference
                   </p>
                   <div className="grid grid-cols-2 gap-3 bm-catering-grid">
@@ -837,14 +837,14 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                           onClick={() => { set("cateringOption", opt.val); if (opt.val === "self-catering") set("selectedDishes", []); }}
                           className="p-4 rounded-xl text-left transition-all"
                           style={{
-                            border: `2px solid ${active ? "#9333ea" : "rgba(167,139,250,0.2)"}`,
-                            background: active ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.03)",
+                            border: `2px solid ${active ? "#f59e0b" : "rgba(245,158,11,0.2)"}`,
+                            background: active ? "rgba(245,158,11,0.2)" : "rgba(255,255,255,0.03)",
                           }}
                         >
                           <div className="flex items-center gap-2 mb-2">
                             <span style={{ fontSize: 22 }}>{opt.icon}</span>
                             <span className="text-sm font-semibold text-white">{opt.title}</span>
-                            {active && <span className="ml-auto" style={{ color: "#a855f7" }}>✓</span>}
+                            {active && <span className="ml-auto" style={{ color: "#fbbf24" }}>✓</span>}
                           </div>
                           <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{opt.sub}</p>
                         </button>
@@ -868,7 +868,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 {form.cateringOption === "self-catering" && (
                   <div
                     className="p-4 rounded-xl text-center"
-                    style={{ background: "rgba(147,51,234,0.08)", border: "1px solid rgba(147,51,234,0.2)" }}
+                    style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)" }}
                   >
                     <div style={{ fontSize: 32 }} className="mb-2">👨‍🍳</div>
                     <p className="text-sm font-medium text-white mb-1">Self-Catering Selected</p>
@@ -887,27 +887,27 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 <div
                   className="p-5 rounded-xl"
                   style={{
-                    background: "linear-gradient(135deg,rgba(147,51,234,0.15),rgba(124,58,237,0.08))",
-                    border: "1px solid rgba(147,51,234,0.25)",
+                    background: "linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.08))",
+                    border: "1px solid rgba(245,158,11,0.25)",
                   }}
                 >
                   <p
                     className="text-xs font-semibold uppercase tracking-widest mb-3"
-                    style={{ color: "#a855f7" }}
+                    style={{ color: "#fbbf24" }}
                   >
                     Estimated Budget
                   </p>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Guest</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Guest</span>
                       <span className="text-white font-medium">{form.clientName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Hall</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Hall</span>
                       <span className="text-white font-medium">{selectedHall?.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Date</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Date</span>
                       <span className="text-white font-medium">
                         {new Date(form.eventDate + "T12:00:00").toLocaleDateString("en-PK", {
                           day: "numeric",
@@ -917,19 +917,19 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Time Slot</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Time Slot</span>
                       <span className="text-white font-medium">{form.timeSlotLabel}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Event</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Event</span>
                       <span className="text-white font-medium">{form.eventType}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Guests</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Guests</span>
                       <span className="text-white font-medium">{form.guests}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span style={{ color: "rgba(255,255,255,0.5)" }}>Menu</span>
+                      <span style={{ color: "rgba(255,255,255,0.75)" }}>Menu</span>
                       <span className="text-white font-medium">
                         {form.cateringOption === "self-catering"
                           ? "Self-Catering"
@@ -937,21 +937,21 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                       </span>
                     </div>
 
-                    <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(167,139,250,0.15)" }}>
+                    <div className="pt-2 mt-2" style={{ borderTop: "1px solid rgba(245,158,11,0.15)" }}>
                       <div className="flex justify-between text-sm">
-                        <span style={{ color: "rgba(255,255,255,0.5)" }}>Room Rate</span>
+                        <span style={{ color: "rgba(255,255,255,0.75)" }}>Room Rate</span>
                         <span className="text-white font-semibold">PKR {roomRate.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-sm mt-1">
-                        <span style={{ color: "rgba(255,255,255,0.5)" }}>Tax (16%)</span>
+                        <span style={{ color: "rgba(255,255,255,0.75)" }}>Tax (16%)</span>
                         <span className="text-white font-semibold">PKR {tax.toLocaleString()}</span>
                       </div>
                     </div>
                     <div
                       className="flex justify-between pt-3 mt-2"
-                      style={{ borderTop: "1px solid rgba(167,139,250,0.2)" }}
+                      style={{ borderTop: "1px solid rgba(245,158,11,0.2)" }}
                     >
-                      <span className="text-base font-semibold" style={{ color: "#a855f7" }}>
+                      <span className="text-base font-semibold" style={{ color: "#fbbf24" }}>
                         Grand Total
                       </span>
                       <span className="text-lg font-bold text-white">PKR {grandTotal.toLocaleString()}</span>
@@ -1077,11 +1077,11 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
 
                 <div
                   className="rounded-xl p-4 mb-4"
-                  style={{ background: "rgba(167,139,250,0.07)", border: "1px solid rgba(167,139,250,0.2)" }}
+                  style={{ background: "rgba(245,158,11,0.07)", border: "1px solid rgba(245,158,11,0.2)" }}
                 >
                   <p
                     className="text-xs tracking-widest uppercase mb-1 text-center"
-                    style={{ color: "#a855f7" }}
+                    style={{ color: "#fbbf24" }}
                   >
                     Booking Reference
                   </p>
@@ -1149,13 +1149,13 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                     className="flex justify-between py-1.5 text-sm bm-summary-row"
                     style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}
                   >
-                    <span style={{ color: "rgba(255,255,255,0.35)" }}>{k}</span>
+                    <span style={{ color: "rgba(255,255,255,0.65)" }}>{k}</span>
                     <span className="font-medium text-white bm-summary-val">{v}</span>
                   </div>
                 ))}
 
                 {confirmedStatus === "Pending" && (
-                  <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.2)" }}>
+                  <p className="text-xs mt-3 text-center" style={{ color: "rgba(255,255,255,0.5)" }}>
                     This page checks for updates automatically every 12 seconds.
                   </p>
                 )}
@@ -1163,7 +1163,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                   <a
                     href="/booking-status"
                     style={{
-                      color: "#a855f7",
+                      color: "#fbbf24",
                       fontSize: "0.78rem",
                       textDecoration: "none",
                       display: "inline-flex",
@@ -1186,8 +1186,8 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
               <button
                 onClick={() => setStep((s) => s - 1)}
                 className="px-5 py-2.5 rounded-xl text-sm transition-all"
-                style={{ border: "1px solid rgba(167,139,250,0.2)", color: "#c084fc" }}
-                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(124,58,237,0.1)")}
+                style={{ border: "1px solid rgba(245,158,11,0.2)", color: "#fcd34d" }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(245,158,11,0.1)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 ← Back
@@ -1198,7 +1198,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
                 onClick={next}
                 disabled={loading}
                 className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
-                style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)", opacity: loading ? 0.6 : 1 }}
+                style={{ background: "linear-gradient(135deg,#d97706,#fbbf24)", opacity: loading ? 0.6 : 1 }}
               >
                 {loading ? "Booking..." : step === 4 ? "Confirm Booking →" : "Next →"}
               </button>
@@ -1206,7 +1206,7 @@ export default function BookingModal({ hall: initialHall, onClose, onSuccess }) 
               <button
                 onClick={onClose}
                 className="px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-                style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}
+                style={{ background: "linear-gradient(135deg,#d97706,#fbbf24)" }}
               >
                 Done
               </button>

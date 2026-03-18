@@ -5,7 +5,7 @@ import api from "../services/api";
 const ROLES = ["manager", "waiter", "chef", "security", "cleaner", "decorator"];
 
 const ROLE_META = {
-  manager:   { icon: "👔", color: "#a855f7", bg: "rgba(168,85,247,0.14)", border: "rgba(168,85,247,0.38)" },
+  manager:   { icon: "👔", color: "#818cf8", bg: "rgba(79,70,229,0.14)", border: "rgba(99,102,241,0.38)" },
   waiter:    { icon: "🍽️", color: "#06b6d4", bg: "rgba(6,182,212,0.14)",  border: "rgba(6,182,212,0.38)"  },
   chef:      { icon: "👨‍🍳", color: "#f59e0b", bg: "rgba(245,158,11,0.14)", border: "rgba(245,158,11,0.38)" },
   security:  { icon: "🛡️", color: "#10b981", bg: "rgba(16,185,129,0.14)", border: "rgba(16,185,129,0.38)" },
@@ -62,7 +62,7 @@ const CSS = `
   .emp-box {
     width:100%;max-width:460px;
     background:#0f0a28;
-    border:1px solid rgba(139,92,246,.22);
+    border:1px solid rgba(99,102,241,.22);
     border-radius:16px;overflow:hidden;
     box-shadow:0 28px 80px rgba(0,0,0,.78);
     animation:empIn .2s cubic-bezier(.22,1,.36,1);
@@ -75,13 +75,13 @@ const CSS = `
     overflow-y:auto;flex:1;
   }
   .emp-scroll::-webkit-scrollbar{width:3px}
-  .emp-scroll::-webkit-scrollbar-thumb{background:rgba(147,51,234,.3);border-radius:2px}
+  .emp-scroll::-webkit-scrollbar-thumb{background:rgba(99,102,241,.3);border-radius:2px}
 
   /* ── Header ── */
   .emp-hd {
     padding:1.1rem 1.2rem .95rem;
     display:flex;gap:.85rem;align-items:flex-start;
-    border-bottom:1px solid rgba(139,92,246,.12);
+    border-bottom:1px solid rgba(99,102,241,.12);
     transition:background .3s;
     flex-shrink:0;
   }
@@ -109,21 +109,21 @@ const CSS = `
   .emp-lbl {
     display:flex;justify-content:space-between;align-items:center;
     font-size:.59rem;font-weight:700;letter-spacing:.12em;
-    text-transform:uppercase;color:rgba(196,139,252,.5);
+    text-transform:uppercase;color:rgba(165,180,252,.85);
     margin-bottom:.22rem;
   }
-  .emp-lbl-cnt { color:rgba(196,139,252,.28);font-weight:400;letter-spacing:0;text-transform:none;font-size:.59rem; }
+  .emp-lbl-cnt { color:#94a3b8;font-weight:400;letter-spacing:0;text-transform:none;font-size:.59rem; }
 
   .emp-inp {
     width:100%;padding:.58rem .8rem;border-radius:8px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(139,92,246,.18);
+    background:#1e2433;
+    border:1px solid rgba(99,102,241,.35);
     color:white;font-size:.83rem;outline:none;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     transition:border-color .15s,background .15s;
     box-sizing:border-box;
   }
-  .emp-inp:focus  { border-color:rgba(147,51,234,.55);background:rgba(255,255,255,.07); }
+  .emp-inp:focus  { border-color:rgba(99,102,241,.55);background:#1e2433; }
   .emp-inp.err    { border-color:rgba(239,68,68,.5);background:rgba(239,68,68,.04); }
   .emp-inp::placeholder { color:rgba(255,255,255,.17); }
   .emp-inp[type=date]   { color-scheme:dark; }
@@ -134,19 +134,19 @@ const CSS = `
   .emp-dd { position:relative; }
   .emp-dd-btn {
     width:100%;padding:.58rem .8rem;border-radius:8px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(139,92,246,.18);
+    background:#1e2433;
+    border:1px solid rgba(99,102,241,.35);
     color:white;cursor:pointer;outline:none;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     display:flex;align-items:center;justify-content:space-between;
     transition:all .15s;box-sizing:border-box;
   }
   .emp-dd-btn:focus,.emp-dd-btn.open {
-    border-color:rgba(147,51,234,.55);background:rgba(255,255,255,.07);
+    border-color:rgba(99,102,241,.55);background:#1e2433;
   }
   .emp-dd-list {
     position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:9999;
-    background:#100929;border:1px solid rgba(139,92,246,.22);
+    background:#1e2433;border:1px solid rgba(99,102,241,.22);
     border-radius:10px;overflow:hidden;
     box-shadow:0 18px 50px rgba(0,0,0,.7);
   }
@@ -155,9 +155,9 @@ const CSS = `
     background:transparent;border-left:3px solid transparent;
     display:flex;align-items:center;gap:.55rem;
     cursor:pointer;transition:background .1s;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
   }
-  .emp-dd-opt:hover   { background:rgba(255,255,255,.04); }
+  .emp-dd-opt:hover   { background:#1e2433; }
   .emp-dd-opt.sel     { background:var(--dbg);border-left-color:var(--dc); }
 
   /* ── Toggle ── */
@@ -175,31 +175,31 @@ const CSS = `
   .emp-acts { display:flex;gap:.55rem;justify-content:flex-end;margin-top:.9rem; }
   .emp-cancel {
     padding:.55rem 1.1rem;border-radius:8px;cursor:pointer;
-    border:1px solid rgba(139,92,246,.2);background:transparent;
-    color:rgba(196,139,252,.5);font-size:.82rem;font-weight:500;
-    font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+    border:1px solid rgba(99,102,241,.4);background:transparent;
+    color:rgba(165,180,252,.85);font-size:.82rem;font-weight:500;
+    font-family:'Inter',sans-serif;transition:all .15s;
   }
-  .emp-cancel:hover { border-color:rgba(139,92,246,.4);color:rgba(196,139,252,.8); }
+  .emp-cancel:hover { border-color:rgba(99,102,241,.4);color:#a5b4fc; }
   .emp-save {
     padding:.55rem 1.3rem;border-radius:8px;border:none;cursor:pointer;
-    background:linear-gradient(135deg,#6d28d9,#9333ea);
+    background:linear-gradient(135deg,#4f46e5,#7c3aed);
     color:white;font-size:.82rem;font-weight:700;
-    font-family:'Plus Jakarta Sans',sans-serif;
+    font-family:'Inter',sans-serif;
     min-width:115px;display:flex;align-items:center;justify-content:center;gap:.38rem;
-    box-shadow:0 4px 16px rgba(109,40,217,.38);transition:all .15s;
+    box-shadow:0 4px 16px rgba(99,102,241,.38);transition:all .15s;
   }
-  .emp-save:hover:not(:disabled) { transform:translateY(-1px);box-shadow:0 6px 22px rgba(109,40,217,.52); }
+  .emp-save:hover:not(:disabled) { transform:translateY(-1px);box-shadow:0 6px 22px rgba(79,70,229,.52); }
   .emp-save:disabled { opacity:.5;cursor:not-allowed;transform:none; }
 
   /* ── Employee row ── */
   .emp-row {
     display:flex;align-items:center;gap:.8rem;
     padding:.75rem 1rem;border-radius:12px;
-    border:1px solid rgba(139,92,246,.1);
-    background:rgba(255,255,255,.02);
+    border:1px solid rgba(99,102,241,.3);
+    background:#1e2433;
     transition:all .14s;cursor:pointer;
   }
-  .emp-row:hover { border-color:rgba(147,51,234,.28);background:rgba(109,40,217,.07); }
+  .emp-row:hover { border-color:rgba(99,102,241,.28);background:rgba(79,70,229,.07); }
 
   /* ── Responsive ── */
   @media(max-width:500px) {
@@ -238,7 +238,7 @@ function Avatar({ employee, size = 40 }) {
   );
   const initials = employee.name ? employee.name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) : "?";
   return (
-    <div style={{ width: size, height: size, borderRadius: "50%", flexShrink: 0, background: m.bg, border: `2px solid ${m.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.32, fontWeight: 700, color: m.color, fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+    <div style={{ width: size, height: size, borderRadius: "50%", flexShrink: 0, background: m.bg, border: `2px solid ${m.border}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: size * 0.32, fontWeight: 700, color: m.color, fontFamily: "'Inter',sans-serif" }}>
       {initials}
     </div>
   );
@@ -268,7 +268,7 @@ function RoleDropdown({ value, onChange }) {
             {value}
           </span>
         </span>
-        <span style={{ color: "rgba(167,139,250,.4)", fontSize: ".58rem", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0)", transition: "transform .18s" }}>▼</span>
+        <span style={{ color: "rgba(99,102,241,.4)", fontSize: ".58rem", display: "inline-block", transform: open ? "rotate(180deg)" : "rotate(0)", transition: "transform .18s" }}>▼</span>
       </button>
 
       {open && (
@@ -370,10 +370,10 @@ function EmployeeModal({ employee, onClose, onSave }) {
             <div style={{ flex: 1, minWidth: 0 }}>
               {/* Title row */}
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: ".5rem", marginBottom: ".35rem" }}>
-                <h3 className="emp-hd-title" style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "1.15rem", fontWeight: 600, margin: 0, lineHeight: 1.15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <h3 className="emp-hd-title" style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "1.15rem", fontWeight: 600, margin: 0, lineHeight: 1.15, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                   {isEdit ? "Edit Employee" : "Add New Employee"}
                 </h3>
-                <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: "7px", flexShrink: 0, border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.42)", cursor: "pointer", fontSize: ".82rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+                <button onClick={onClose} style={{ width: 26, height: 26, borderRadius: "7px", flexShrink: 0, border: "1px solid rgba(255,255,255,.1)", background: "#1e2433", color: "rgba(255,255,255,.42)", cursor: "pointer", fontSize: ".82rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
               </div>
 
               {/* Designation badge + active toggle */}
@@ -398,7 +398,7 @@ function EmployeeModal({ employee, onClose, onSave }) {
               {/* Photo URL or remove */}
               <div style={{ marginTop: ".38rem" }}>
                 {preview ? (
-                  <button type="button" onClick={() => { setPreview(""); set("image", ""); }} style={{ padding: "1px 8px", borderRadius: "999px", fontSize: ".62rem", border: "1px solid rgba(239,68,68,.28)", background: "rgba(239,68,68,.08)", color: "#f87171", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif" }}>
+                  <button type="button" onClick={() => { setPreview(""); set("image", ""); }} style={{ padding: "1px 8px", borderRadius: "999px", fontSize: ".62rem", border: "1px solid rgba(239,68,68,.28)", background: "rgba(239,68,68,.08)", color: "#f87171", cursor: "pointer", fontFamily: "'Inter',sans-serif" }}>
                     ✕ Remove photo
                   </button>
                 ) : (
@@ -543,9 +543,9 @@ function EmployeeViewModal({ employee, onClose, onEdit }) {
         <div className="emp-box" style={{ maxWidth: 380 }}>
           {/* Header */}
           <div style={{ padding: "1.2rem 1.2rem .9rem", textAlign: "center", background: `linear-gradient(135deg,${meta.bg},rgba(15,10,40,0))`, borderBottom: `1px solid ${meta.border}`, position: "relative", flexShrink: 0 }}>
-            <button onClick={onClose} style={{ position: "absolute", top: ".85rem", right: ".85rem", width: 26, height: 26, borderRadius: "7px", border: "1px solid rgba(255,255,255,.1)", background: "rgba(255,255,255,.06)", color: "rgba(255,255,255,.42)", cursor: "pointer", fontSize: ".82rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
+            <button onClick={onClose} style={{ position: "absolute", top: ".85rem", right: ".85rem", width: 26, height: 26, borderRadius: "7px", border: "1px solid rgba(255,255,255,.1)", background: "#1e2433", color: "rgba(255,255,255,.42)", cursor: "pointer", fontSize: ".82rem", display: "flex", alignItems: "center", justifyContent: "center" }}>✕</button>
             <Avatar employee={employee} size={62} />
-            <h3 style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "1.2rem", fontWeight: 600, margin: ".55rem 0 .25rem" }}>{employee.name}</h3>
+            <h3 style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "1.2rem", fontWeight: 600, margin: ".55rem 0 .25rem" }}>{employee.name}</h3>
             <span style={{ display: "inline-flex", alignItems: "center", gap: ".22rem", padding: "2px 10px", borderRadius: "999px", fontSize: ".67rem", fontWeight: 700, textTransform: "capitalize", background: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}>
               {meta.icon} {employee.role}
             </span>
@@ -555,7 +555,7 @@ function EmployeeViewModal({ employee, onClose, onEdit }) {
             <div style={{ padding: ".9rem 1.1rem 1.1rem" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: ".38rem", marginBottom: ".9rem" }}>
                 {rows.map(r => (
-                  <div key={r.label} style={{ display: "flex", alignItems: "center", gap: ".6rem", padding: ".42rem .72rem", borderRadius: "8px", background: "rgba(255,255,255,.03)", border: "1px solid rgba(139,92,246,.09)" }}>
+                  <div key={r.label} style={{ display: "flex", alignItems: "center", gap: ".6rem", padding: ".42rem .72rem", borderRadius: "8px", background: "#1e2433", border: "1px solid rgba(99,102,241,.09)" }}>
                     <span style={{ fontSize: ".82rem", width: 19, textAlign: "center", flexShrink: 0 }}>{r.icon}</span>
                     <div>
                       <p style={{ color: "rgba(255,255,255,.22)", fontSize: ".57rem", textTransform: "uppercase", letterSpacing: ".1em", margin: 0 }}>{r.label}</p>
@@ -565,8 +565,8 @@ function EmployeeViewModal({ employee, onClose, onEdit }) {
                 ))}
               </div>
               <div style={{ display: "flex", gap: ".5rem" }}>
-                <button onClick={onClose} style={{ flex: 1, padding: ".52rem", borderRadius: "8px", border: "1px solid rgba(139,92,246,.18)", background: "transparent", color: "rgba(196,139,252,.5)", fontSize: ".8rem", fontFamily: "'Plus Jakarta Sans',sans-serif", cursor: "pointer" }}>Close</button>
-                <button onClick={() => { onClose(); onEdit(employee); }} style={{ flex: 1, padding: ".52rem", borderRadius: "8px", border: "none", background: "linear-gradient(135deg,#6d28d9,#9333ea)", color: "white", fontSize: ".8rem", fontWeight: 700, fontFamily: "'Plus Jakarta Sans',sans-serif", cursor: "pointer" }}>✏ Edit</button>
+                <button onClick={onClose} style={{ flex: 1, padding: ".52rem", borderRadius: "8px", border: "1px solid rgba(99,102,241,.18)", background: "transparent", color: "#94a3b8", fontSize: ".8rem", fontFamily: "'Inter',sans-serif", cursor: "pointer" }}>Close</button>
+                <button onClick={() => { onClose(); onEdit(employee); }} style={{ flex: 1, padding: ".52rem", borderRadius: "8px", border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontSize: ".8rem", fontWeight: 700, fontFamily: "'Inter',sans-serif", cursor: "pointer" }}>✏ Edit</button>
               </div>
             </div>
           </div>
@@ -629,8 +629,8 @@ export default function EmployeesTab({ toast }) {
       {/* ── Header ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.3rem", flexWrap: "wrap", gap: ".7rem" }}>
         <div>
-          <h2 style={{ fontFamily: "'Cormorant Garamond',serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 3px" }}>
-            Manage <em style={{ color: "#9333ea" }}>Employees</em>
+          <h2 style={{ fontFamily: "'Sora',sans-serif", color: "white", fontSize: "clamp(1.4rem,4vw,1.75rem)", fontWeight: 600, margin: "0 0 3px" }}>
+            Manage <em style={{ color: "#6366f1" }}>Employees</em>
           </h2>
           <p style={{ color: "rgba(255,255,255,.27)", fontSize: ".77rem", margin: 0 }}>
             {filtered.length !== employees.length ? `${filtered.length} of ${employees.length}` : employees.length} team member{employees.length !== 1 ? "s" : ""}
@@ -640,16 +640,16 @@ export default function EmployeesTab({ toast }) {
         {/* Search + Add */}
         <div style={{ display: "flex", gap: ".5rem", alignItems: "center", flexWrap: "wrap" }}>
           <div style={{ position: "relative" }}>
-            <span style={{ position: "absolute", left: ".72rem", top: "50%", transform: "translateY(-50%)", color: "rgba(167,139,250,.35)", fontSize: ".82rem", pointerEvents: "none" }}>🔍</span>
+            <span style={{ position: "absolute", left: ".72rem", top: "50%", transform: "translateY(-50%)", color: "rgba(99,102,241,.35)", fontSize: ".82rem", pointerEvents: "none" }}>🔍</span>
             <input className="a-input" value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search…"
               style={{ paddingLeft: "2rem", width: "clamp(140px,30vw,210px)", fontSize: ".8rem" }} />
           </div>
           <button
-            style={{ padding: ".58rem 1.1rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg,#6d28d9,#9333ea)", color: "white", fontWeight: 600, fontSize: ".82rem", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif", boxShadow: "0 4px 14px rgba(109,40,217,.38)", whiteSpace: "nowrap", transition: "all .15s" }}
+            style={{ padding: ".58rem 1.1rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontWeight: 600, fontSize: ".82rem", cursor: "pointer", fontFamily: "'Inter',sans-serif", boxShadow: "0 4px 14px rgba(99,102,241,.38)", whiteSpace: "nowrap", transition: "all .15s" }}
             onClick={() => setModal("new")}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(109,40,217,.5)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 14px rgba(109,40,217,.38)"; }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-1px)"; e.currentTarget.style.boxShadow = "0 6px 20px rgba(79,70,229,.5)"; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ""; e.currentTarget.style.boxShadow = "0 4px 14px rgba(99,102,241,.38)"; }}
           >
             + Add Employee
           </button>
@@ -659,7 +659,7 @@ export default function EmployeesTab({ toast }) {
       {/* ── Stats ── */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: ".75rem", marginBottom: "1.2rem" }}>
         {[
-          { label: "Total Staff",     value: employees.length,                         icon: "👥", color: "#9333ea" },
+          { label: "Total Staff",     value: employees.length,                         icon: "👥", color: "#6366f1" },
           { label: "Active",          value: active,                                   icon: "🟢", color: "#10b981" },
           { label: "Inactive",        value: employees.length - active,                icon: "🔴", color: "#ef4444" },
           { label: "Monthly Payroll", value: `${(totalSalary / 1000).toFixed(0)}K PKR`, icon: "💰", color: "#f59e0b" },
@@ -668,7 +668,7 @@ export default function EmployeesTab({ toast }) {
             <div style={{ width: 36, height: 36, borderRadius: "10px", background: `${s.color}1a`, border: `1px solid ${s.color}2e`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", flexShrink: 0 }}>{s.icon}</div>
             <div>
               <p style={{ color: "rgba(255,255,255,.27)", fontSize: ".6rem", letterSpacing: ".1em", textTransform: "uppercase", margin: "0 0 1px" }}>{s.label}</p>
-              <p style={{ color: "white", fontSize: "1.25rem", fontWeight: 700, fontFamily: "'Cormorant Garamond',serif", margin: 0, lineHeight: 1 }}>{s.value}</p>
+              <p style={{ color: "white", fontSize: "1.25rem", fontWeight: 700, fontFamily: "'Sora',sans-serif", margin: 0, lineHeight: 1 }}>{s.value}</p>
             </div>
           </div>
         ))}
@@ -682,15 +682,15 @@ export default function EmployeesTab({ toast }) {
           return (
             <button key={r} onClick={() => setRoleFilter(r)} style={{
               padding: ".28rem .72rem", borderRadius: "999px", fontSize: ".71rem",
-              fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: "pointer",
-              border: `1px solid ${on ? (m?.border || "rgba(147,51,234,.5)") : "rgba(139,92,246,.15)"}`,
-              background: on ? (m ? m.bg : "rgba(109,40,217,.22)") : "transparent",
-              color: on ? (m?.color || "white") : "rgba(196,139,252,.42)",
+              fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: "pointer",
+              border: `1px solid ${on ? (m?.border || "rgba(99,102,241,.5)") : "rgba(99,102,241,.15)"}`,
+              background: on ? (m ? m.bg : "rgba(79,70,229,.22)") : "transparent",
+              color: on ? (m?.color || "white") : "rgba(240,212,154,.42)",
               transition: "all .13s", display: "flex", alignItems: "center", gap: ".27rem",
             }}>
               {m && <span style={{ fontSize: ".74rem" }}>{m.icon}</span>}
               <span style={{ textTransform: "capitalize" }}>{r}</span>
-              <span style={{ background: on ? "rgba(255,255,255,.15)" : "rgba(139,92,246,.12)", borderRadius: "999px", padding: "0 5px", fontSize: ".59rem", fontWeight: 700 }}>
+              <span style={{ background: on ? "rgba(255,255,255,.15)" : "rgba(99,102,241,.12)", borderRadius: "999px", padding: "0 5px", fontSize: ".59rem", fontWeight: 700 }}>
                 {roleCounts[r] || 0}
               </span>
             </button>
@@ -705,13 +705,13 @@ export default function EmployeesTab({ toast }) {
           Loading employees…
         </div>
       ) : filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(139,92,246,.09)", borderRadius: "13px" }}>
+        <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(99,102,241,.09)", borderRadius: "13px" }}>
           <p style={{ fontSize: "2rem", marginBottom: ".6rem" }}>🔍</p>
           <p style={{ color: "rgba(255,255,255,.2)", fontSize: ".86rem", marginBottom: ".9rem" }}>
             {employees.length === 0 ? "No employees yet. Add your first team member." : "No employees match your search."}
           </p>
           {employees.length === 0 && (
-            <button style={{ padding: ".58rem 1.2rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg,#6d28d9,#9333ea)", color: "white", fontWeight: 600, fontSize: ".82rem", cursor: "pointer", fontFamily: "'Plus Jakarta Sans',sans-serif" }}
+            <button style={{ padding: ".58rem 1.2rem", borderRadius: "10px", border: "none", background: "linear-gradient(135deg,#4f46e5,#7c3aed)", color: "white", fontWeight: 600, fontSize: ".82rem", cursor: "pointer", fontFamily: "'Inter',sans-serif" }}
               onClick={() => setModal("new")}>
               + Add First Employee
             </button>
@@ -742,8 +742,8 @@ export default function EmployeesTab({ toast }) {
                     </div>
                   </div>
                   <div style={{ display: "flex", gap: ".28rem", flexShrink: 0 }} onClick={e => e.stopPropagation()}>
-                    <button onClick={() => setModal(emp)} style={{ padding: ".26rem .6rem", borderRadius: "6px", border: "1px solid rgba(167,139,250,.18)", background: "transparent", color: "#c084fc", fontSize: ".7rem", fontFamily: "'Plus Jakarta Sans',sans-serif", cursor: "pointer" }}>✏</button>
-                    <button onClick={() => handleDelete(emp._id)} style={{ padding: ".26rem .6rem", borderRadius: "6px", border: "1px solid rgba(239,68,68,.16)", background: "rgba(239,68,68,.06)", color: "#f87171", fontSize: ".7rem", fontFamily: "'Plus Jakarta Sans',sans-serif", cursor: "pointer" }}>🗑</button>
+                    <button onClick={() => setModal(emp)} style={{ padding: ".26rem .6rem", borderRadius: "6px", border: "1px solid rgba(99,102,241,.18)", background: "transparent", color: "#a5b4fc", fontSize: ".7rem", fontFamily: "'Inter',sans-serif", cursor: "pointer" }}>✏</button>
+                    <button onClick={() => handleDelete(emp._id)} style={{ padding: ".26rem .6rem", borderRadius: "6px", border: "1px solid rgba(239,68,68,.16)", background: "rgba(239,68,68,.06)", color: "#f87171", fontSize: ".7rem", fontFamily: "'Inter',sans-serif", cursor: "pointer" }}>🗑</button>
                   </div>
                 </div>
               );
@@ -754,17 +754,17 @@ export default function EmployeesTab({ toast }) {
           {totalPages > 1 && (
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: ".32rem", marginTop: "1.3rem", flexWrap: "wrap" }}>
               <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-                style={{ padding: ".32rem .72rem", borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: page === 1 ? "not-allowed" : "pointer", border: "1px solid rgba(139,92,246,.17)", background: "transparent", color: page === 1 ? "rgba(196,139,252,.15)" : "#c084fc" }}>
+                style={{ padding: ".32rem .72rem", borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: page === 1 ? "not-allowed" : "pointer", border: "1px solid rgba(99,102,241,.17)", background: "transparent", color: page === 1 ? "rgba(165,180,252,.15)" : "#a5b4fc" }}>
                 ← Prev
               </button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(n => (
                 <button key={n} onClick={() => setPage(n)}
-                  style={{ width: 29, height: 29, borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 700, cursor: "pointer", border: `1px solid ${page === n ? "rgba(147,51,234,.46)" : "rgba(139,92,246,.13)"}`, background: page === n ? "linear-gradient(135deg,rgba(109,40,217,.4),rgba(147,51,234,.25))" : "transparent", color: page === n ? "white" : "rgba(196,139,252,.36)" }}>
+                  style={{ width: 29, height: 29, borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Inter',sans-serif", fontWeight: 700, cursor: "pointer", border: `1px solid ${page === n ? "rgba(212,168,83,.46)" : "rgba(99,102,241,.13)"}`, background: page === n ? "linear-gradient(135deg,rgba(79,70,229,.4),rgba(99,102,241,.25))" : "transparent", color: page === n ? "white" : "rgba(240,212,154,.36)" }}>
                   {n}
                 </button>
               ))}
               <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-                style={{ padding: ".32rem .72rem", borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 600, cursor: page === totalPages ? "not-allowed" : "pointer", border: "1px solid rgba(139,92,246,.17)", background: "transparent", color: page === totalPages ? "rgba(196,139,252,.15)" : "#c084fc" }}>
+                style={{ padding: ".32rem .72rem", borderRadius: "7px", fontSize: ".72rem", fontFamily: "'Inter',sans-serif", fontWeight: 600, cursor: page === totalPages ? "not-allowed" : "pointer", border: "1px solid rgba(99,102,241,.17)", background: "transparent", color: page === totalPages ? "rgba(165,180,252,.15)" : "#a5b4fc" }}>
                 Next →
               </button>
             </div>

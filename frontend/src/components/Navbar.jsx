@@ -18,14 +18,14 @@ export default function Navbar({ onBookNow }) {
       style={{
         background: scrolled ? "rgba(7,5,15,0.96)" : "transparent",
         backdropFilter: scrolled ? "blur(14px)" : "none",
-        borderBottom: scrolled ? "1px solid rgba(167,139,250,0.12)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(245,158,11,0.12)" : "none",
         padding: scrolled ? "0.75rem 0" : "1.25rem 0",
       }}
     >
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
         <a href="/" style={{ fontFamily: "'Playfair Display',serif" }} className="text-xl font-semibold">
-          <span style={{ color: "#a855f7" }}>Noor</span>
+          <span style={{ color: "#fbbf24" }}>Noor</span>
           <span className="text-white"> Mahal</span>
         </a>
 
@@ -36,8 +36,8 @@ export default function Navbar({ onBookNow }) {
               key={l}
               href={`#${l.toLowerCase()}`}
               className="text-sm transition-colors"
-              style={{ color: "rgba(255,255,255,0.5)", letterSpacing: "0.05em" }}
-              onMouseEnter={(e) => (e.target.style.color = "#c084fc")}
+              style={{ color: "rgba(255,255,255,0.75)", letterSpacing: "0.05em" }}
+              onMouseEnter={(e) => (e.target.style.color = "#fcd34d")}
               onMouseLeave={(e) => (e.target.style.color = "rgba(255,255,255,0.5)")}
             >
               {l}
@@ -46,9 +46,9 @@ export default function Navbar({ onBookNow }) {
           <a
             href="/booking-status"
             className="text-sm transition-colors"
-            style={{ color: "rgba(167,139,250,0.6)", letterSpacing: "0.05em" }}
-            onMouseEnter={(e) => (e.target.style.color = "#c084fc")}
-            onMouseLeave={(e) => (e.target.style.color = "rgba(167,139,250,0.6)")}
+            style={{ color: "rgba(245,158,11,0.6)", letterSpacing: "0.05em" }}
+            onMouseEnter={(e) => (e.target.style.color = "#fcd34d")}
+            onMouseLeave={(e) => (e.target.style.color = "rgba(245,158,11,0.6)")}
           >
             Track Booking
           </a>
@@ -58,7 +58,7 @@ export default function Navbar({ onBookNow }) {
         <button
           onClick={onBookNow}
           className="px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-all"
-          style={{ background: "linear-gradient(135deg,#7c3aed,#a855f7)" }}
+          style={{ background: "linear-gradient(135deg,#d97706,#fbbf24)" }}
           onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
           onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
         >

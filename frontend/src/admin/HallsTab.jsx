@@ -27,10 +27,10 @@ function HallModal({ hall, onClose, onSave }) {
       <div className="modal-box" style={{ maxWidth:500 }}>
         <div style={{ padding:"1.75rem" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem" }}>
-            <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.5rem", fontWeight:600, margin:0 }}>
+            <h3 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.5rem", fontWeight:600, margin:0 }}>
               {hall?._id ? "Edit Hall" : "Add New Hall"}
             </h3>
-            <button onClick={onClose} style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.08)", borderRadius:"10px", color:"rgba(255,255,255,0.5)", fontSize:"1rem", cursor:"pointer", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
+            <button onClick={onClose} style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:"10px", color:"#cbd5e1", fontSize:"1rem", cursor:"pointer", width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center" }}>✕</button>
           </div>
 
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"1rem" }}>
@@ -100,26 +100,26 @@ export default function HallsTab({ toast }) {
     <div>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"1.5rem", flexWrap:"wrap", gap:"0.75rem" }}>
         <div>
-          <h2 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
-            Manage <em style={{ color:"#9333ea", fontStyle:"italic" }}>Halls</em>
+          <h2 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.75rem", fontWeight:600, margin:"0 0 4px" }}>
+            Manage <em style={{ color:"#6366f1", fontStyle:"italic" }}>Halls</em>
           </h2>
           <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.8rem", margin:0 }}>{halls.length} venue{halls.length!==1?"s":""} configured</p>
         </div>
         <button style={btnPrimary} onClick={()=>setModal("new")}
-          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(109,40,217,0.4)";}}
+          onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-1px)";e.currentTarget.style.boxShadow="0 8px 24px rgba(79,70,229,0.4)";}}
           onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
           + Add Hall
         </button>
       </div>
 
       {loading ? (
-        <div style={{ textAlign:"center", padding:"4rem", color:"rgba(255,255,255,0.25)" }}>
+        <div style={{ textAlign:"center", padding:"4rem", color:"#94a3b8" }}>
           <div style={{ fontSize:"2rem", marginBottom:"0.75rem", opacity:0.4 }}>🏛️</div>Loading halls…
         </div>
       ) : halls.length===0 ? (
-        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(139,92,246,0.12)", borderRadius:"18px" }}>
+        <div style={{ textAlign:"center", padding:"4rem 2rem", border:"1px solid rgba(99,102,241,0.12)", borderRadius:"18px" }}>
           <p style={{ fontSize:"2.5rem", marginBottom:"0.75rem" }}>🏛️</p>
-          <p style={{ color:"rgba(255,255,255,0.4)", marginBottom:"1.25rem" }}>No halls yet. Add your first venue.</p>
+          <p style={{ color:"#94a3b8", marginBottom:"1.25rem" }}>No halls yet. Add your first venue.</p>
           <button style={btnPrimary} onClick={()=>setModal("new")}>+ Add First Hall</button>
         </div>
       ) : (
@@ -128,12 +128,12 @@ export default function HallsTab({ toast }) {
             <div key={h._id} className="hall-card">
               {h.image
                 ? <img src={h.image} alt={h.name} style={{ width:"100%", height:160, objectFit:"cover" }} />
-                : <div style={{ width:"100%", height:160, background:"linear-gradient(135deg,#2d1b6b,#1a0f3c)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem" }}>🏛️</div>
+                : <div style={{ width:"100%", height:160, background:"linear-gradient(135deg,#252d3d,#252d3d)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"3rem" }}>🏛️</div>
               }
               <div style={{ padding:"1.15rem" }}>
-                <h3 style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.15rem", fontWeight:600, margin:"0 0 0.3rem" }}>{h.name}</h3>
+                <h3 style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.15rem", fontWeight:600, margin:"0 0 0.3rem" }}>{h.name}</h3>
                 <div style={{ display:"flex", gap:"0.5rem", marginBottom:"0.4rem", flexWrap:"wrap" }}>
-                  <span style={{ background:"rgba(147,51,234,0.15)", border:"1px solid rgba(147,51,234,0.3)", borderRadius:"999px", padding:"2px 9px", color:"#c084fc", fontSize:"0.72rem", fontWeight:600 }}>
+                  <span style={{ background:"rgba(99,102,241,0.15)", border:"1px solid rgba(99,102,241,0.3)", borderRadius:"999px", padding:"2px 9px", color:"#a5b4fc", fontSize:"0.72rem", fontWeight:600 }}>
                     PKR {h.pricePerHead?.toLocaleString()}/head
                   </span>
                   <span style={{ background:"rgba(6,182,212,0.1)", border:"1px solid rgba(6,182,212,0.25)", borderRadius:"999px", padding:"2px 9px", color:"rgba(103,232,249,0.85)", fontSize:"0.72rem" }}>

@@ -3,7 +3,7 @@ import api from "../services/api";
 import { btnGhost, btnDanger } from "./adminTheme";
 
 const SLOT_TIMES  = { afternoon:"12:00 PM – 4:00 PM", evening:"5:00 PM – 9:00 PM", latenight:"10:00 PM – 2:00 AM" };
-const SLOT_COLOR  = { afternoon:"#06b6d4", evening:"#f59e0b", latenight:"#a855f7" };
+const SLOT_COLOR  = { afternoon:"#06b6d4", evening:"#f59e0b", latenight:"#818cf8" };
 const SLOT_LABEL  = { afternoon:"Afternoon", evening:"Evening", latenight:"Late Night" };
 
 const CAT_COLOR = {
@@ -20,20 +20,20 @@ const STATUS_CFG = {
   Confirmed: { color:"#10b981", bg:"rgba(16,185,129,0.1)",  border:"rgba(16,185,129,0.28)", icon:"✓", msg:"Booking confirmed. SMS has been sent to the client." },
   Pending:   { color:"#f59e0b", bg:"rgba(245,158,11,0.1)",  border:"rgba(245,158,11,0.28)", icon:"⏳", msg:"Awaiting manager confirmation. Client will be notified once approved." },
   Cancelled:  { color:"#ef4444", bg:"rgba(239,68,68,0.1)",   border:"rgba(239,68,68,0.28)",  icon:"✕", msg:"This booking has been cancelled. Please contact the client if needed." },
-  Completed:  { color:"#818cf8", bg:"rgba(129,140,248,0.1)", border:"rgba(129,140,248,0.28)", icon:"★", msg:"This event has been completed. Thank you for choosing Noor Mahal!" },
+  Completed:  { color:"#5eead4", bg:"rgba(94,234,212,0.1)", border:"rgba(94,234,212,0.28)", icon:"★", msg:"This event has been completed. Thank you for choosing Noor Mahal!" },
 };
 
 const fmt = d => d ? new Date(d).toLocaleDateString("en-PK",{weekday:"long",day:"numeric",month:"long",year:"numeric"}) : "—";
 
 function InfoRow({ icon, label, value, highlight, mono }) {
   return (
-    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.6rem 0", borderBottom:"1px solid rgba(255,255,255,0.05)", gap:"1rem" }}>
+    <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"0.6rem 0", borderBottom:"1px solid #252d3d", gap:"1rem" }}>
       <div style={{ display:"flex", alignItems:"center", gap:"0.55rem", flexShrink:0 }}>
         <span style={{ fontSize:"0.85rem", opacity:0.6, width:18, textAlign:"center" }}>{icon}</span>
         <span style={{ color:"rgba(255,255,255,0.32)", fontSize:"0.78rem", fontWeight:500 }}>{label}</span>
       </div>
       <span style={{
-        color: highlight?"#c084fc":"rgba(255,255,255,0.88)",
+        color: highlight?"#a5b4fc":"rgba(255,255,255,0.88)",
         fontSize: mono?"0.8rem":"0.82rem",
         fontWeight: highlight?700:500,
         textAlign:"right",
@@ -126,11 +126,11 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
   return (
     <div className="bdm-dishes" style={{ padding:"0.75rem 1.7rem 0" }}>
       {/* Section header */}
-      <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", marginBottom:"0.75rem", paddingTop:"0.5rem", borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+      <div style={{ display:"flex", alignItems:"center", gap:"0.6rem", marginBottom:"0.75rem", paddingTop:"0.5rem", borderTop:"1px solid #252d3d" }}>
         <span style={{ fontSize:"0.85rem", opacity:0.6 }}>🍽️</span>
         <span style={{ color:"rgba(255,255,255,0.32)", fontSize:"0.78rem", fontWeight:500 }}>Selected Menu</span>
         {!loading && dishes.length > 0 && (
-          <span style={{ marginLeft:"auto", background:"rgba(147,51,234,0.15)", border:"1px solid rgba(147,51,234,0.3)", borderRadius:999, padding:"1px 8px", color:"#c084fc", fontSize:"0.65rem", fontWeight:700 }}>
+          <span style={{ marginLeft:"auto", background:"rgba(99,102,241,0.15)", border:"1px solid rgba(99,102,241,0.3)", borderRadius:999, padding:"1px 8px", color:"#a5b4fc", fontSize:"0.65rem", fontWeight:700 }}>
             {dishes.length} dish{dishes.length !== 1 ? "es" : ""}
           </span>
         )}
@@ -138,21 +138,21 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
         {!editing && (
           <button
             onClick={openEditor}
-            style={{ marginLeft: dishes.length > 0 ? "0.5rem" : "auto", padding:"2px 10px", borderRadius:8, fontSize:"0.65rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(147,51,234,0.3)", background:"rgba(147,51,234,0.1)", color:"#c084fc", transition:"all 0.15s" }}
-            onMouseEnter={e=>e.currentTarget.style.background="rgba(147,51,234,0.25)"}
-            onMouseLeave={e=>e.currentTarget.style.background="rgba(147,51,234,0.1)"}
+            style={{ marginLeft: dishes.length > 0 ? "0.5rem" : "auto", padding:"2px 10px", borderRadius:8, fontSize:"0.65rem", fontWeight:600, cursor:"pointer", border:"1px solid rgba(99,102,241,0.3)", background:"rgba(99,102,241,0.1)", color:"#a5b4fc", transition:"all 0.15s" }}
+            onMouseEnter={e=>e.currentTarget.style.background="rgba(99,102,241,0.25)"}
+            onMouseLeave={e=>e.currentTarget.style.background="rgba(99,102,241,0.1)"}
           >✏️ Edit</button>
         )}
       </div>
 
       {/* ── Inline dish editor ── */}
       {editing && (
-        <div style={{ border:"1px solid rgba(147,51,234,0.3)", borderRadius:12, overflow:"hidden", marginBottom:"0.75rem" }}>
+        <div style={{ border:"1px solid rgba(99,102,241,0.3)", borderRadius:12, overflow:"hidden", marginBottom:"0.75rem" }}>
           {/* Tabs */}
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:0, borderBottom:"1px solid rgba(147,51,234,0.2)" }}>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(4,1fr)", gap:0, borderBottom:"1px solid rgba(99,102,241,0.2)" }}>
             {DISH_CAT_META.map(cat => (
               <button key={cat.key} type="button" onClick={() => setActiveTab(cat.key)}
-                style={{ padding:"7px 4px", fontSize:"0.68rem", fontWeight:600, cursor:"pointer", border:"none", background: activeTab===cat.key ? "rgba(124,58,237,0.35)" : "rgba(255,255,255,0.03)", color: activeTab===cat.key ? "white" : "rgba(255,255,255,0.4)", borderRight:"1px solid rgba(147,51,234,0.15)", transition:"all 0.15s" }}>
+                style={{ padding:"7px 4px", fontSize:"0.68rem", fontWeight:600, cursor:"pointer", border:"none", background: activeTab===cat.key ? "rgba(79,70,229,0.35)" : "#1e2433", color: activeTab===cat.key ? "white" : "#94a3b8", borderRight:"1px solid rgba(99,102,241,0.15)", transition:"all 0.15s" }}>
                 {cat.icon} {cat.short}
               </button>
             ))}
@@ -160,29 +160,29 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
           {/* Dish list */}
           <div style={{ padding:"8px", display:"flex", flexDirection:"column", gap:4, maxHeight:180, overflowY:"auto" }}>
             {editorTabDishes.length === 0
-              ? <p style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.72rem", padding:"8px", textAlign:"center" }}>No items in this category</p>
+              ? <p style={{ color:"#94a3b8", fontSize:"0.72rem", padding:"8px", textAlign:"center" }}>No items in this category</p>
               : editorTabDishes.map(d => {
                   const checked = selected.includes(String(d._id));
                   return (
                     <button key={d._id} type="button" onClick={() => toggleDish(String(d._id))}
-                      style={{ display:"flex", alignItems:"center", gap:8, padding:"5px 8px", borderRadius:7, cursor:"pointer", border:`1px solid ${checked ? "#9333ea" : "rgba(255,255,255,0.08)"}`, background: checked ? "rgba(124,58,237,0.2)" : "rgba(255,255,255,0.03)", textAlign:"left", transition:"all 0.12s" }}>
-                      <span style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${checked ? "#a855f7" : "rgba(255,255,255,0.25)"}`, background: checked ? "#7c3aed" : "transparent", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"white" }}>{checked ? "✓" : ""}</span>
-                      <span style={{ fontSize:"0.75rem", color: checked ? "white" : "rgba(255,255,255,0.7)", fontWeight: checked ? 600 : 400 }}>{d.name}</span>
+                      style={{ display:"flex", alignItems:"center", gap:8, padding:"5px 8px", borderRadius:7, cursor:"pointer", border:`1px solid ${checked ? "#6366f1" : "#252d3d"}`, background: checked ? "rgba(79,70,229,0.2)" : "#1e2433", textAlign:"left", transition:"all 0.12s" }}>
+                      <span style={{ width:14, height:14, borderRadius:3, border:`1.5px solid ${checked ? "#818cf8" : "#94a3b8"}`, background: checked ? "#4f46e5" : "transparent", flexShrink:0, display:"flex", alignItems:"center", justifyContent:"center", fontSize:9, color:"white" }}>{checked ? "✓" : ""}</span>
+                      <span style={{ fontSize:"0.75rem", color: checked ? "white" : "#cbd5e1", fontWeight: checked ? 600 : 400 }}>{d.name}</span>
                     </button>
                   );
                 })
             }
           </div>
           {/* Footer */}
-          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", borderTop:"1px solid rgba(147,51,234,0.15)", background:"rgba(255,255,255,0.02)" }}>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"8px 10px", borderTop:"1px solid rgba(99,102,241,0.15)", background:"#1e2433" }}>
             <span style={{ fontSize:"0.68rem", color:"rgba(255,255,255,0.3)" }}>{selected.length} selected</span>
             <div style={{ display:"flex", gap:6 }}>
               <button onClick={() => setEditing(false)}
-                style={{ padding:"4px 12px", borderRadius:7, fontSize:"0.7rem", cursor:"pointer", border:"1px solid rgba(255,255,255,0.12)", background:"transparent", color:"rgba(255,255,255,0.45)" }}>
+                style={{ padding:"4px 12px", borderRadius:7, fontSize:"0.7rem", cursor:"pointer", border:"1px solid rgba(255,255,255,0.12)", background:"transparent", color:"#94a3b8" }}>
                 Cancel
               </button>
               <button onClick={saveDishes} disabled={saving}
-                style={{ padding:"4px 14px", borderRadius:7, fontSize:"0.7rem", fontWeight:600, cursor: saving ? "not-allowed" : "pointer", border:"1px solid rgba(147,51,234,0.5)", background:"rgba(124,58,237,0.3)", color:"#c084fc", opacity: saving ? 0.6 : 1 }}>
+                style={{ padding:"4px 14px", borderRadius:7, fontSize:"0.7rem", fontWeight:600, cursor: saving ? "not-allowed" : "pointer", border:"1px solid rgba(99,102,241,0.5)", background:"rgba(79,70,229,0.3)", color:"#a5b4fc", opacity: saving ? 0.6 : 1 }}>
                 {saving ? "Saving…" : "Save"}
               </button>
             </div>
@@ -192,43 +192,43 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
 
       {!editing && (
         loading && hasIds ? (
-          <p style={{ color:"rgba(255,255,255,0.25)", fontSize:"0.78rem", marginBottom:"0.75rem" }}>Loading dishes…</p>
+          <p style={{ color:"#94a3b8", fontSize:"0.78rem", marginBottom:"0.75rem" }}>Loading dishes…</p>
         ) : isUnset ? (
-          <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <div style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
             <span style={{ fontSize:"0.85rem", opacity:0.4 }}>📋</span>
-            <span style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.78rem" }}>Not specified — click Edit to set</span>
+            <span style={{ color:"#cbd5e1", fontSize:"0.78rem" }}>Not specified — click Edit to set</span>
           </div>
         ) : isSelfCater ? (
-          <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <div style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
             <span style={{ fontSize:"0.85rem", opacity:0.4 }}>👨‍🍳</span>
-            <span style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.78rem" }}>Self-catering</span>
+            <span style={{ color:"#cbd5e1", fontSize:"0.78rem" }}>Self-catering</span>
           </div>
         ) : (isOurMenu && !hasIds) ? (
-          <div style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <div style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:10, padding:"0.65rem 0.9rem", marginBottom:"0.75rem", display:"flex", alignItems:"center", gap:"0.5rem" }}>
             <span style={{ fontSize:"0.85rem", opacity:0.4 }}>🍽️</span>
-            <span style={{ color:"rgba(255,255,255,0.35)", fontSize:"0.78rem" }}>Our menu — click Edit to add dishes</span>
+            <span style={{ color:"#cbd5e1", fontSize:"0.78rem" }}>Our menu — click Edit to add dishes</span>
           </div>
         ) : dishes.length > 0 ? (
           <>
             {/* Compact summary — first 3 pills + "View All" if more */}
             <div
               onClick={() => setShowAll(true)}
-              style={{ cursor:"pointer", background:"rgba(255,255,255,0.03)", border:"1px solid rgba(167,139,250,0.15)", borderRadius:10, padding:"0.6rem 0.85rem", marginBottom:"0.75rem", transition:"all 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.borderColor="rgba(147,51,234,0.4)"}
-              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(167,139,250,0.15)"}
+              style={{ cursor:"pointer", background:"#1e2433", border:"1px solid rgba(99,102,241,0.15)", borderRadius:10, padding:"0.6rem 0.85rem", marginBottom:"0.75rem", transition:"all 0.15s" }}
+              onMouseEnter={e => e.currentTarget.style.borderColor="rgba(99,102,241,0.4)"}
+              onMouseLeave={e => e.currentTarget.style.borderColor="rgba(99,102,241,0.15)"}
             >
               <div style={{ display:"flex", flexWrap:"wrap", gap:"0.35rem", alignItems:"center" }}>
                 {dishes.slice(0, 4).map(d => (
-                  <span key={d._id} style={{ background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:999, padding:"2px 10px", color:"rgba(255,255,255,0.82)", fontSize:"0.72rem", fontWeight:500 }}>
+                  <span key={d._id} style={{ background:"#252d3d", border:"1px solid rgba(255,255,255,0.1)", borderRadius:999, padding:"2px 10px", color:"rgba(255,255,255,0.82)", fontSize:"0.72rem", fontWeight:500 }}>
                     {d.name}
                   </span>
                 ))}
                 {dishes.length > 4 && (
-                  <span style={{ background:"rgba(147,51,234,0.2)", border:"1px solid rgba(147,51,234,0.35)", borderRadius:999, padding:"2px 10px", color:"#c084fc", fontSize:"0.72rem", fontWeight:600 }}>
+                  <span style={{ background:"rgba(99,102,241,0.2)", border:"1px solid rgba(99,102,241,0.35)", borderRadius:999, padding:"2px 10px", color:"#a5b4fc", fontSize:"0.72rem", fontWeight:600 }}>
                     +{dishes.length - 4} more
                   </span>
                 )}
-                <span style={{ marginLeft:"auto", color:"rgba(167,139,250,0.5)", fontSize:"0.68rem" }}>tap to view all →</span>
+                <span style={{ marginLeft:"auto", color:"rgba(99,102,241,0.5)", fontSize:"0.68rem" }}>tap to view all →</span>
               </div>
             </div>
 
@@ -238,15 +238,15 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
                 onClick={e => e.target === e.currentTarget && setShowAll(false)}
                 style={{ position:"fixed", inset:0, zIndex:600, background:"rgba(4,3,14,0.8)", backdropFilter:"blur(6px)", display:"flex", alignItems:"center", justifyContent:"center", padding:"1rem" }}
               >
-                <div style={{ width:"100%", maxWidth:460, borderRadius:20, background:"linear-gradient(145deg,#13093e,#0d0726)", border:"1px solid rgba(147,51,234,0.3)", overflow:"hidden", boxShadow:"0 40px 80px rgba(0,0,0,0.7)" }}>
+                <div style={{ width:"100%", maxWidth:460, borderRadius:20, background:"linear-gradient(145deg,#13093e,#1e2433)", border:"1px solid rgba(99,102,241,0.3)", overflow:"hidden", boxShadow:"0 40px 80px rgba(0,0,0,0.7)" }}>
                   {/* Header */}
-                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.1rem 1.3rem", borderBottom:"1px solid rgba(255,255,255,0.06)" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"1.1rem 1.3rem", borderBottom:"1px solid #1e2433" }}>
                     <div>
                       <p style={{ color:"white", fontWeight:600, fontSize:"0.95rem", margin:"0 0 2px" }}>Selected Menu</p>
-                      <p style={{ color:"rgba(192,132,252,0.6)", fontSize:"0.72rem", margin:0 }}>{dishes.length} dish{dishes.length !== 1 ? "es" : ""} selected</p>
+                      <p style={{ color:"#94a3b8", fontSize:"0.72rem", margin:0 }}>{dishes.length} dish{dishes.length !== 1 ? "es" : ""} selected</p>
                     </div>
                     <button onClick={() => setShowAll(false)}
-                      style={{ width:30, height:30, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", background:"rgba(255,255,255,0.05)", color:"rgba(255,255,255,0.5)", fontSize:"0.9rem", cursor:"pointer" }}>✕</button>
+                      style={{ width:30, height:30, borderRadius:8, border:"1px solid rgba(255,255,255,0.1)", background:"#252d3d", color:"#cbd5e1", fontSize:"0.9rem", cursor:"pointer" }}>✕</button>
                   </div>
                   {/* Grouped dishes */}
                   <div style={{ padding:"1rem 1.3rem", maxHeight:"60vh", overflowY:"auto" }}>
@@ -271,9 +271,9 @@ function SelectedDishesSection({ bookingId, dishIds, cateringOption, onDishesUpd
                       );
                     })}
                   </div>
-                  <div style={{ padding:"0.75rem 1.3rem", borderTop:"1px solid rgba(255,255,255,0.05)", textAlign:"right" }}>
+                  <div style={{ padding:"0.75rem 1.3rem", borderTop:"1px solid #252d3d", textAlign:"right" }}>
                     <button onClick={() => setShowAll(false)}
-                      style={{ padding:"0.45rem 1.2rem", borderRadius:9, border:"1px solid rgba(147,51,234,0.3)", background:"rgba(124,58,237,0.15)", color:"#c084fc", fontSize:"0.82rem", fontWeight:600, cursor:"pointer" }}>
+                      style={{ padding:"0.45rem 1.2rem", borderRadius:9, border:"1px solid rgba(99,102,241,0.3)", background:"rgba(79,70,229,0.15)", color:"#a5b4fc", fontSize:"0.82rem", fontWeight:600, cursor:"pointer" }}>
                       Close
                     </button>
                   </div>
@@ -300,7 +300,7 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
   const st   = STATUS_CFG[displayStatus] || STATUS_CFG.Pending;
   const sc   = st.color;
   const slot = b.timeSlot;
-  const slotColor = slot ? (SLOT_COLOR[slot]||"#9333ea") : "#9333ea";
+  const slotColor = slot ? (SLOT_COLOR[slot]||"#6366f1") : "#6366f1";
 
   const handleConfirm = async () => {
     setConfirming(true);
@@ -323,7 +323,7 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
         @keyframes fadeIn{from{opacity:0}to{opacity:1}}
         @keyframes slideUp{from{opacity:0;transform:translateY(20px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}
         .bdm-scroll::-webkit-scrollbar{width:3px}
-        .bdm-scroll::-webkit-scrollbar-thumb{background:rgba(147,51,234,0.3);border-radius:2px}
+        .bdm-scroll::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.3);border-radius:2px}
         @media(max-width:520px){
           .bdm-hero{padding:1.1rem 1.1rem 0!important}
           .bdm-grid{grid-template-columns:1fr!important;padding:0 1.1rem!important}
@@ -339,9 +339,9 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
 
       <div className="bdm-scroll" style={{
         width:"100%", maxWidth:520, maxHeight:"92vh", overflowY:"auto", minWidth:0,
-        borderRadius:24, background:"linear-gradient(160deg,#13093e,#0d0726)",
-        border:"1px solid rgba(147,51,234,0.25)",
-        boxShadow:"0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(147,51,234,0.1)",
+        borderRadius:24, background:"linear-gradient(160deg,#13093e,#1e2433)",
+        border:"1px solid rgba(99,102,241,0.25)",
+        boxShadow:"0 40px 100px rgba(0,0,0,0.75), 0 0 0 1px rgba(99,102,241,0.1)",
         animation:"slideUp 0.22s ease",
       }}>
 
@@ -352,12 +352,12 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
         <div className="bdm-hero" style={{ padding:"1.6rem 1.7rem 0" }}>
           <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"1.2rem" }}>
             <div style={{ flex:1, minWidth:0 }}>
-              <h3 className="bdm-name" style={{ fontFamily:"'Cormorant Garamond',serif", color:"white", fontSize:"1.65rem", fontWeight:700, margin:"0 0 6px", lineHeight:1.1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
+              <h3 className="bdm-name" style={{ fontFamily:"'Sora',sans-serif", color:"white", fontSize:"1.65rem", fontWeight:700, margin:"0 0 6px", lineHeight:1.1, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>
                 {b.clientName}
               </h3>
               <div style={{ display:"flex", gap:"0.4rem", flexWrap:"wrap", alignItems:"center" }}>
                 {b.bookingRef&&(
-                  <span style={{ background:"rgba(147,51,234,0.16)", border:"1px solid rgba(147,51,234,0.35)", borderRadius:999, padding:"2px 10px", color:"rgba(192,132,252,0.9)", fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.07em", fontFamily:"'Courier New',monospace" }}>
+                  <span style={{ background:"rgba(99,102,241,0.16)", border:"1px solid rgba(99,102,241,0.35)", borderRadius:999, padding:"2px 10px", color:"#a5b4fc", fontSize:"0.68rem", fontWeight:700, letterSpacing:"0.07em", fontFamily:"'Courier New',monospace" }}>
                     {b.bookingRef}
                   </span>
                 )}
@@ -367,7 +367,7 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
                   </span>
                 )}
                 {b.eventType&&(
-                  <span style={{ background:"rgba(255,255,255,0.06)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:999, padding:"2px 9px", color:"rgba(255,255,255,0.5)", fontSize:"0.68rem" }}>
+                  <span style={{ background:"#1e2433", border:"1px solid rgba(255,255,255,0.1)", borderRadius:999, padding:"2px 9px", color:"#cbd5e1", fontSize:"0.68rem" }}>
                     {b.eventType}
                   </span>
                 )}
@@ -375,9 +375,9 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
             </div>
 
             <button onClick={onClose}
-              style={{ width:34, height:34, borderRadius:10, border:"1px solid rgba(255,255,255,0.09)", background:"rgba(255,255,255,0.05)", color:"rgba(255,255,255,0.45)", fontSize:"1rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginLeft:"0.75rem", transition:"all 0.15s" }}
+              style={{ width:34, height:34, borderRadius:10, border:"1px solid rgba(255,255,255,0.09)", background:"#252d3d", color:"#94a3b8", fontSize:"1rem", cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, marginLeft:"0.75rem", transition:"all 0.15s" }}
               onMouseEnter={e=>{e.currentTarget.style.background="rgba(255,255,255,0.12)";e.currentTarget.style.color="white";}}
-              onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.05)";e.currentTarget.style.color="rgba(255,255,255,0.45)";}}>✕</button>
+              onMouseLeave={e=>{e.currentTarget.style.background="#252d3d";e.currentTarget.style.color="#94a3b8";}}>✕</button>
           </div>
 
           {/* ── Status banner ── */}
@@ -391,7 +391,7 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
             </div>
             <div className="bdm-status-right" style={{ textAlign:"right", flexShrink:0 }}>
               <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.6rem", margin:"0 0 2px", letterSpacing:"0.06em" }}>TOTAL</p>
-              <p style={{ color:"#c084fc", fontWeight:800, fontSize:"1.05rem", margin:0 }}>PKR {b.totalPrice?.toLocaleString()}</p>
+              <p style={{ color:"#a5b4fc", fontWeight:800, fontSize:"1.05rem", margin:0 }}>PKR {b.totalPrice?.toLocaleString()}</p>
             </div>
           </div>
         </div>
@@ -404,7 +404,7 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
             { icon:"🏛️", label:"Hall",         value:b.hallId?.name||"—" },
             { icon:"🎉", label:"Event Type",   value:b.eventType||"—" },
           ].map(({icon,label,value})=>(
-            <div key={label} style={{ background:"rgba(255,255,255,0.03)", border:"1px solid rgba(255,255,255,0.07)", borderRadius:12, padding:"0.75rem 0.85rem" }}>
+            <div key={label} style={{ background:"#1e2433", border:"1px solid #252d3d", borderRadius:12, padding:"0.75rem 0.85rem" }}>
               <p style={{ color:"rgba(255,255,255,0.3)", fontSize:"0.65rem", margin:"0 0 3px", textTransform:"uppercase", letterSpacing:"0.07em" }}>{icon} {label}</p>
               <p style={{ color:"rgba(255,255,255,0.88)", fontSize:"0.82rem", fontWeight:600, margin:0, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{value}</p>
             </div>
@@ -418,12 +418,12 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
           <InfoRow icon="💳" label="Payment"      value={b.paymentMethod||"—"} />
           <InfoRow icon="🔖" label="Transaction"  value={b.transactionId||"—"} mono />
           {b.specialRequests&&b.specialRequests!=="None"&&(
-            <div style={{ padding:"0.7rem 0", borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
+            <div style={{ padding:"0.7rem 0", borderBottom:"1px solid #252d3d" }}>
               <div style={{ display:"flex", alignItems:"center", gap:"0.55rem", marginBottom:"0.35rem" }}>
                 <span style={{ fontSize:"0.85rem", opacity:0.6 }}>💬</span>
                 <span style={{ color:"rgba(255,255,255,0.32)", fontSize:"0.78rem", fontWeight:500 }}>Special Requests</span>
               </div>
-              <p style={{ color:"rgba(255,255,255,0.7)", fontSize:"0.8rem", margin:0, lineHeight:1.6, paddingLeft:"1.55rem" }}>{b.specialRequests}</p>
+              <p style={{ color:"#cbd5e1", fontSize:"0.8rem", margin:0, lineHeight:1.6, paddingLeft:"1.55rem" }}>{b.specialRequests}</p>
             </div>
           )}
         </div>
@@ -459,9 +459,9 @@ export default function BookingDetailModal({ booking:b, onClose, onStatusChange 
             </button>
           )}
           <button onClick={onClose}
-            style={{ padding:"0.55rem 1.1rem", borderRadius:11, border:"1px solid rgba(139,92,246,0.25)", background:"transparent", color:"rgba(192,132,252,0.7)", fontSize:"0.82rem", fontWeight:600, cursor:"pointer", transition:"all 0.15s" }}
-            onMouseEnter={e=>{e.currentTarget.style.background="rgba(109,40,217,0.15)";e.currentTarget.style.color="#c084fc";}}
-            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="rgba(192,132,252,0.7)";}}>
+            style={{ padding:"0.55rem 1.1rem", borderRadius:11, border:"1px solid rgba(99,102,241,0.25)", background:"transparent", color:"#94a3b8", fontSize:"0.82rem", fontWeight:600, cursor:"pointer", transition:"all 0.15s" }}
+            onMouseEnter={e=>{e.currentTarget.style.background="rgba(79,70,229,0.15)";e.currentTarget.style.color="#a5b4fc";}}
+            onMouseLeave={e=>{e.currentTarget.style.background="transparent";e.currentTarget.style.color="#94a3b8";}}>
             Close
           </button>
         </div>
